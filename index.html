@@ -4,49 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carrier Pigeon AI — Demo Gallery</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%230c0c0d'/><g fill='%23f1f1ef'><rect x='17.5' y='8.7' width='8' height='8' rx='0.8'/><rect x='26.2' y='8.7' width='8' height='8' rx='0.8'/><rect x='60' y='8.7' width='8' height='8' rx='0.8'/><rect x='68.7' y='8.7' width='8' height='8' rx='0.8'/><rect x='8.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='17.5' y='17.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='35' y='17.5' width='8' height='8' rx='0.8'/><rect x='60' y='17.5' width='8' height='8' rx='0.8'/><rect x='68.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='86.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='26.2' width='8' height='8' rx='0.8'/><rect x='35' y='26.2' width='8' height='8' rx='0.8'/><rect x='43.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='52.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='60' y='26.2' width='8' height='8' rx='0.8'/><rect x='68.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='77.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='35' width='8' height='8' rx='0.8'/><rect x='35' y='35' width='8' height='8' rx='0.8'/><rect x='43.7' y='35' width='8' height='8' rx='0.8'/><rect x='52.5' y='35' width='8' height='8' rx='0.8'/><rect x='60' y='35' width='8' height='8' rx='0.8'/><rect x='68.7' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='43.7' width='8' height='8' rx='0.8'/><rect x='35' y='43.7' width='8' height='8' rx='0.8'/><rect x='43.7' y='43.7' width='8' height='8' rx='0.8'/><rect x='52.5' y='43.7' width='8' height='8' rx='0.8'/><rect x='60' y='43.7' width='8' height='8' rx='0.8'/><rect x='17.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='52.5' width='8' height='8' rx='0.8'/><rect x='35' y='52.5' width='8' height='8' rx='0.8'/><rect x='43.7' y='52.5' width='8' height='8' rx='0.8'/><rect x='52.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='61.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='61.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='61.2' width='8' height='8' rx='0.8'/><rect x='35' y='61.2' width='8' height='8' rx='0.8'/><rect x='0' y='70' width='8' height='8' rx='0.8'/><rect x='8.7' y='70' width='8' height='8' rx='0.8'/></g><rect x='77.5' y='17.5' width='8' height='8' rx='0.8' fill='%239bff5b'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --ink:       #0e0e0d;
-    --ink-2:     #3a3a37;
-    --ink-3:     #7a7a74;
-    --ink-4:     #b0b0a8;
-    --surface:   #ffffff;
-    --bg:        #f7f6f2;
-    --border:    rgba(14,14,13,0.1);
-    --border-2:  rgba(14,14,13,0.06);
-    --accent:    #1a5cff;
-    --accent-bg: rgba(26,92,255,0.07);
-    --live-dot:  #16a34a;
-    --coming:    #94a3b8;
+    --ink:     #0c0c0d;
+    --ink-2:   #1a1a1c;
+    --ink-3:   #2a2a2d;
+    --paper:   #f1f1ef;
+    --paper-2: #e7e5dd;
+    --muted:   #7a7a76;
+    --signal:  #9bff5b;
+
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-sans);
     font-size: 15px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: var(--signal); }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
 
   /* ── NAV ── */
   nav {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(247,246,242,0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(12,12,13,0.78);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--ink-3);
     padding: 0 24px;
-    height: 56px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -55,61 +60,55 @@
   .nav-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     text-decoration: none;
   }
 
-  .nav-mark {
-    width: 28px;
-    height: 28px;
-    background: var(--ink);
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .nav-mark svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-mark { display: block; flex: 0 0 auto; }
 
   .nav-wordmark {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    letter-spacing: -0.01em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--paper);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
   }
 
   .nav-cta {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--ink-3);
-    text-decoration: none;
-    border: 1px solid var(--border);
-    padding: 6px 14px;
-    border-radius: 6px;
-    transition: all 0.15s;
-  }
-
-  .nav-cta:hover { background: var(--surface); color: var(--ink); border-color: rgba(14,14,13,0.2); }
-
-  /* ── HERO ── */
-  .hero {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 80px 24px 64px;
-  }
-
-  .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ink-3);
-    margin-bottom: 20px;
+    color: var(--paper);
+    text-decoration: none;
+    border: 1px solid var(--paper);
+    padding: 10px 16px;
+    transition: transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s;
+  }
+
+  .nav-cta:hover { background: var(--paper); color: var(--ink); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 88px 24px 64px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   .hero-eyebrow::before {
@@ -117,28 +116,29 @@
     display: inline-block;
     width: 24px;
     height: 1px;
-    background: var(--ink-4);
+    background: var(--signal);
   }
 
   .hero h1 {
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(2.6rem, 6vw, 4rem);
-    font-weight: 400;
-    line-height: 1.08;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+    line-height: 1.12;
     letter-spacing: -0.02em;
-    color: var(--ink);
+    color: var(--paper);
     margin-bottom: 20px;
-    max-width: 640px;
+    max-width: 680px;
   }
 
   .hero h1 em {
     font-style: italic;
-    color: var(--ink-2);
+    font-weight: 400;
+    color: var(--signal);
   }
 
   .hero-sub {
     font-size: 16px;
-    color: var(--ink-3);
+    color: var(--muted);
     font-weight: 300;
     max-width: 480px;
     line-height: 1.65;
@@ -149,102 +149,104 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
-    color: var(--ink-3);
+    color: var(--muted);
     text-decoration: none;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--ink-3);
     padding-bottom: 2px;
     transition: color 0.15s, border-color 0.15s;
   }
 
-  .hero-contact:hover { color: var(--accent); border-color: var(--accent); }
+  .hero-contact:hover { color: var(--signal); border-color: var(--signal); }
 
   /* ── FILTER BAR ── */
   .filter-bar {
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto 32px;
     padding: 0 24px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
   .filter-label {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--ink-4);
-    letter-spacing: 0.06em;
+    color: var(--muted);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     margin-right: 4px;
   }
 
   .filter-btn {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
-    letter-spacing: 0.03em;
-    padding: 5px 12px;
-    border-radius: 99px;
-    border: 1px solid var(--border);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 0;
+    border: 1px solid var(--ink-3);
     background: transparent;
-    color: var(--ink-3);
+    color: var(--muted);
     cursor: pointer;
     transition: all 0.15s;
   }
 
-  .filter-btn:hover { background: var(--surface); color: var(--ink); }
-  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .filter-btn:hover { border-color: var(--paper); color: var(--paper); }
+  .filter-btn.active { background: var(--signal); color: var(--ink); border-color: var(--signal); }
 
   /* ── GRID ── */
   .grid {
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto;
     padding: 0 24px 96px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    gap: 1px;
+    background: var(--ink-3);
+    border: 1px solid var(--ink-3);
   }
 
   /* ── CARD ── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
+    background: var(--ink);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    transition: background 0.18s;
     cursor: default;
   }
 
-  .card:not(.coming-soon):hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 36px rgba(14,14,13,0.08);
-    border-color: rgba(14,14,13,0.16);
-  }
+  .card:not(.coming-soon):hover { background: var(--ink-2); }
 
   .card-thumb {
-    height: 148px;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    border-bottom: 1px solid var(--ink-3);
+    background: var(--ink-2);
   }
 
   .card-thumb-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--ink);
+    border: 1px solid var(--ink-3);
   }
 
   .card-thumb-icon svg {
-    width: 26px;
-    height: 26px;
-    stroke: #fff;
+    width: 24px;
+    height: 24px;
+    stroke: var(--signal);
     fill: none;
     stroke-width: 1.75;
     stroke-linecap: round;
@@ -252,7 +254,7 @@
   }
 
   .card-body {
-    padding: 18px 20px 20px;
+    padding: 20px 22px 22px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -262,24 +264,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .card-tag {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--ink-4);
+    color: var(--muted);
   }
 
   .card-status {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-family: 'DM Mono', monospace;
+    gap: 6px;
+    font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .status-dot {
@@ -288,31 +291,31 @@
     border-radius: 50%;
   }
 
-  .status-live .status-dot { background: var(--live-dot); }
-  .status-live { color: var(--live-dot); }
-  .status-coming .status-dot { background: var(--coming); }
-  .status-coming { color: var(--coming); }
+  .status-live .status-dot { background: var(--signal); box-shadow: 0 0 6px var(--signal); }
+  .status-live { color: var(--signal); }
+  .status-coming .status-dot { background: var(--muted); }
+  .status-coming { color: var(--muted); }
 
   .card-title {
-    font-family: 'Instrument Serif', serif;
-    font-size: 1.35rem;
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--ink);
-    margin-bottom: 6px;
+    font-family: var(--font-sans);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--paper);
+    margin-bottom: 8px;
     letter-spacing: -0.01em;
   }
 
   .card-desc {
     font-size: 13px;
-    color: var(--ink-3);
-    line-height: 1.55;
+    color: var(--muted);
+    line-height: 1.6;
     font-weight: 300;
     flex: 1;
   }
 
   .card-footer {
-    padding: 0 20px 18px;
+    padding: 0 22px 22px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -321,19 +324,21 @@
   .btn-demo {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: var(--ink);
-    color: #fff;
+    gap: 8px;
+    background: transparent;
+    color: var(--paper);
     text-decoration: none;
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: opacity 0.15s;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid var(--paper);
+    transition: transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s;
   }
 
-  .btn-demo:hover { opacity: 0.82; }
+  .btn-demo:hover { background: var(--signal); color: var(--ink); border-color: var(--signal); transform: translateY(-1px); }
 
   .btn-demo svg {
     width: 12px;
@@ -348,31 +353,32 @@
   .btn-request {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: transparent;
-    color: var(--ink-3);
+    color: var(--muted);
     text-decoration: none;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid var(--ink-3);
     transition: all 0.15s;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
   }
 
-  .btn-request:hover { color: var(--ink); border-color: rgba(14,14,13,0.2); background: var(--bg); }
+  .btn-request:hover { color: var(--paper); border-color: var(--paper); }
 
-  .coming-soon .card-thumb { opacity: 0.45; }
-  .coming-soon .card-title { color: var(--ink-2); }
-  .coming-soon .card-desc { color: var(--ink-4); }
+  .coming-soon .card-thumb-icon svg { stroke: var(--muted); }
+  .coming-soon .card-title { color: var(--muted); }
+  .coming-soon .card-desc { color: #55554f; }
 
   /* ── FOOTER ── */
   footer {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--ink-3);
     padding: 28px 24px;
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -382,17 +388,17 @@
   }
 
   .footer-note {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--ink-4);
-    letter-spacing: 0.03em;
+    color: var(--muted);
+    letter-spacing: 0.06em;
   }
 
-  .footer-note a { color: var(--ink-3); text-decoration: none; }
-  .footer-note a:hover { color: var(--ink); }
+  .footer-note a { color: var(--muted); text-decoration: none; }
+  .footer-note a:hover { color: var(--signal); }
 
   @media (max-width: 560px) {
-    .hero h1 { font-size: 2.2rem; }
+    .hero h1 { font-size: 2.1rem; }
     .grid { grid-template-columns: 1fr; }
     nav { padding: 0 16px; }
     .hero, .filter-bar, .grid { padding-left: 16px; padding-right: 16px; }
@@ -403,19 +409,29 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="/">
-    <div class="nav-mark">
-      <svg viewBox="0 0 16 16"><path d="M2 10 C4 6, 8 4, 14 5"/><path d="M14 5 L11 3 M14 5 L12 8"/></svg>
-    </div>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="28" height="28" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#f1f1ef">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#9bff5b"/>
+    </svg>
     <span class="nav-wordmark">Carrier Pigeon AI</span>
   </a>
-  <a class="nav-cta" href="mailto:andrew@carrierpigeonai.dev">get in touch</a>
+  <a class="nav-cta" href="mailto:andrew@carrierpigeonai.dev">Send a Pigeon</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">Demo gallery</div>
-  <h1>Web tools built for<br><em>local businesses</em></h1>
+  <h1>Web tools built for <em>local businesses</em></h1>
   <p class="hero-sub">Every app here is a real, working prototype — built for the kinds of businesses that keep Lafayette running. Each one can be customized and live in days.</p>
   <a class="hero-contact" href="mailto:andrew@carrierpigeonai.dev">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>
@@ -425,7 +441,7 @@
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <span class="filter-label">filter</span>
+  <span class="filter-label">Filter</span>
   <button class="filter-btn active" data-filter="all" onclick="filterCards(this, 'all')">All</button>
   <button class="filter-btn" data-filter="live" onclick="filterCards(this, 'live')">Live demos</button>
   <button class="filter-btn" data-filter="booking" onclick="filterCards(this, 'booking')">Booking</button>
@@ -439,8 +455,8 @@
 
   <!-- LIVE: Appointment Scheduler -->
   <div class="card" data-categories="live booking">
-    <div class="card-thumb" style="background: linear-gradient(135deg, #e8f5f0 0%, #d1ede4 100%);">
-      <div class="card-thumb-icon" style="background: #1D9E75;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
       </div>
     </div>
@@ -462,8 +478,8 @@
 
   <!-- LIVE: Invoice Generator -->
   <div class="card" data-categories="live finance">
-    <div class="card-thumb" style="background: linear-gradient(135deg, #e8f0fa 0%, #cfe0f5 100%);">
-      <div class="card-thumb-icon" style="background: #378ADD;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/></svg>
       </div>
     </div>
@@ -485,8 +501,8 @@
 
   <!-- LIVE: Open Today -->
   <div class="card" data-categories="live marketing operations">
-    <div class="card-thumb" style="background: linear-gradient(135deg, #fef3e2 0%, #fde8c0 100%);">
-      <div class="card-thumb-icon" style="background: #EF9F27;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       </div>
     </div>
@@ -508,8 +524,8 @@
 
   <!-- COMING: Digital Waitlist -->
   <div class="card coming-soon" data-categories="booking operations">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
     </div>
@@ -528,8 +544,8 @@
 
   <!-- COMING: Feedback Collector -->
   <div class="card coming-soon" data-categories="marketing">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
     </div>
@@ -548,8 +564,8 @@
 
   <!-- COMING: Loyalty Punch Card -->
   <div class="card coming-soon" data-categories="marketing operations">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </div>
     </div>
@@ -568,8 +584,8 @@
 
   <!-- COMING: Promotion Builder -->
   <div class="card coming-soon" data-categories="marketing">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
     </div>
@@ -588,8 +604,8 @@
 
   <!-- COMING: Expense Tracker -->
   <div class="card coming-soon" data-categories="finance operations">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
     </div>
@@ -608,8 +624,8 @@
 
   <!-- COMING: Tip Calculator -->
   <div class="card coming-soon" data-categories="finance operations">
-    <div class="card-thumb" style="background: #f5f5f3;">
-      <div class="card-thumb-icon" style="background: #c8c8c2;">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h10M7 12h5"/></svg>
       </div>
     </div>
