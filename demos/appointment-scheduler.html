@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Appointment Scheduler — Carrier Pigeon AI Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --green: #1D9E75; --green-light: #E1F5EE; --green-dark: #0F6E56; --red-light: #FCEBEB; --red: #E24B4A; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
@@ -69,13 +69,15 @@
   .confirm-icon svg { width: 28px; height: 28px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .screen { display: none; }
   .screen.active { display: block; }
-  .demo-bar { background: var(--ink); color: rgba(255,255,255,0.7); text-align: center; font-size: 12px; padding: 8px; letter-spacing: 0.04em; }
-  .demo-bar a { color: #fff; text-decoration: none; font-weight: 500; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
 </style>
 </head>
 <body>
 
-<div class="demo-bar">Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a> — want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
 
 <nav>
   <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>

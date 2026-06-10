@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open Today? — Carrier Pigeon AI Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --amber: #EF9F27; --amber-light: #faeeda; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); --green: #16a34a; --red: #dc2626; }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: var(--ink); color: rgba(255,255,255,0.7); text-align: center; font-size: 12px; padding: 8px; letter-spacing: 0.04em; }
-  .demo-bar a { color: #fff; text-decoration: none; font-weight: 500; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
   nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
   .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
   .nav-back:hover { color: var(--ink); }
@@ -70,7 +72,7 @@
 </head>
 <body>
 
-<div class="demo-bar">Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a> — want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
 
 <nav>
   <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
