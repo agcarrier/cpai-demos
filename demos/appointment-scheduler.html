@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Scheduler — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --green: #1D9E75; --green-light: #E1F5EE; --green-dark: #0F6E56; --red-light: #FCEBEB; --red: #E24B4A; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--green-light); color: var(--green-dark); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .app { max-width: 480px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .brand-name { font-size: 16px; font-weight: 500; }
+  .brand-sub { font-size: 12px; color: var(--ink-3); }
+  .stepper { display: flex; gap: 6px; margin-bottom: 2rem; }
+  .step-dot { height: 3px; flex: 1; border-radius: 99px; background: var(--border); transition: background 0.2s; }
+  .step-dot.done { background: var(--green); }
+  .step-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 6px; }
+  .section-title { font-size: 20px; font-weight: 500; margin-bottom: 1.25rem; }
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .cal-month { font-size: 15px; font-weight: 500; }
+  .cal-nav { background: none; border: 1px solid var(--border); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-3); }
+  .cal-nav:hover { background: var(--surface); }
+  .cal-nav svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow { font-size: 11px; color: var(--ink-4); text-align: center; padding: 4px 0 8px; }
+  .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; }
+  .cal-day:hover:not(.empty):not(.past) { background: #f0f0ec; }
+  .cal-day.past { color: var(--ink-4); cursor: default; }
+  .cal-day.empty { cursor: default; }
+  .cal-day.today { font-weight: 600; color: var(--green); }
+  .cal-day.selected { background: var(--green); color: #fff; font-weight: 500; }
+  .cal-day.has-slots { position: relative; }
+  .cal-day.has-slots::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--green); }
+  .cal-day.selected::after { background: rgba(255,255,255,0.6); }
+  .selected-date-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f0f0ec; border-radius: 8px; margin-bottom: 1rem; font-size: 13px; }
+  .selected-date-bar .date-label { font-weight: 500; }
+  .selected-date-bar button { background: none; border: none; font-size: 12px; color: var(--green); cursor: pointer; }
+  .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .slot { padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--surface); transition: all 0.12s; }
+  .slot:hover { border-color: var(--green); color: var(--green); }
+  .slot.selected { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+  .slot.booked { color: var(--ink-4); border-color: rgba(14,14,13,0.06); cursor: not-allowed; text-decoration: line-through; }
+  .form-row { margin-bottom: 1rem; }
+  .form-label { font-size: 13px; color: var(--ink-3); margin-bottom: 6px; display: block; }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--surface); color: var(--ink); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--green); }
+  .form-row textarea { resize: none; height: 72px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .btn-primary { width: 100%; padding: 12px; background: var(--green); border: none; border-radius: 9px; color: #fff; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.12s; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-ghost { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 9px 16px; font-size: 13px; color: var(--ink-3); cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 6px; }
+  .btn-ghost svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .summary-card { background: #f0f0ec; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+  .summary-row .label { color: var(--ink-3); }
+  .summary-row .value { font-weight: 500; }
+  .confirm-icon { width: 56px; height: 56px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+  .confirm-icon svg { width: 28px; height: 28px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .demo-bar { background: var(--ink); color: rgba(255,255,255,0.7); text-align: center; font-size: 12px; padding: 8px; letter-spacing: 0.04em; }
+  .demo-bar a { color: #fff; text-decoration: none; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="demo-bar">Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a> — want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="app">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Book an appointment</div>
+      <div class="brand-sub">Sunrise Hair Studio</div>
+    </div>
+  </div>
+
+  <div class="stepper" id="stepper">
+    <div class="step-dot done" id="dot0"></div>
+    <div class="step-dot" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+  </div>
+
+  <div class="screen active" id="screen-date">
+    <div class="step-label">Step 1 of 3</div>
+    <div class="section-title">Pick a date</div>
+    <div class="cal-header">
+      <button class="cal-nav" id="prev-month"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg></button>
+      <span class="cal-month" id="cal-month-label"></span>
+      <button class="cal-nav" id="next-month"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <div class="screen" id="screen-time">
+    <div class="step-label">Step 2 of 3</div>
+    <div class="section-title">Pick a time</div>
+    <div class="selected-date-bar">
+      <span class="date-label" id="selected-date-label"></span>
+      <button onclick="goTo('date')">Change</button>
+    </div>
+    <div class="slots-grid" id="slots-grid"></div>
+    <div class="divider"></div>
+    <button class="btn-primary" id="btn-to-details" disabled onclick="goTo('details')">Continue</button>
+  </div>
+
+  <div class="screen" id="screen-details">
+    <div class="step-label">Step 3 of 3</div>
+    <div class="section-title">Your details</div>
+    <div class="form-row"><label class="form-label">Full name</label><input type="text" id="inp-name" placeholder="e.g. Maria Santos" oninput="checkForm()"></div>
+    <div class="form-row"><label class="form-label">Phone number</label><input type="tel" id="inp-phone" placeholder="(555) 000-0000" oninput="checkForm()"></div>
+    <div class="form-row"><label class="form-label">Service</label>
+      <select id="inp-service" onchange="checkForm()">
+        <option value="">Select a service…</option>
+        <option>Haircut & Style — $45</option>
+        <option>Color & Highlight — $95</option>
+        <option>Blowout — $35</option>
+        <option>Keratin Treatment — $120</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">Notes <span style="color:var(--ink-4);font-size:12px;">(optional)</span></label><textarea id="inp-notes" placeholder="Any special requests…"></textarea></div>
+    <div class="divider"></div>
+    <div class="summary-card">
+      <div class="summary-row"><span class="label">Date</span><span class="value" id="sum-date">—</span></div>
+      <div class="summary-row"><span class="label">Time</span><span class="value" id="sum-time">—</span></div>
+    </div>
+    <button class="btn-primary" id="btn-confirm" disabled onclick="confirm()">Confirm booking</button>
+    <div style="margin-top:10px;text-align:center;"><button class="btn-ghost" onclick="goTo('time')" style="display:inline-flex;"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg>Back</button></div>
+  </div>
+
+  <div class="screen" id="screen-confirm">
+    <div style="text-align:center;padding:1rem 0 2rem;">
+      <div class="confirm-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="section-title" style="margin-bottom:0.5rem;">You're booked!</div>
+      <p style="font-size:14px;color:var(--ink-3);margin-bottom:1.75rem;">We'll send a reminder the day before. See you soon!</p>
+      <div class="summary-card" style="text-align:left;">
+        <div class="summary-row"><span class="label">Name</span><span class="value" id="conf-name">—</span></div>
+        <div class="summary-row"><span class="label">Service</span><span class="value" id="conf-service">—</span></div>
+        <div class="summary-row"><span class="label">Date</span><span class="value" id="conf-date">—</span></div>
+        <div class="summary-row"><span class="label">Time</span><span class="value" id="conf-time">—</span></div>
+      </div>
+      <button class="btn-primary" onclick="reset()" style="margin-top:1rem;">Book another</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const TIMES=['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM'];
+const BOOKED={'2':'10:00 AM','5':'1:00 PM','12':'11:00 AM','18':'9:30 AM','22':'2:30 PM'};
+let viewYear,viewMonth,selDate=null,selTime=null;
+function init(){const now=new Date();viewYear=now.getFullYear();viewMonth=now.getMonth();renderCal();}
+function renderCal(){
+  document.getElementById('cal-month-label').textContent=MONTHS[viewMonth]+' '+viewYear;
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  DAYS.forEach(d=>{const el=document.createElement('div');el.className='cal-dow';el.textContent=d;grid.appendChild(el);});
+  const first=new Date(viewYear,viewMonth,1).getDay();
+  const days=new Date(viewYear,viewMonth+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=days;d++){
+    const el=document.createElement('div');el.className='cal-day';
+    const dt=new Date(viewYear,viewMonth,d);dt.setHours(0,0,0,0);
+    el.textContent=d;
+    if(dt<today)el.classList.add('past');
+    else{el.classList.add('has-slots');if(dt.getTime()===today.getTime())el.classList.add('today');if(selDate&&selDate.getTime()===dt.getTime())el.classList.add('selected');el.addEventListener('click',()=>pickDate(dt,d));}
+    grid.appendChild(el);
+  }
+}
+function pickDate(dt,d){selDate=dt;selTime=null;renderCal();const label=MONTHS[dt.getMonth()]+' '+d+', '+dt.getFullYear();document.getElementById('selected-date-label').textContent=label;document.getElementById('sum-date').textContent=label;document.getElementById('conf-date').textContent=label;renderSlots(d);goTo('time');}
+function renderSlots(d){const grid=document.getElementById('slots-grid');grid.innerHTML='';const booked=BOOKED[String(d%30)]||null;TIMES.forEach(t=>{const el=document.createElement('div');el.className='slot';el.textContent=t;if(t===booked){el.classList.add('booked');}else{el.addEventListener('click',()=>pickTime(t));}grid.appendChild(el);});}
+function pickTime(t){selTime=t;document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));document.querySelectorAll('.slot').forEach(s=>{if(s.textContent===t&&!s.classList.contains('booked'))s.classList.add('selected');});document.getElementById('sum-time').textContent=t;document.getElementById('conf-time').textContent=t;document.getElementById('btn-to-details').disabled=false;}
+function checkForm(){const ok=document.getElementById('inp-name').value.trim()&&document.getElementById('inp-phone').value.trim()&&document.getElementById('inp-service').value;document.getElementById('btn-confirm').disabled=!ok;}
+function confirm(){document.getElementById('conf-name').textContent=document.getElementById('inp-name').value.trim();document.getElementById('conf-service').textContent=document.getElementById('inp-service').value;goTo('confirm');}
+function goTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+screen).classList.add('active');const steps={date:0,time:1,details:2,confirm:3};const idx=steps[screen]||0;[0,1,2].forEach(i=>{document.getElementById('dot'+i).classList.toggle('done',i<=idx);});}
+function reset(){selDate=null;selTime=null;['inp-name','inp-phone','inp-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('inp-service').value='';document.getElementById('btn-confirm').disabled=true;goTo('date');renderCal();}
+document.getElementById('prev-month').addEventListener('click',()=>{viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}renderCal();});
+document.getElementById('next-month').addEventListener('click',()=>{viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}renderCal();});
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrier Pigeon AI — Demo Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0e0e0d;
+    --ink-2:     #3a3a37;
+    --ink-3:     #7a7a74;
+    --ink-4:     #b0b0a8;
+    --surface:   #ffffff;
+    --bg:        #f7f6f2;
+    --border:    rgba(14,14,13,0.1);
+    --border-2:  rgba(14,14,13,0.06);
+    --accent:    #1a5cff;
+    --accent-bg: rgba(26,92,255,0.07);
+    --live-dot:  #16a34a;
+    --coming:    #94a3b8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247,246,242,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--ink);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-mark svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .nav-wordmark {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .nav-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .nav-cta:hover { background: var(--surface); color: var(--ink); border-color: rgba(14,14,13,0.2); }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 24px 64px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--ink-4);
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+    max-width: 640px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--ink-2);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--ink-3);
+    font-weight: 300;
+    max-width: 480px;
+    line-height: 1.65;
+    margin-bottom: 36px;
+  }
+
+  .hero-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .hero-contact:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    max-width: 860px;
+    margin: 0 auto 32px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-4);
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { background: var(--surface); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ── GRID ── */
+  .grid {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    cursor: default;
+  }
+
+  .card:not(.coming-soon):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(14,14,13,0.08);
+    border-color: rgba(14,14,13,0.16);
+  }
+
+  .card-thumb {
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-thumb-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-thumb-icon svg {
+    width: 26px;
+    height: 26px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .card-body {
+    padding: 18px 20px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-live .status-dot { background: var(--live-dot); }
+  .status-live { color: var(--live-dot); }
+  .status-coming .status-dot { background: var(--coming); }
+  .status-coming { color: var(--coming); }
+
+  .card-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.55;
+    font-weight: 300;
+    flex: 1;
+  }
+
+  .card-footer {
+    padding: 0 20px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ink);
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: opacity 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-demo:hover { opacity: 0.82; }
+
+  .btn-demo svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-request {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--ink-3);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-request:hover { color: var(--ink); border-color: rgba(14,14,13,0.2); background: var(--bg); }
+
+  .coming-soon .card-thumb { opacity: 0.45; }
+  .coming-soon .card-title { color: var(--ink-2); }
+  .coming-soon .card-desc { color: var(--ink-4); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 24px;
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-4);
+    letter-spacing: 0.03em;
+  }
+
+  .footer-note a { color: var(--ink-3); text-decoration: none; }
+  .footer-note a:hover { color: var(--ink); }
+
+  @media (max-width: 560px) {
+    .hero h1 { font-size: 2.2rem; }
+    .grid { grid-template-columns: 1fr; }
+    nav { padding: 0 16px; }
+    .hero, .filter-bar, .grid { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-mark">
+      <svg viewBox="0 0 16 16"><path d="M2 10 C4 6, 8 4, 14 5"/><path d="M14 5 L11 3 M14 5 L12 8"/></svg>
+    </div>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <a class="nav-cta" href="mailto:andrew@carrierpigeonai.dev">get in touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Demo gallery</div>
+  <h1>Web tools built for<br><em>local businesses</em></h1>
+  <p class="hero-sub">Every app here is a real, working prototype — built for the kinds of businesses that keep Lafayette running. Each one can be customized and live in days.</p>
+  <a class="hero-contact" href="mailto:andrew@carrierpigeonai.dev">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>
+    andrew@carrierpigeonai.dev
+  </a>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">filter</span>
+  <button class="filter-btn active" data-filter="all" onclick="filterCards(this, 'all')">All</button>
+  <button class="filter-btn" data-filter="live" onclick="filterCards(this, 'live')">Live demos</button>
+  <button class="filter-btn" data-filter="booking" onclick="filterCards(this, 'booking')">Booking</button>
+  <button class="filter-btn" data-filter="finance" onclick="filterCards(this, 'finance')">Finance</button>
+  <button class="filter-btn" data-filter="marketing" onclick="filterCards(this, 'marketing')">Marketing</button>
+  <button class="filter-btn" data-filter="operations" onclick="filterCards(this, 'operations')">Operations</button>
+</div>
+
+<!-- GRID -->
+<main class="grid" id="card-grid">
+
+  <!-- LIVE: Appointment Scheduler -->
+  <div class="card" data-categories="live booking">
+    <div class="card-thumb" style="background: linear-gradient(135deg, #e8f5f0 0%, #d1ede4 100%);">
+      <div class="card-thumb-icon" style="background: #1D9E75;">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Booking</span>
+        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+      </div>
+      <div class="card-title">Appointment scheduler</div>
+      <p class="card-desc">A clean 3-step booking flow — calendar, time slots, and customer details. Works for salons, groomers, consultants, and any service business.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/appointment-scheduler">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: Invoice Generator -->
+  <div class="card" data-categories="live finance">
+    <div class="card-thumb" style="background: linear-gradient(135deg, #e8f0fa 0%, #cfe0f5 100%);">
+      <div class="card-thumb-icon" style="background: #378ADD;">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Finance</span>
+        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+      </div>
+      <div class="card-title">Invoice generator</div>
+      <p class="card-desc">Fill in your client details, add line items, and print a clean PDF invoice. No accounting software needed — just open and go.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/invoice-generator">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: Open Today -->
+  <div class="card" data-categories="live marketing operations">
+    <div class="card-thumb" style="background: linear-gradient(135deg, #fef3e2 0%, #fde8c0 100%);">
+      <div class="card-thumb-icon" style="background: #EF9F27;">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+      </div>
+      <div class="card-title">"Open today?" page</div>
+      <p class="card-desc">A shareable link that shows your hours, live open/closed status, and today's special. Drop it in your Instagram bio and never miss a call about hours again.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/open-today">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- COMING: Digital Waitlist -->
+  <div class="card coming-soon" data-categories="booking operations">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Booking</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Digital waitlist</div>
+      <p class="card-desc">Customers join via QR code and get a text when it's their turn. No app download, no clipboard — built for barbershops, walk-in clinics, and restaurants.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Digital Waitlist">Request this</a>
+    </div>
+  </div>
+
+  <!-- COMING: Feedback Collector -->
+  <div class="card coming-soon" data-categories="marketing">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Review collector</div>
+      <p class="card-desc">Capture feedback after every visit and automatically nudge happy customers toward your Google or Yelp listing. Simple enough for any owner to manage.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Review Collector">Request this</a>
+    </div>
+  </div>
+
+  <!-- COMING: Loyalty Punch Card -->
+  <div class="card coming-soon" data-categories="marketing operations">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Loyalty punch card</div>
+      <p class="card-desc">A digital version of the paper punch card, tied to a phone number. No app download required — customers visit a link, you tap a button, they earn their reward.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Loyalty Punch Card">Request this</a>
+    </div>
+  </div>
+
+  <!-- COMING: Promotion Builder -->
+  <div class="card coming-soon" data-categories="marketing">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Promotion builder</div>
+      <p class="card-desc">Enter your deal, dates, and logo — get a shareable flyer image sized for Instagram, Facebook, and text. No Canva account, no design skills needed.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Promotion Builder">Request this</a>
+    </div>
+  </div>
+
+  <!-- COMING: Expense Tracker -->
+  <div class="card coming-soon" data-categories="finance operations">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Finance</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Expense tracker</div>
+      <p class="card-desc">A lightweight daily log for cash expenses, organized by category with a monthly summary. Built for owners who don't need QuickBooks — just visibility.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Expense Tracker">Request this</a>
+    </div>
+  </div>
+
+  <!-- COMING: Tip Calculator -->
+  <div class="card coming-soon" data-categories="finance operations">
+    <div class="card-thumb" style="background: #f5f5f3;">
+      <div class="card-thumb-icon" style="background: #c8c8c2;">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h10M7 12h5"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Operations</span>
+        <span class="card-status status-coming"><span class="status-dot"></span>Coming soon</span>
+      </div>
+      <div class="card-title">Tip calculator & splitter</div>
+      <p class="card-desc">Post a QR code at your tables or share with staff at end of night. Enter the total, split by hours worked or seat count, and everyone gets their number instantly.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-request" href="mailto:andrew@carrierpigeonai.dev?subject=Interested in: Tip Calculator">Request this</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-note">© 2026 Carrier Pigeon AI · Lafayette, LA · <a href="mailto:andrew@carrierpigeonai.dev">andrew@carrierpigeonai.dev</a></span>
+  <span class="footer-note"><a href="https://carrierpigeonai.dev">carrierpigeonai.dev</a></span>
+</footer>
+
+<script>
+function filterCards(btn, filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(card => {
+    const cats = card.dataset.categories || '';
+    const show = filter === 'all' || cats.includes(filter);
+    card.style.display = show ? '' : 'none';
+  });
+}
+</script>
+
+</body>
+</html>

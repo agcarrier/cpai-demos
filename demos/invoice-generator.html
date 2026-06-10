@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: var(--ink); color: rgba(255,255,255,0.7); text-align: center; font-size: 12px; padding: 8px; letter-spacing: 0.04em; }
+  .demo-bar a { color: #fff; text-decoration: none; font-weight: 500; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+  .btn-print { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 9px 16px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; }
+  .btn-print svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); }
+  .form-group textarea { resize: none; height: 56px; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin: 1.5rem 0 0.75rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .items-table th { font-size: 11px; color: var(--ink-4); text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+  .items-table th:last-child, .items-table td:last-child { text-align: right; }
+  .items-table td { padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .items-table tr:last-child td { border-bottom: none; }
+  .item-desc { width: 100%; border: none; background: transparent; font-size: 13px; color: var(--ink); font-family: 'Inter', sans-serif; padding: 0; outline: none; }
+  .item-num { width: 70px; border: 1px solid transparent; background: transparent; font-size: 13px; color: var(--ink); font-family: 'Inter', sans-serif; padding: 3px 4px; border-radius: 5px; text-align: right; outline: none; }
+  .item-num:focus { border-color: var(--border); }
+  .remove-btn { background: none; border: none; color: var(--ink-4); cursor: pointer; padding: 0 4px; font-size: 16px; line-height: 1; }
+  .remove-btn:hover { color: #E24B4A; }
+  .add-line { display: flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: 1px dashed var(--border); border-radius: 7px; padding: 8px 12px; color: var(--ink-3); font-size: 13px; cursor: pointer; width: 100%; font-family: 'Inter', sans-serif; }
+  .add-line:hover { background: var(--bg); }
+  .add-line svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .totals { margin-top: 1rem; }
+  .totals-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--ink-3); }
+  .totals-row.total { font-size: 16px; font-weight: 500; color: var(--ink); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+  .note-badge { font-size: 11px; color: var(--ink-4); background: var(--bg); border-radius: 5px; padding: 2px 7px; margin-left: 6px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+  @media print { .no-print { display: none !important; } .wrap { padding: 0; } nav, .demo-bar { display: none !important; } body { background: #fff; } .card { border: none; padding: 0; } }
+  @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } .page-header { flex-wrap: wrap; gap: 12px; } }
+</style>
+</head>
+<body>
+
+<div class="demo-bar no-print">Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a> — want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav class="no-print">
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div>
+      <div><h1>Invoice generator</h1><div class="page-sub">Fill in, then print or save as PDF</div></div>
+    </div>
+    <button class="btn-print no-print" onclick="window.print()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print / Save PDF</button>
+  </div>
+
+  <div class="two-col">
+    <div style="grid-column:1/-1"><div class="section-head">Your business</div></div>
+    <div class="form-group"><label>Business name</label><input type="text" id="biz-name" value="Sunrise Hair Studio" oninput="calcTotals()"></div>
+    <div class="form-group"><label>Your name</label><input type="text" id="biz-owner" value="Rosa Delgado" oninput="calcTotals()"></div>
+    <div class="form-group" style="grid-column:1/-1"><label>Address / contact</label><textarea id="biz-address">412 Oak Street, Lafayette, LA 70501
+(337) 555-0182 · rosa@sunrisehair.com</textarea></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="two-col">
+    <div style="grid-column:1/-1"><div class="section-head">Bill to</div></div>
+    <div class="form-group"><label>Client name</label><input type="text" id="client-name" value="Madeleine Thibodeaux"></div>
+    <div class="form-group"><label>Client email / phone</label><input type="text" id="client-contact" value="m.thibodeaux@email.com"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="two-col">
+    <div style="grid-column:1/-1"><div class="section-head">Invoice details</div></div>
+    <div class="form-group"><label>Invoice #</label><input type="text" id="inv-num" value="INV-2026-014"></div>
+    <div class="form-group"><label>Date issued</label><input type="date" id="inv-date"></div>
+    <div class="form-group"><label>Due date</label><input type="date" id="inv-due"></div>
+    <div class="form-group"><label>Tax rate (%)</label><input type="number" id="tax-rate" value="0" min="0" max="100" step="0.1" oninput="calcTotals()"></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-head no-print">Line items</div>
+  <div class="card">
+    <table class="items-table">
+      <thead><tr><th>Description</th><th style="text-align:right;width:64px;">Qty</th><th style="text-align:right;width:80px;">Price</th><th style="text-align:right;width:72px;">Total</th><th class="no-print" style="width:28px;"></th></tr></thead>
+      <tbody id="items-body"></tbody>
+    </table>
+    <button class="add-line no-print" onclick="addLine()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add line item</button>
+    <div class="totals">
+      <div class="totals-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+      <div class="totals-row"><span>Tax <span class="note-badge" id="tax-pct-label">0%</span></span><span id="tax-amt">$0.00</span></div>
+      <div class="totals-row total"><span>Total due</span><span id="grand-total">$0.00</span></div>
+    </div>
+  </div>
+  <div class="form-group no-print"><label>Notes / payment instructions</label><textarea id="inv-notes" placeholder="e.g. Please pay via Venmo @rosadelgado within 14 days. Thank you!"></textarea></div>
+</div>
+
+<script>
+let items=[{desc:'Color & Highlight',qty:1,price:95},{desc:'Blowout & Style',qty:1,price:45}];
+function fmt(n){return '$'+n.toFixed(2);}
+function renderItems(){
+  const body=document.getElementById('items-body');body.innerHTML='';
+  items.forEach((item,idx)=>{const tr=document.createElement('tr');tr.innerHTML=`<td><input class="item-desc" value="${item.desc}" oninput="items[${idx}].desc=this.value" placeholder="Service or product…"></td><td><input class="item-num" type="number" value="${item.qty}" min="1" step="1" oninput="items[${idx}].qty=parseFloat(this.value)||0;calcTotals();" style="width:56px;"></td><td><input class="item-num" type="number" value="${item.price}" min="0" step="0.01" oninput="items[${idx}].price=parseFloat(this.value)||0;calcTotals();" style="width:72px;"></td><td class="item-total" style="font-weight:500;min-width:64px;" id="it-${idx}">${fmt(item.qty*item.price)}</td><td class="no-print"><button class="remove-btn" onclick="removeLine(${idx})">×</button></td>`;body.appendChild(tr);});
+  calcTotals();
+}
+function calcTotals(){let sub=0;items.forEach((item,idx)=>{const t=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);sub+=t;const el=document.getElementById('it-'+idx);if(el)el.textContent=fmt(t);});const taxRate=parseFloat(document.getElementById('tax-rate').value)||0;const taxAmt=sub*taxRate/100;document.getElementById('subtotal').textContent=fmt(sub);document.getElementById('tax-amt').textContent=fmt(taxAmt);document.getElementById('grand-total').textContent=fmt(sub+taxAmt);document.getElementById('tax-pct-label').textContent=taxRate.toFixed(1)+'%';}
+function addLine(){items.push({desc:'',qty:1,price:0});renderItems();}
+function removeLine(idx){items.splice(idx,1);renderItems();}
+function setDates(){const today=new Date();const fmt2=d=>d.toISOString().split('T')[0];const due=new Date();due.setDate(today.getDate()+30);document.getElementById('inv-date').value=fmt2(today);document.getElementById('inv-due').value=fmt2(due);}
+setDates();renderItems();
+</script>
+</body>
+</html>
