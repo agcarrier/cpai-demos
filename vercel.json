@@ -5,6 +5,7 @@
     { "source": "/demos/open-today", "destination": "/demos/open-today.html" },
     { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" },
     { "source": "/demos/review-collector", "destination": "/demos/review-collector.html" },
-    { "source": "/demos/loyalty-punch-card", "destination": "/demos/loyalty-punch-card.html" }
+    { "source": "/demos/loyalty-punch-card", "destination": "/demos/loyalty-punch-card.html" },
+    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" }
   ]
 }

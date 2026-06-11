@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promotion Builder — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+
+  .columns { display: grid; grid-template-columns: 1fr 340px; gap: 1rem; align-items: start; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
+  .form-group input, .form-group textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
+  .form-group textarea { resize: none; height: 60px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .swatches { display: flex; gap: 8px; }
+  .swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
+  .swatch:hover { transform: scale(1.08); }
+  .swatch.active { border-color: var(--ink); }
+
+  .file-row { display: flex; align-items: center; gap: 10px; }
+  .file-row input[type=file] { font-size: 12px; flex: 1; }
+  .btn-clear { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-size: 11px; cursor: pointer; color: var(--ink-3); font-family: 'Inter', sans-serif; }
+  .btn-clear:hover { border-color: var(--ink-3); color: var(--ink); }
+
+  .preview-wrap { position: sticky; top: 72px; }
+  .preview-canvas-holder { width: 100%; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 1rem; background: #fff; }
+  .preview-canvas-holder canvas { width: 100%; height: 100%; display: block; }
+
+  .format-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .format-btn { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 8px; font-size: 11px; font-weight: 500; cursor: pointer; color: var(--ink-3); font-family: 'Inter', sans-serif; }
+  .format-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+  .btn-download { width: 100%; background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Inter', sans-serif; }
+  .btn-download:hover { opacity: 0.92; }
+  .btn-download svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  @media (max-width: 760px) { .columns { grid-template-columns: 1fr; } .preview-wrap { position: static; max-width: 420px; margin: 0 auto; } }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M11 2a2 2 0 0 0-2 2v2H7a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2z"/><path d="M7 16v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/></svg></div>
+      <div><h1>Promotion builder</h1><div class="page-sub">Build a shareable flyer for your next deal</div></div>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="card">
+      <div class="section-head">Promotion details</div>
+      <div class="form-group"><label>Business name</label><input type="text" id="biz-name" value="Sunrise Hair Studio" oninput="draw()"></div>
+      <div class="form-group"><label>Headline (the deal)</label><input type="text" id="headline" value="20% OFF" oninput="draw()"></div>
+      <div class="form-group"><label>Details</label><textarea id="details" oninput="draw()">All color services this weekend only. Mention this flyer when you book.</textarea></div>
+      <div class="two-col">
+        <div class="form-group"><label>Valid dates</label><input type="text" id="dates" value="June 14–15" oninput="draw()"></div>
+        <div class="form-group"><label>Footer note</label><input type="text" id="footer" value="(337) 555-0182 · @sunrisehairstudio" oninput="draw()"></div>
+      </div>
+      <div class="form-group">
+        <label>Accent color</label>
+        <div class="swatches" id="swatches"></div>
+      </div>
+      <div class="form-group">
+        <label>Logo (optional, square works best)</label>
+        <div class="file-row">
+          <input type="file" id="logo-input" accept="image/*" onchange="loadLogo(event)">
+          <button class="btn-clear" onclick="clearLogo()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="section-head">Preview</div>
+      <div class="preview-canvas-holder"><canvas id="canvas" width="1080" height="1080"></canvas></div>
+      <div class="format-row">
+        <button class="format-btn active" data-w="1080" data-h="1080" onclick="setFormat(this)">Square</button>
+        <button class="format-btn" data-w="1080" data-h="1920" onclick="setFormat(this)">Story</button>
+        <button class="format-btn" data-w="1200" data-h="630" onclick="setFormat(this)">Facebook</button>
+      </div>
+      <button class="btn-download" onclick="download()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download image</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#378ADD', '#3FAE5C', '#D98E2B', '#C2487A', '#7A5FD9', '#0e0e0d'];
+let accent = COLORS[0];
+let logoImg = null;
+let format = { w: 1080, h: 1080 };
+
+function buildSwatches(){
+  const wrap = document.getElementById('swatches');
+  COLORS.forEach((c, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (i === 0 ? ' active' : '');
+    sw.style.background = c;
+    sw.onclick = () => {
+      accent = c;
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      draw();
+    };
+    wrap.appendChild(sw);
+  });
+}
+
+function setFormat(btn){
+  document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  format = { w: parseInt(btn.dataset.w), h: parseInt(btn.dataset.h) };
+  const canvas = document.getElementById('canvas');
+  canvas.width = format.w;
+  canvas.height = format.h;
+  document.querySelector('.preview-canvas-holder').style.aspectRatio = `${format.w}/${format.h}`;
+  draw();
+}
+
+function loadLogo(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => { logoImg = img; draw(); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearLogo(){
+  logoImg = null;
+  document.getElementById('logo-input').value = '';
+  draw();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for(let i=0;i<words.length;i++){
+    const test = line + words[i] + ' ';
+    if(ctx.measureText(test).width > maxWidth && line !== ''){
+      lines.push(line.trim());
+      line = words[i] + ' ';
+    } else {
+      line = test;
+    }
+  }
+  lines.push(line.trim());
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+  return lines.length;
+}
+
+function draw(){
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = W * 0.07;
+
+  // Background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Accent block at top
+  const bandH = H * 0.10;
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, bandH);
+
+  // Business name
+  ctx.fillStyle = '#0e0e0d';
+  ctx.font = `600 ${W*0.032}px Inter, sans-serif`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(document.getElementById('biz-name').value || 'Your Business', pad, bandH + pad * 1.4);
+
+  // Logo (top right)
+  if(logoImg){
+    const size = bandH * 0.85;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(W - pad - size/2, bandH/2, size/2, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(logoImg, W - pad - size, 0, size, size);
+    ctx.restore();
+  }
+
+  // Headline
+  ctx.fillStyle = accent;
+  ctx.font = `800 ${W*0.115}px Inter, sans-serif`;
+  const headlineY = H * 0.42;
+  ctx.fillText(document.getElementById('headline').value || 'YOUR DEAL', pad, headlineY);
+
+  // Details
+  ctx.fillStyle = '#3a3a37';
+  ctx.font = `400 ${W*0.034}px Inter, sans-serif`;
+  wrapText(ctx, document.getElementById('details').value || '', pad, headlineY + W*0.08, W - pad*2, W*0.05);
+
+  // Dates badge
+  const dates = document.getElementById('dates').value || '';
+  if(dates){
+    ctx.font = `600 ${W*0.03}px JetBrains Mono, monospace`;
+    const textW = ctx.measureText(dates).width;
+    const badgeY = H - pad * 2.6;
+    const badgePadX = W*0.025, badgePadY = W*0.018;
+    ctx.fillStyle = accent;
+    if(ctx.roundRect){
+      ctx.beginPath();
+      ctx.roundRect(pad, badgeY - W*0.04, textW + badgePadX*2, W*0.058, W*0.008);
+      ctx.fill();
+    } else {
+      ctx.fillRect(pad, badgeY - W*0.04, textW + badgePadX*2, W*0.058);
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(dates, pad + badgePadX, badgeY);
+  }
+
+  // Footer
+  ctx.fillStyle = '#7a7a74';
+  ctx.font = `500 ${W*0.022}px JetBrains Mono, monospace`;
+  ctx.fillText(document.getElementById('footer').value || '', pad, H - pad * 0.9);
+}
+
+function download(){
+  const canvas = document.getElementById('canvas');
+  const link = document.createElement('a');
+  link.download = 'promotion.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+buildSwatches();
+draw();
+</script>
+</body>
+</html>
