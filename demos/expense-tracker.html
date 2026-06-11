@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+  .stat-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+  .columns { display: grid; grid-template-columns: 300px 1fr; gap: 1rem; align-items: start; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+
+  .form-group { margin-bottom: 0.85rem; }
+  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--blue); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn-add { width: 100%; background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 0.4rem; }
+  .btn-add:hover { opacity: 0.92; }
+
+  /* Category breakdown */
+  .cat-row { margin-bottom: 12px; }
+  .cat-row:last-child { margin-bottom: 0; }
+  .cat-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .cat-top .cat-name { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+  .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cat-amt { font-family: 'JetBrains Mono', monospace; color: var(--ink-3); }
+  .cat-bar { height: 6px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 99px; }
+
+  /* Expense list */
+  .expense-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .expense-row:last-child { border-bottom: none; }
+  .expense-cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .expense-info { flex: 1; min-width: 0; }
+  .expense-note { font-size: 13px; font-weight: 500; }
+  .expense-meta { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .expense-amt { font-size: 13px; font-weight: 600; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .remove-btn { background: none; border: none; color: var(--ink-4); cursor: pointer; padding: 0 4px; font-size: 16px; line-height: 1; flex-shrink: 0; }
+  .remove-btn:hover { color: #E24B4A; }
+  .empty-state { text-align: center; padding: 2rem 1rem; color: var(--ink-3); font-size: 13px; }
+
+  @media (max-width: 680px) { .columns { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; } .stat-num { font-size: 18px; } }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg></div>
+      <div><h1>Expense tracker</h1><div class="page-sub">Log cash expenses and see where the money goes</div></div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-total">$0.00</div><div class="stat-label">This month</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-count">0</div><div class="stat-label">Entries</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-top">—</div><div class="stat-label">Top category</div></div>
+  </div>
+
+  <div class="columns">
+    <div>
+      <div class="card" style="margin-bottom: 1rem;">
+        <div class="section-head">Add expense</div>
+        <div class="form-group"><label>Description</label><input type="text" id="in-note" placeholder="e.g. Restock shampoo"></div>
+        <div class="two-col">
+          <div class="form-group"><label>Amount</label><input type="number" id="in-amount" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="form-group"><label>Category</label>
+            <select id="in-category"></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Date</label><input type="date" id="in-date"></div>
+        <button class="btn-add" onclick="addExpense()">Add expense</button>
+      </div>
+
+      <div class="card">
+        <div class="section-head">By category</div>
+        <div id="category-breakdown"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">Recent expenses</div>
+      <div id="expense-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = [
+  { name: 'Supplies', color: '#378ADD' },
+  { name: 'Inventory', color: '#3FAE5C' },
+  { name: 'Utilities', color: '#D98E2B' },
+  { name: 'Rent', color: '#7A5FD9' },
+  { name: 'Marketing', color: '#C2487A' },
+  { name: 'Other', color: '#7a7a74' },
+];
+
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function daysAgo(n){ const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().split('T')[0]; }
+
+let expenses = [
+  { note: 'Color & shampoo restock', amount: 142.50, category: 'Inventory', date: daysAgo(2) },
+  { note: 'Window cleaning', amount: 60, category: 'Supplies', date: daysAgo(4) },
+  { note: 'Electric bill', amount: 218.40, category: 'Utilities', date: daysAgo(6) },
+  { note: 'Instagram ad boost', amount: 35, category: 'Marketing', date: daysAgo(9) },
+  { note: 'Monthly rent', amount: 1400, category: 'Rent', date: daysAgo(11) },
+  { note: 'Coffee for the shop', amount: 18.75, category: 'Other', date: daysAgo(14) },
+];
+
+function fmt(n){ return '$' + n.toFixed(2); }
+function catColor(name){ const c = CATEGORIES.find(c => c.name === name); return c ? c.color : '#7a7a74'; }
+
+function populateCategorySelect(){
+  const sel = document.getElementById('in-category');
+  sel.innerHTML = CATEGORIES.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
+
+function addExpense(){
+  const note = document.getElementById('in-note').value.trim();
+  const amount = parseFloat(document.getElementById('in-amount').value);
+  const category = document.getElementById('in-category').value;
+  const date = document.getElementById('in-date').value || todayStr();
+  if(!note || !amount || amount <= 0){
+    if(!note) document.getElementById('in-note').focus();
+    else document.getElementById('in-amount').focus();
+    return;
+  }
+  expenses.unshift({ note, amount, category, date });
+  document.getElementById('in-note').value = '';
+  document.getElementById('in-amount').value = '';
+  render();
+}
+
+function removeExpense(idx){
+  expenses.splice(idx, 1);
+  render();
+}
+
+function isThisMonth(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+}
+
+function render(){
+  // Recompute monthly stats
+  const monthly = expenses.filter(e => isThisMonth(e.date));
+  const total = monthly.reduce((s,e) => s + e.amount, 0);
+  document.getElementById('stat-total').textContent = fmt(total);
+  document.getElementById('stat-count').textContent = monthly.length;
+
+  // Category breakdown
+  const byCat = {};
+  monthly.forEach(e => { byCat[e.category] = (byCat[e.category]||0) + e.amount; });
+  const sorted = Object.entries(byCat).sort((a,b) => b[1]-a[1]);
+  document.getElementById('stat-top').textContent = sorted.length ? sorted[0][0] : '—';
+
+  const breakdown = document.getElementById('category-breakdown');
+  if(sorted.length === 0){
+    breakdown.innerHTML = `<div class="empty-state">No expenses logged this month yet.</div>`;
+  } else {
+    breakdown.innerHTML = sorted.map(([name, amt]) => {
+      const pct = total ? (amt/total*100) : 0;
+      return `
+        <div class="cat-row">
+          <div class="cat-top">
+            <span class="cat-name"><span class="cat-dot" style="background:${catColor(name)}"></span>${name}</span>
+            <span class="cat-amt">${fmt(amt)}</span>
+          </div>
+          <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%;background:${catColor(name)}"></div></div>
+        </div>`;
+    }).join('');
+  }
+
+  // Expense list (all, most recent first)
+  const list = document.getElementById('expense-list');
+  if(expenses.length === 0){
+    list.innerHTML = `<div class="empty-state">No expenses logged yet.</div>`;
+  } else {
+    const ordered = expenses.map((e, i) => ({...e, idx: i})).sort((a,b) => b.date.localeCompare(a.date));
+    list.innerHTML = ordered.map(e => `
+      <div class="expense-row">
+        <div class="expense-cat-dot" style="background:${catColor(e.category)}"></div>
+        <div class="expense-info">
+          <div class="expense-note">${e.note}</div>
+          <div class="expense-meta">${e.category} · ${e.date}</div>
+        </div>
+        <div class="expense-amt">${fmt(e.amount)}</div>
+        <button class="remove-btn" onclick="removeExpense(${e.idx})">×</button>
+      </div>
+    `).join('');
+  }
+}
+
+populateCategorySelect();
+document.getElementById('in-date').value = todayStr();
+render();
+</script>
+</body>
+</html>

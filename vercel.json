@@ -6,6 +6,7 @@
     { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" },
     { "source": "/demos/review-collector", "destination": "/demos/review-collector.html" },
     { "source": "/demos/loyalty-punch-card", "destination": "/demos/loyalty-punch-card.html" },
-    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" }
+    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" },
+    { "source": "/demos/expense-tracker", "destination": "/demos/expense-tracker.html" }
   ]
 }
