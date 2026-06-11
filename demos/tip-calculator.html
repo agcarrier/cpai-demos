@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tip Calculator & Splitter — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  .tab-btn { background: none; border: none; padding: 10px 4px; margin-right: 18px; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; font-family: 'Inter', sans-serif; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--blue); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
+  .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--ink); background: var(--surface); font-family: 'JetBrains Mono', monospace; outline: none; transition: border-color 0.15s; }
+  .form-group input:focus { border-color: var(--blue); }
+
+  .pct-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .pct-btn { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 4px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; }
+  .pct-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+  .stepper { display: flex; align-items: center; gap: 12px; }
+  .stepper button { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 18px; cursor: pointer; color: var(--ink-2); font-family: 'Inter', sans-serif; line-height: 1; }
+  .stepper button:hover { border-color: var(--ink-3); }
+  .stepper-val { font-size: 18px; font-weight: 600; font-family: 'JetBrains Mono', monospace; min-width: 40px; text-align: center; }
+
+  .result-box { background: var(--bg); border-radius: 10px; padding: 1.1rem 1.25rem; margin-top: 1.25rem; }
+  .result-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--ink-2); }
+  .result-row.big { font-size: 22px; font-weight: 600; color: var(--ink); padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--border); }
+  .result-row .val { font-family: 'JetBrains Mono', monospace; }
+
+  /* Staff split */
+  .staff-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .staff-row:last-child { border-bottom: none; }
+  .staff-row input[type=text] { flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+  .staff-row input[type=number] { width: 64px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: 'JetBrains Mono', monospace; outline: none; text-align: right; }
+  .staff-row input:focus { border-color: var(--blue); }
+  .staff-share { width: 76px; text-align: right; font-size: 13px; font-weight: 600; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .remove-btn { background: none; border: none; color: var(--ink-4); cursor: pointer; padding: 0 2px; font-size: 16px; line-height: 1; flex-shrink: 0; }
+  .remove-btn:hover { color: #E24B4A; }
+  .add-line { display: flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: 1px dashed var(--border); border-radius: 7px; padding: 8px 12px; color: var(--ink-3); font-size: 13px; cursor: pointer; width: 100%; font-family: 'Inter', sans-serif; }
+  .add-line:hover { background: var(--bg); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div><h1>Tip calculator & splitter</h1><div class="page-sub">Split a bill evenly, or split staff tips by hours worked</div></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-bill" onclick="showTab('bill')">Split a bill</button>
+    <button class="tab-btn" id="tab-staff" onclick="showTab('staff')">Split staff tips</button>
+  </div>
+
+  <!-- BILL SPLIT -->
+  <div id="view-bill" class="card">
+    <div class="form-group">
+      <label>Bill total</label>
+      <input type="number" id="bill-total" min="0" step="0.01" value="84.50" oninput="renderBill()">
+    </div>
+    <div class="form-group">
+      <label>Tip percentage</label>
+      <div class="pct-row" id="pct-row"></div>
+      <input type="number" id="custom-pct" min="0" max="100" step="1" value="20" oninput="setCustomPct()" style="display:none; margin-top:8px;">
+    </div>
+    <div class="form-group">
+      <label>Split between</label>
+      <div class="stepper">
+        <button onclick="changePeople(-1)">−</button>
+        <div class="stepper-val" id="people-val">2</div>
+        <button onclick="changePeople(1)">+</button>
+        <span style="font-size:13px;color:var(--ink-3)">people</span>
+      </div>
+    </div>
+    <div class="result-box">
+      <div class="result-row"><span>Tip amount</span><span class="val" id="bill-tip">$0.00</span></div>
+      <div class="result-row"><span>Total with tip</span><span class="val" id="bill-grand">$0.00</span></div>
+      <div class="result-row big"><span>Each person owes</span><span class="val" id="bill-each">$0.00</span></div>
+    </div>
+  </div>
+
+  <!-- STAFF SPLIT -->
+  <div id="view-staff" class="card hidden">
+    <div class="form-group">
+      <label>Total tip pool</label>
+      <input type="number" id="staff-pool" min="0" step="0.01" value="240" oninput="renderStaff()">
+    </div>
+    <div class="section-head" style="margin-top:1.25rem;">Staff hours worked</div>
+    <div id="staff-list"></div>
+    <button class="add-line" onclick="addStaff()">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add staff member
+    </button>
+    <div class="result-box">
+      <div class="result-row"><span>Total hours</span><span class="val" id="staff-total-hours">0</span></div>
+      <div class="result-row big"><span>Per hour rate</span><span class="val" id="staff-per-hour">$0.00</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PCTS = [15, 18, 20, 25];
+let selectedPct = 20;
+let people = 2;
+let staff = [
+  { name: 'Jordan', hours: 6 },
+  { name: 'Casey', hours: 4.5 },
+  { name: 'Riley', hours: 5 },
+];
+
+function fmt(n){ return '$' + n.toFixed(2); }
+
+function buildPctRow(){
+  const row = document.getElementById('pct-row');
+  row.innerHTML = '';
+  PCTS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'pct-btn' + (p === selectedPct ? ' active' : '');
+    btn.textContent = p + '%';
+    btn.onclick = () => { selectedPct = p; document.getElementById('custom-pct').style.display='none'; buildPctRow(); renderBill(); };
+    row.appendChild(btn);
+  });
+  const customBtn = document.createElement('button');
+  const isCustom = !PCTS.includes(selectedPct);
+  customBtn.className = 'pct-btn' + (isCustom ? ' active' : '');
+  customBtn.textContent = 'Custom';
+  customBtn.onclick = () => {
+    const input = document.getElementById('custom-pct');
+    input.style.display = 'block';
+    input.focus();
+    selectedPct = parseFloat(input.value) || 0;
+    buildPctRow();
+    renderBill();
+  };
+  row.appendChild(customBtn);
+}
+
+function setCustomPct(){
+  selectedPct = parseFloat(document.getElementById('custom-pct').value) || 0;
+  renderBill();
+}
+
+function changePeople(delta){
+  people = Math.max(1, people + delta);
+  document.getElementById('people-val').textContent = people;
+  renderBill();
+}
+
+function renderBill(){
+  const total = parseFloat(document.getElementById('bill-total').value) || 0;
+  const tip = total * (selectedPct/100);
+  const grand = total + tip;
+  document.getElementById('bill-tip').textContent = fmt(tip);
+  document.getElementById('bill-grand').textContent = fmt(grand);
+  document.getElementById('bill-each').textContent = fmt(grand / people);
+}
+
+function addStaff(){
+  staff.push({ name: '', hours: 0 });
+  renderStaff();
+}
+
+function removeStaff(idx){
+  staff.splice(idx, 1);
+  renderStaff();
+}
+
+function updateStaff(idx, field, value){
+  staff[idx][field] = field === 'hours' ? (parseFloat(value) || 0) : value;
+  renderStaff();
+}
+
+function renderStaff(){
+  const pool = parseFloat(document.getElementById('staff-pool').value) || 0;
+  const totalHours = staff.reduce((s,m) => s + (m.hours||0), 0);
+  const perHour = totalHours ? pool / totalHours : 0;
+
+  const list = document.getElementById('staff-list');
+  list.innerHTML = staff.map((m, idx) => {
+    const share = (m.hours||0) * perHour;
+    return `
+      <div class="staff-row">
+        <input type="text" placeholder="Name" value="${m.name}" oninput="updateStaff(${idx},'name',this.value)">
+        <input type="number" min="0" step="0.25" value="${m.hours}" oninput="updateStaff(${idx},'hours',this.value)">
+        <div class="staff-share">${fmt(share)}</div>
+        <button class="remove-btn" onclick="removeStaff(${idx})">×</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('staff-total-hours').textContent = totalHours.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  document.getElementById('staff-per-hour').textContent = fmt(perHour);
+}
+
+function showTab(name){
+  document.getElementById('view-bill').classList.toggle('hidden', name !== 'bill');
+  document.getElementById('view-staff').classList.toggle('hidden', name !== 'staff');
+  document.getElementById('tab-bill').classList.toggle('active', name === 'bill');
+  document.getElementById('tab-staff').classList.toggle('active', name === 'staff');
+}
+
+buildPctRow();
+renderBill();
+renderStaff();
+</script>
+</body>
+</html>
