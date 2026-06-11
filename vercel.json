@@ -3,6 +3,7 @@
     { "source": "/demos/appointment-scheduler", "destination": "/demos/appointment-scheduler.html" },
     { "source": "/demos/invoice-generator", "destination": "/demos/invoice-generator.html" },
     { "source": "/demos/open-today", "destination": "/demos/open-today.html" },
-    { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" }
+    { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" },
+    { "source": "/demos/review-collector", "destination": "/demos/review-collector.html" }
   ]
 }

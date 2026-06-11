@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Collector — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --amber: #D98E2B; --amber-light: #faf0e0; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  .tab-btn { background: none; border: none; padding: 10px 4px; margin-right: 18px; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; font-family: 'Inter', sans-serif; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--blue); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+
+  /* Customer view */
+  .review-prompt { text-align: center; padding: 1rem 0 0.5rem; }
+  .review-prompt h2 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+  .review-prompt p { font-size: 13px; color: var(--ink-3); margin-bottom: 1.5rem; }
+  .stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 0.5rem; }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 4px; line-height: 0; }
+  .star-btn svg { width: 38px; height: 38px; stroke: var(--ink-4); fill: none; stroke-width: 1.5; transition: all 0.1s; }
+  .star-btn.filled svg { stroke: var(--amber); fill: var(--amber); }
+  .star-btn:hover svg { stroke: var(--amber); transform: scale(1.08); }
+  .star-label { text-align: center; font-size: 12px; color: var(--ink-3); height: 18px; margin-bottom: 1rem; }
+
+  .result-panel { text-align: center; padding: 1rem 0; }
+  .result-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+  .result-icon.good { background: var(--green-light); }
+  .result-icon.good svg { stroke: var(--green); }
+  .result-icon.bad { background: var(--amber-light); }
+  .result-icon.bad svg { stroke: var(--amber); }
+  .result-icon svg { width: 24px; height: 24px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .result-panel h2 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+  .result-panel p { font-size: 13px; color: var(--ink-3); margin-bottom: 1.25rem; max-width: 38ch; margin-left: auto; margin-right: auto; }
+
+  .platform-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .platform-btn { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--ink); background: var(--surface); transition: border-color 0.15s; }
+  .platform-btn:hover { border-color: var(--ink-3); }
+  .platform-btn svg { width: 16px; height: 16px; }
+
+  .feedback-form textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif; resize: none; height: 90px; outline: none; margin-bottom: 0.75rem; }
+  .feedback-form textarea:focus { border-color: var(--blue); }
+  .btn-primary { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-text { background: none; border: none; color: var(--ink-3); font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; text-decoration: underline; margin-top: 0.75rem; display: block; margin-left: auto; margin-right: auto; }
+
+  /* Dashboard */
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  @media (min-width: 480px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+  .stat-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+  .feed-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-stars { display: flex; gap: 1px; flex-shrink: 0; padding-top: 1px; }
+  .feed-stars svg { width: 13px; height: 13px; stroke: var(--amber); fill: var(--amber); }
+  .feed-stars svg.empty { stroke: var(--ink-4); fill: none; }
+  .feed-body { flex: 1; min-width: 0; }
+  .feed-name { font-size: 12px; font-weight: 500; }
+  .feed-text { font-size: 13px; color: var(--ink-2); margin-top: 3px; line-height: 1.5; }
+  .feed-time { font-size: 11px; color: var(--ink-4); margin-top: 4px; }
+  .feed-empty { text-align: center; padding: 2rem 1rem; color: var(--ink-3); font-size: 13px; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div><h1>Review collector</h1><div class="page-sub">Smart review requests that route happy customers to Google/Yelp</div></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-customer" onclick="showTab('customer')">Customer experience</button>
+    <button class="tab-btn" id="tab-dashboard" onclick="showTab('dashboard')">Owner dashboard</button>
+  </div>
+
+  <!-- CUSTOMER VIEW -->
+  <div id="view-customer" class="card">
+    <div id="step-rate">
+      <div class="review-prompt">
+        <h2>How was your visit to Sunrise Hair Studio?</h2>
+        <p>Tap a star to leave quick feedback — it takes 10 seconds.</p>
+      </div>
+      <div class="stars" id="stars"></div>
+      <div class="star-label" id="star-label"></div>
+    </div>
+
+    <div id="step-good" class="result-panel hidden">
+      <div class="result-icon good"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+      <h2>So glad you had a great experience!</h2>
+      <p>Mind sharing it publicly? It takes 30 seconds and helps other folks in Lafayette find us.</p>
+      <div class="platform-row">
+        <a class="platform-btn" href="#" onclick="return fakeRedirect(event,'Google')"><svg viewBox="0 0 24 24" fill="none"><path d="M21.6 12.23c0-.74-.07-1.45-.19-2.14H12v4.05h5.4a4.6 4.6 0 0 1-2 3.02v2.5h3.23c1.9-1.75 2.97-4.32 2.97-7.43z" fill="#4285F4"/><path d="M12 22c2.7 0 4.96-.9 6.62-2.43l-3.23-2.5c-.9.6-2.04.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H3.06v2.59A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 13.91A6 6 0 0 1 6.08 12c0-.66.11-1.3.32-1.91V7.5H3.06A10 10 0 0 0 2 12c0 1.61.39 3.14 1.06 4.5z" fill="#FBBC05"/><path d="M12 5.98c1.47 0 2.79.5 3.82 1.49l2.87-2.87C16.95 2.99 14.7 2 12 2A10 10 0 0 0 3.06 7.5l3.34 2.59c.8-2.36 3-4.11 5.6-4.11z" fill="#EA4335"/></svg> Google</a>
+        <a class="platform-btn" href="#" onclick="return fakeRedirect(event,'Yelp')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#D32323"/><path d="M11.1 12.6L7 14a1 1 0 0 1-1.27-1.21 6.9 6.9 0 0 1 2.65-3.78 1 1 0 0 1 1.55.46l1.5 4a1 1 0 0 1-.33 1.13zm.6 1.7l3.5 2.95a1 1 0 0 1-.27 1.66 6.9 6.9 0 0 1-4.6.16 1 1 0 0 1-.6-1.4l1.5-3.6a1 1 0 0 1 .47-.77zm1.7-1.9l4.3-.95a1 1 0 0 1 1.13 1.34 6.9 6.9 0 0 1-2.96 3.5 1 1 0 0 1-1.46-.6l-1.3-3.97a1 1 0 0 1 .29-1.32zm-.3-2.2l-1.05-4.25a1 1 0 0 1 1.04-1.24 6.9 6.9 0 0 1 4.06 1.96 1 1 0 0 1-.07 1.48L13.9 10.5a1 1 0 0 1-.8.2 1 1 0 0 1-.6-.5z" fill="#fff"/></svg> Yelp</a>
+      </div>
+      <button class="btn-text" onclick="resetFlow()">Start over</button>
+    </div>
+
+    <div id="step-bad" class="result-panel feedback-form hidden">
+      <div class="result-icon bad"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.29 3.86l-8.18 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.89-3.14l-8.18-14a2 2 0 0 0-3.42 0z"/></svg></div>
+      <h2 style="text-align:left">Sorry to hear that — tell us what happened</h2>
+      <p style="text-align:left;margin-left:0">This goes straight to the owner, not posted publicly. We'll follow up directly.</p>
+      <textarea id="feedback-text" placeholder="What could we have done better?"></textarea>
+      <button class="btn-primary" onclick="submitFeedback()">Send feedback privately</button>
+      <button class="btn-text" onclick="resetFlow()">Start over</button>
+    </div>
+
+    <div id="step-thanks" class="result-panel hidden">
+      <div class="result-icon good"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <h2>Thanks — we'll be in touch.</h2>
+      <p>Your feedback was sent privately to the business owner.</p>
+      <button class="btn-text" onclick="resetFlow()">Start over</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="card hidden">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="stat-sent">86</div><div class="stat-label">Requests sent</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-avg">4.6</div><div class="stat-label">Avg rating</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-public">61</div><div class="stat-label">Routed to Google/Yelp</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-private">3</div><div class="stat-label">Private feedback</div></div>
+    </div>
+    <div class="section-head">Recent private feedback</div>
+    <div id="feed-list"></div>
+  </div>
+</div>
+
+<script>
+let selectedRating = 0;
+let stats = { sent: 86, ratingsSum: 396, ratingsCount: 86, public: 61, private: 3 };
+let feed = [
+  { name: 'Anonymous', rating: 2, text: "Waited almost 25 minutes past my appointment time with no update. The cut itself was fine.", time: '2 days ago' },
+  { name: 'Anonymous', rating: 3, text: "Loved the color, but the shop felt a little rushed today.", time: '5 days ago' },
+  { name: 'Anonymous', rating: 1, text: "Booked online for 2pm, got there and was told the stylist left for the day.", time: '1 week ago' },
+];
+
+function buildStars(){
+  const wrap = document.getElementById('stars');
+  wrap.innerHTML = '';
+  for(let i=1;i<=5;i++){
+    const btn = document.createElement('button');
+    btn.className = 'star-btn';
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+    btn.onmouseenter = () => highlight(i);
+    btn.onmouseleave = () => highlight(selectedRating);
+    btn.onclick = () => rate(i);
+    wrap.appendChild(btn);
+  }
+}
+
+function highlight(n){
+  const labels = ['', 'Poor', 'Not great', 'Okay', 'Good', 'Excellent!'];
+  document.querySelectorAll('.star-btn').forEach((b, idx) => {
+    b.classList.toggle('filled', idx < n);
+  });
+  document.getElementById('star-label').textContent = labels[n] || '';
+}
+
+function rate(n){
+  selectedRating = n;
+  highlight(n);
+  stats.sent++; stats.ratingsSum += n; stats.ratingsCount++;
+  setTimeout(() => {
+    document.getElementById('step-rate').classList.add('hidden');
+    if(n >= 4){
+      stats.public++;
+      document.getElementById('step-good').classList.remove('hidden');
+    } else {
+      document.getElementById('step-bad').classList.remove('hidden');
+    }
+    refreshDashboard();
+  }, 350);
+}
+
+function fakeRedirect(e, platform){
+  e.preventDefault();
+  alert(`In a real deployment, this opens your ${platform} review page in a new tab.`);
+  return false;
+}
+
+function submitFeedback(){
+  const text = document.getElementById('feedback-text').value.trim();
+  if(!text){ document.getElementById('feedback-text').focus(); return; }
+  feed.unshift({ name: 'Anonymous', rating: selectedRating, text, time: 'just now' });
+  stats.private++;
+  document.getElementById('step-bad').classList.add('hidden');
+  document.getElementById('step-thanks').classList.remove('hidden');
+  document.getElementById('feedback-text').value = '';
+  refreshDashboard();
+}
+
+function resetFlow(){
+  selectedRating = 0;
+  highlight(0);
+  document.getElementById('step-good').classList.add('hidden');
+  document.getElementById('step-bad').classList.add('hidden');
+  document.getElementById('step-thanks').classList.add('hidden');
+  document.getElementById('step-rate').classList.remove('hidden');
+}
+
+function showTab(name){
+  document.getElementById('view-customer').classList.toggle('hidden', name !== 'customer');
+  document.getElementById('view-dashboard').classList.toggle('hidden', name !== 'dashboard');
+  document.getElementById('tab-customer').classList.toggle('active', name === 'customer');
+  document.getElementById('tab-dashboard').classList.toggle('active', name === 'dashboard');
+}
+
+function starsSvg(filled){
+  return `<svg class="${filled ? '' : 'empty'}" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+}
+
+function refreshDashboard(){
+  document.getElementById('stat-sent').textContent = stats.sent;
+  document.getElementById('stat-avg').textContent = (stats.ratingsSum / stats.ratingsCount).toFixed(1);
+  document.getElementById('stat-public').textContent = stats.public;
+  document.getElementById('stat-private').textContent = stats.private;
+
+  const list = document.getElementById('feed-list');
+  list.innerHTML = '';
+  if(feed.length === 0){
+    list.innerHTML = `<div class="feed-empty">No private feedback yet.</div>`;
+    return;
+  }
+  feed.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'feed-item';
+    let starsHtml = '';
+    for(let i=1;i<=5;i++) starsHtml += starsSvg(i <= item.rating);
+    row.innerHTML = `
+      <div class="feed-stars">${starsHtml}</div>
+      <div class="feed-body">
+        <div class="feed-name">${item.name}</div>
+        <div class="feed-text">${item.text}</div>
+        <div class="feed-time">${item.time}</div>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+
+buildStars();
+refreshDashboard();
+</script>
+</body>
+</html>
