@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loyalty Punch Card — Carrier Pigeon AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --amber: #D98E2B; --amber-light: #faf0e0; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
+  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
+  .demo-bar a:hover { text-decoration: underline; }
+  .demo-bar .sep { color: #45453f; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .page-header-left { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  h1 { font-size: 16px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--ink-3); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+
+  .form-row { display: flex; gap: 8px; }
+  .form-row input { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-row input:focus { border-color: var(--blue); }
+  .btn-primary { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .hint { font-size: 11px; color: var(--ink-4); margin-top: 8px; }
+
+  .punch-empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink-3); font-size: 13px; }
+  .punch-empty svg { width: 32px; height: 32px; stroke: var(--ink-4); fill: none; stroke-width: 1.5; margin-bottom: 10px; }
+
+  .punch-customer { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 8px; }
+  .punch-customer-name { font-size: 14px; font-weight: 500; }
+  .punch-customer-meta { font-size: 11px; color: var(--ink-3); }
+
+  .punch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .punch-cell { aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .punch-cell.filled { border-style: solid; border-color: var(--green); background: var(--green-light); }
+  .punch-cell.filled svg { stroke: var(--green); }
+  .punch-cell.reward { border-color: var(--amber); background: var(--amber-light); }
+  .punch-cell.reward svg { stroke: var(--amber); }
+  .punch-cell svg { width: 18px; height: 18px; fill: none; stroke: var(--ink-4); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .punch-progress { font-size: 13px; color: var(--ink-2); text-align: center; margin-bottom: 1rem; }
+  .punch-progress strong { color: var(--ink); }
+
+  .reward-banner { background: var(--amber-light); border: 1px solid var(--amber); border-radius: 8px; padding: 12px 14px; text-align: center; font-size: 13px; font-weight: 500; color: #8a5d12; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .reward-banner svg { width: 16px; height: 16px; stroke: #8a5d12; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+  .action-row { display: flex; gap: 8px; }
+  .action-row button { flex: 1; }
+  .btn-secondary { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--ink); padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .btn-secondary:hover { border-color: var(--ink-3); }
+  .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+  .stat-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120%); background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 99px; transition: transform 0.25s ease; z-index: 200; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 420px) { .punch-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; } }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
+  <span class="nav-badge">Live demo</span>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <div><h1>Loyalty punch card</h1><div class="page-sub">Look up a customer by phone, add a stamp, redeem rewards</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">Look up customer</div>
+    <div class="form-row">
+      <input type="text" id="phone-input" placeholder="Enter phone number, e.g. (337) 555-0182" onkeydown="if(event.key==='Enter')lookup()">
+      <button class="btn-primary" onclick="lookup()">Look up</button>
+    </div>
+    <div class="hint">Try an existing number like (337) 555-0148, or enter any new number to create a card.</div>
+  </div>
+
+  <div class="card" id="punch-card">
+    <div class="punch-empty">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <div>Look up a customer to view their punch card.</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-cards">0</div><div class="stat-label">Active cards</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-stamps">0</div><div class="stat-label">Stamps given</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-rewards">0</div><div class="stat-label">Rewards redeemed</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TOTAL_STAMPS = 10;
+let customers = {
+  '(337) 555-0148': { name: 'Jenna R.', stamps: 7 },
+  '(337) 555-0172': { name: 'Marcus T.', stamps: 10 },
+  '(337) 555-0199': { name: 'Dana B.', stamps: 2 },
+};
+let totalStampsGiven = Object.values(customers).reduce((s,c)=>s+c.stamps, 0) + 23;
+let rewardsRedeemed = 8;
+let currentPhone = null;
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+function lookup(){
+  const phone = document.getElementById('phone-input').value.trim();
+  if(!phone) return;
+  if(!customers[phone]){
+    customers[phone] = { name: 'New customer', stamps: 0 };
+    showToast(`New punch card created for ${phone}`);
+  }
+  currentPhone = phone;
+  renderCard();
+}
+
+function addStamp(){
+  if(!currentPhone) return;
+  const c = customers[currentPhone];
+  if(c.stamps >= TOTAL_STAMPS) return;
+  c.stamps++;
+  totalStampsGiven++;
+  if(c.stamps >= TOTAL_STAMPS){
+    showToast(`${c.name}'s card is full — reward earned!`);
+  } else {
+    showToast(`Stamp added for ${c.name} (${c.stamps}/${TOTAL_STAMPS})`);
+  }
+  renderCard();
+  renderStats();
+}
+
+function redeem(){
+  if(!currentPhone) return;
+  const c = customers[currentPhone];
+  if(c.stamps < TOTAL_STAMPS) return;
+  c.stamps = 0;
+  rewardsRedeemed++;
+  showToast(`Reward redeemed for ${c.name} — card reset`);
+  renderCard();
+  renderStats();
+}
+
+function renderCard(){
+  const wrap = document.getElementById('punch-card');
+  if(!currentPhone){
+    wrap.innerHTML = `<div class="punch-empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div>Look up a customer to view their punch card.</div></div>`;
+    return;
+  }
+  const c = customers[currentPhone];
+  const full = c.stamps >= TOTAL_STAMPS;
+  let cells = '';
+  for(let i=0;i<TOTAL_STAMPS;i++){
+    const filled = i < c.stamps;
+    const isLast = i === TOTAL_STAMPS - 1;
+    const cls = filled ? (isLast && full ? 'filled reward' : 'filled') : '';
+    const icon = filled
+      ? `<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`
+      : (isLast ? `<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>` : '');
+    cells += `<div class="punch-cell ${cls}">${icon}</div>`;
+  }
+  wrap.innerHTML = `
+    <div class="punch-customer">
+      <div>
+        <div class="punch-customer-name">${c.name}</div>
+        <div class="punch-customer-meta">${currentPhone}</div>
+      </div>
+    </div>
+    <div class="punch-grid">${cells}</div>
+    ${full
+      ? `<div class="reward-banner"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg> Card complete — free item earned!</div>`
+      : `<div class="punch-progress">${TOTAL_STAMPS - c.stamps} more visit${TOTAL_STAMPS - c.stamps === 1 ? '' : 's'} until <strong>free reward</strong></div>`
+    }
+    <div class="action-row">
+      <button class="btn-primary" onclick="addStamp()" ${full ? 'disabled' : ''}>Add stamp</button>
+      <button class="btn-secondary" onclick="redeem()" ${full ? '' : 'disabled'}>Redeem reward</button>
+    </div>
+  `;
+}
+
+function renderStats(){
+  document.getElementById('stat-cards').textContent = Object.keys(customers).length;
+  document.getElementById('stat-stamps').textContent = totalStampsGiven;
+  document.getElementById('stat-rewards').textContent = rewardsRedeemed;
+}
+
+renderStats();
+</script>
+</body>
+</html>
