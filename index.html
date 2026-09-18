@@ -7,18 +7,22 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%230c0c0d'/><g fill='%23f1f1ef'><rect x='17.5' y='8.7' width='8' height='8' rx='0.8'/><rect x='26.2' y='8.7' width='8' height='8' rx='0.8'/><rect x='60' y='8.7' width='8' height='8' rx='0.8'/><rect x='68.7' y='8.7' width='8' height='8' rx='0.8'/><rect x='8.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='17.5' y='17.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='35' y='17.5' width='8' height='8' rx='0.8'/><rect x='60' y='17.5' width='8' height='8' rx='0.8'/><rect x='68.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='86.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='26.2' width='8' height='8' rx='0.8'/><rect x='35' y='26.2' width='8' height='8' rx='0.8'/><rect x='43.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='52.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='60' y='26.2' width='8' height='8' rx='0.8'/><rect x='68.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='77.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='35' width='8' height='8' rx='0.8'/><rect x='35' y='35' width='8' height='8' rx='0.8'/><rect x='43.7' y='35' width='8' height='8' rx='0.8'/><rect x='52.5' y='35' width='8' height='8' rx='0.8'/><rect x='60' y='35' width='8' height='8' rx='0.8'/><rect x='68.7' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='43.7' width='8' height='8' rx='0.8'/><rect x='35' y='43.7' width='8' height='8' rx='0.8'/><rect x='43.7' y='43.7' width='8' height='8' rx='0.8'/><rect x='52.5' y='43.7' width='8' height='8' rx='0.8'/><rect x='60' y='43.7' width='8' height='8' rx='0.8'/><rect x='17.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='52.5' width='8' height='8' rx='0.8'/><rect x='35' y='52.5' width='8' height='8' rx='0.8'/><rect x='43.7' y='52.5' width='8' height='8' rx='0.8'/><rect x='52.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='61.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='61.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='61.2' width='8' height='8' rx='0.8'/><rect x='35' y='61.2' width='8' height='8' rx='0.8'/><rect x='0' y='70' width='8' height='8' rx='0.8'/><rect x='8.7' y='70' width='8' height='8' rx='0.8'/></g><rect x='77.5' y='17.5' width='8' height='8' rx='0.8' fill='%239bff5b'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --ink:     #0c0c0d;
-    --ink-2:   #1a1a1c;
-    --ink-3:   #2a2a2d;
-    --paper:   #f1f1ef;
-    --paper-2: #e7e5dd;
-    --muted:   #7a7a76;
-    --signal:  #9bff5b;
+    /* Studio system, mirrored from carrierpigeonai.dev globals.css:
+       ink = surfaces (off-white), paper = text (near-black). */
+    --ink:     #f3f2ee;
+    --ink-2:   #e9e7e1;
+    --ink-3:   #d6d4cc;
+    --paper:   #161615;
+    --muted:   #5f5e59;
+    --signal:  #2e7d1e;
+    --hl:      #9bff5b;
+    --on-hl:   #161615;
+    --font-display: "Inter Tight", "Inter", sans-serif;
 
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
@@ -46,12 +50,13 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(12,12,13,0.78);
+    background: rgba(243,242,238,0.92);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--ink-3);
-    padding: 0 24px;
-    height: 60px;
+    padding: 0 48px;
+    height: 76px;
+    gap: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -68,10 +73,10 @@
 
   .nav-wordmark {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--paper);
-    letter-spacing: 0.22em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
@@ -83,20 +88,25 @@
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--paper);
+    color: var(--ink);
+    background: var(--paper);
     text-decoration: none;
     border: 1px solid var(--paper);
-    padding: 10px 16px;
+    padding: 11px 18px;
     transition: transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s;
   }
 
-  .nav-cta:hover { background: var(--paper); color: var(--ink); transform: translateY(-1px); }
+  .nav-cta:hover { background: var(--hl); color: var(--on-hl); border-color: var(--hl); transform: translateY(-1px); }
+
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .15s; }
+  .nav-links a:hover, .nav-links a[aria-current] { color: var(--paper); }
 
   /* ── HERO ── */
   .hero {
-    max-width: 880px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 88px 24px 64px;
+    padding: 96px 48px 56px;
   }
 
   .hero-eyebrow {
@@ -120,28 +130,30 @@
   }
 
   .hero h1 {
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     font-weight: 600;
-    font-size: clamp(2.4rem, 5.5vw, 3.6rem);
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    font-size: clamp(56px, 8vw, 116px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
     color: var(--paper);
-    margin-bottom: 20px;
-    max-width: 680px;
+    margin-bottom: 28px;
+    max-width: 12ch;
   }
 
   .hero h1 em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--signal);
+    font-style: normal;
+    background: var(--hl);
+    color: var(--on-hl);
+    padding: 0 0.08em;
+    margin: 0 -0.03em;
   }
 
   .hero-sub {
-    font-size: 16px;
+    font-size: 20px;
     color: var(--muted);
-    font-weight: 300;
-    max-width: 480px;
-    line-height: 1.65;
+    font-weight: 400;
+    max-width: 44ch;
+    line-height: 1.6;
     margin-bottom: 36px;
   }
 
@@ -162,9 +174,9 @@
 
   /* ── FILTER BAR ── */
   .filter-bar {
-    max-width: 880px;
+    max-width: 1200px;
     margin: 0 auto 32px;
-    padding: 0 24px;
+    padding: 0 48px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -195,22 +207,26 @@
   }
 
   .filter-btn:hover { border-color: var(--paper); color: var(--paper); }
-  .filter-btn.active { background: var(--signal); color: var(--ink); border-color: var(--signal); }
+  .filter-btn.active { background: var(--hl); color: var(--on-hl); border-color: var(--hl); }
 
   /* ── GRID ── */
   .grid {
-    max-width: 880px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px 96px;
+    padding: 0;
+    margin-bottom: 112px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--ink-3);
-    border: 1px solid var(--ink-3);
+    gap: 0;
+    border-top: 1px solid var(--ink-3);
+    border-left: 1px solid var(--ink-3);
   }
 
   /* ── CARD ── */
+  /* Hairlines as cell borders, so a short last row leaves no gray fill. */
   .card {
+    border-right: 1px solid var(--ink-3);
+    border-bottom: 1px solid var(--ink-3);
     background: var(--ink);
     overflow: hidden;
     display: flex;
@@ -291,14 +307,14 @@
     border-radius: 50%;
   }
 
-  .status-live .status-dot { background: var(--signal); box-shadow: 0 0 6px var(--signal); }
+  .status-live .status-dot { background: var(--signal); }
   .status-live { color: var(--signal); }
   .status-coming .status-dot { background: var(--muted); }
   .status-coming { color: var(--muted); }
 
   .card-title {
-    font-family: var(--font-sans);
-    font-size: 1.2rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
     font-weight: 600;
     line-height: 1.25;
     color: var(--paper);
@@ -307,10 +323,10 @@
   }
 
   .card-desc {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     line-height: 1.6;
-    font-weight: 300;
+    font-weight: 400;
     flex: 1;
   }
 
@@ -338,7 +354,7 @@
     transition: transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s;
   }
 
-  .btn-demo:hover { background: var(--signal); color: var(--ink); border-color: var(--signal); transform: translateY(-1px); }
+  .btn-demo:hover { background: var(--hl); color: var(--on-hl); border-color: var(--hl); transform: translateY(-1px); }
 
   .btn-demo svg {
     width: 12px;
@@ -372,36 +388,37 @@
 
   .coming-soon .card-thumb-icon svg { stroke: var(--muted); }
   .coming-soon .card-title { color: var(--muted); }
-  .coming-soon .card-desc { color: #55554f; }
+  .coming-soon .card-desc { color: #8a8983; }
 
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--ink-3);
-    padding: 28px 24px;
-    max-width: 880px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+  /* ── FOOTER — dark band, same as carrierpigeonai.dev ── */
+  .site-footer { background: var(--paper); color: var(--ink); padding: 64px 48px 32px; }
+  .site-footer-inner { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+  .site-footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+  .site-footer-brand { display: flex; flex-direction: column; gap: 16px; }
+  .site-footer-logo { display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 16px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+  .site-footer-brand p { color: #9a9992; max-width: 34ch; font-size: 15px; }
+  .site-footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+  .site-footer-links a { color: var(--ink); text-decoration: none; font-size: 15px; }
+  .site-footer-links a:hover { color: var(--hl); }
+  .site-footer-base { border-top: 1px solid rgba(154,153,146,.33); padding-top: 24px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #9a9992; }
+
+  /* Same content edge as the hero text: 1200 container minus 48px gutters. */
+  .grid { width: calc(100% - 96px); max-width: 1104px; }
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    nav { padding: 0 20px; }
+    .nav-wordmark { font-size: 14px; }
+    .hero, .filter-bar { padding-left: 24px; padding-right: 24px; }
+    .grid { width: calc(100% - 48px); }
+    .site-footer { padding: 48px 24px 28px; }
   }
-
-  .footer-note {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-  }
-
-  .footer-note a { color: var(--muted); text-decoration: none; }
-  .footer-note a:hover { color: var(--signal); }
-
   @media (max-width: 560px) {
-    .hero h1 { font-size: 2.1rem; }
     .grid { grid-template-columns: 1fr; }
-    nav { padding: 0 16px; }
-    .hero, .filter-bar, .grid { padding-left: 16px; padding-right: 16px; }
+    .nav-cta { padding: 9px 12px; }
+    .nav-cta, .nav-wordmark { white-space: nowrap; }
+    .nav-wordmark { font-size: 11px; letter-spacing: 0.12em; }
+    .nav-mark { width: 28px; height: 28px; }
+    .nav-logo { gap: 8px; }
   }
 </style>
 </head>
@@ -410,8 +427,8 @@
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="https://carrierpigeonai.dev">
-    <svg class="nav-mark" width="28" height="28" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
-      <g fill="#f1f1ef">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
         <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
         <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
         <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
@@ -421,17 +438,22 @@
         <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
         <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
       </g>
-      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#9bff5b"/>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
     </svg>
     <span class="nav-wordmark">Carrier Pigeon AI</span>
   </a>
-  <a class="nav-cta" href="mailto:andrew@carrierpigeonai.dev">Send a Pigeon</a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">Demo gallery</div>
-  <h1>Web tools built for <em>local businesses</em></h1>
+  <div class="hero-eyebrow">The Lab / AI Automations</div>
+  <h1>Tools built for <em>local</em> businesses.</h1>
   <p class="hero-sub">Every app here is a real, working prototype — built for the kinds of businesses that keep Lafayette running. Each one can be customized and live in days.</p>
   <a class="hero-contact" href="mailto:andrew@carrierpigeonai.dev">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>
@@ -663,9 +685,42 @@
 </main>
 
 <!-- FOOTER -->
-<footer>
-  <span class="footer-note">© 2026 Carrier Pigeon AI · Lafayette, LA · <a href="mailto:andrew@carrierpigeonai.dev">andrew@carrierpigeonai.dev</a></span>
-  <span class="footer-note"><a href="https://carrierpigeonai.dev">carrierpigeonai.dev</a></span>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="site-footer-top">
+      <div class="site-footer-brand">
+        <a class="site-footer-logo" href="https://carrierpigeonai.dev">
+          <svg width="44" height="44" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#f3f2ee">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#9bff5b"/>
+    </svg>
+          Carrier Pigeon AI
+        </a>
+        <p>Helping business owners grow with AI. Built and run from Lafayette, Louisiana.</p>
+      </div>
+      <nav class="site-footer-links" aria-label="Footer">
+        <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+        <a href="https://carrierpigeonai.dev/services/web-design#gallery">Web Design Gallery</a>
+        <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+        <a href="https://carrierpigeonai.dev/contact">Send a Pigeon</a>
+        <a href="mailto:andrew@carrierpigeonai.dev">andrew@carrierpigeonai.dev</a>
+      </nav>
+    </div>
+    <div class="site-footer-base">
+      <span>&copy; 2026 Carrier Pigeon AI</span>
+      <span>Built on the bayou &middot; Lafayette, Louisiana</span>
+      <span>30.2241&deg; N &middot; 92.0198&deg; W</span>
+    </div>
+  </div>
 </footer>
 
 <script>
