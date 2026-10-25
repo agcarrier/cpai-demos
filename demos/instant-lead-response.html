@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/demos/agent-demo.css">
 <link rel="stylesheet" href="/site-nav.css">
 <script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
 </head>
 <body>
 
@@ -179,11 +180,11 @@
 
   // ── Calendar, driven by the agent's action ──
   function slotEl(t) { return document.querySelector('#slots [data-slot="' + t + '"]'); }
-  function offer(slot) {
+  function offer(slots) {
     if (booked) return;
+    const els = slots.map(slotEl).filter(Boolean); if (!els.length) return;
     document.querySelectorAll('#slots .offered').forEach(s => { s.classList.remove('offered'); s.querySelector('.b').textContent = 'Open'; });
-    const el = slotEl(slot); if (!el) return;
-    el.classList.add('offered'); el.querySelector('.b').textContent = 'Offered to ' + ctx.first;
+    els.forEach(el => { el.classList.add('offered'); el.querySelector('.b').textContent = 'Offered to ' + ctx.first; });
     $('conn2').classList.add('on'); status(3, 'holding', true);
     $('calFoot').textContent = 'Agent is offering open times…';
   }
@@ -200,7 +201,7 @@
   }
   function applyAction(r) {
     if (r.action === 'book' && r.slot) book(r.slot);
-    else if (r.action === 'offer' && r.slot) offer(r.slot);
+    else if (r.action === 'offer' && r.slot) offer(r.slots && r.slots.length ? r.slots : [r.slot]);
   }
 
   // ── Timer ──
