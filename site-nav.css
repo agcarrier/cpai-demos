@@ -1,0 +1,46 @@
+/* Site nav dropdowns + mobile menu (see site-nav.js). Uses the Studio tokens each page already defines. */
+.sn-panel[hidden], .sn-mobile[hidden], .sn-acc[hidden] { display: none !important; }
+.sn-drop { position: relative; }
+.sn-trigger { display: flex; align-items: center; gap: 5px; background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); transition: color .15s; }
+.sn-trigger:hover, .sn-trigger[aria-expanded="true"] { color: var(--paper); }
+.sn-chev { transition: transform .2s ease; flex-shrink: 0; margin-top: 1px; }
+[aria-expanded="true"] > .sn-chev { transform: rotate(180deg); }
+
+.sn-panel { position: absolute; top: calc(100% + 16px); left: 50%; transform: translateX(-50%); width: 420px; background: var(--ink); border: 1px solid var(--ink-3); padding: 8px 0; z-index: 200; }
+.sn-panel::before { content: ''; position: absolute; top: -16px; left: 0; right: 0; height: 16px; } /* hover bridge across the gap */
+.sn-caret { position: absolute; top: -5px; left: 50%; width: 9px; height: 9px; background: var(--ink); border: 1px solid var(--ink-3); border-bottom: none; border-right: none; transform: translateX(-50%) rotate(45deg); }
+.nav-links .sn-item { display: flex; align-items: center; gap: 14px; padding: 12px 20px; text-decoration: none; text-transform: none; letter-spacing: normal; transition: background .12s ease; }
+.sn-item:hover, .sn-item:focus-visible { background: var(--ink-2); }
+.sn-item.flagship { border-bottom: 1px solid var(--ink-3); }
+.sn-text { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.sn-name { font: 600 12px var(--font-sans); letter-spacing: -0.01em; color: var(--paper); }
+.sn-item.flagship .sn-name { color: var(--signal); }
+.sn-flag { font: 500 9px var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.sn-sub { flex-basis: 100%; margin-top: 2px; font: 400 11px var(--font-sans); color: var(--muted); }
+.sn-thumb { flex-shrink: 0; width: 108px; height: 72px; overflow: hidden; border: 1px solid var(--ink-3); background: var(--ink-2); }
+.sn-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.sn-item:hover .sn-thumb img { transform: scale(1.04); }
+.sn-item[aria-current] .sn-name::after { content: ' · you are here'; font: 500 9px var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+.sn-burger { display: none; background: none; border: 0; cursor: pointer; padding: 6px; color: var(--paper); line-height: 0; }
+.sn-mobile { position: fixed; left: 0; right: 0; z-index: 99; display: flex; flex-direction: column; background: rgba(243,242,238,0.97); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--ink-3); padding: 12px 24px 28px; max-height: calc(100svh - 64px); overflow-y: auto; }
+.sn-mtrigger, .sn-mlink { display: flex; justify-content: space-between; align-items: center; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--ink-3); padding: 18px 0; cursor: pointer; text-align: left; text-decoration: none; font: 500 13px var(--font-mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--paper); }
+.sn-mtrigger .sn-chev { width: 12px; height: 12px; }
+.sn-acc { border-bottom: 1px solid var(--ink-3); }
+.sn-mitem { display: flex; align-items: center; gap: 14px; padding: 12px 0 12px 16px; border-top: 1px solid var(--ink-3); text-decoration: none; font: 500 12px var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.sn-mitem .sn-name { font: inherit; letter-spacing: inherit; color: inherit; }
+.sn-mitem .sn-thumb { width: 72px; height: 48px; }
+.sn-mcta { margin-top: 24px; align-self: flex-start; }
+
+@media (min-width: 861px) {
+  nav .nav-links { display: flex; }
+  .sn-mobile { display: none !important; }
+}
+@media (max-width: 860px) {
+  nav .nav-links, nav > .nav-cta { display: none !important; }
+  .sn-burger { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sn-chev, .sn-thumb img { transition: none; }
+  .sn-item:hover .sn-thumb img { transform: none; }
+}
