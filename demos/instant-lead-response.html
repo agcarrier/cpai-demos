@@ -85,7 +85,7 @@
   .replay:hover { color: var(--paper); }
 
   .lead-card { display: none; }
-  .lead-card.show { display: block; animation: stampIn .4s cubic-bezier(.2,.7,.3,1.2); }
+  .lead-card.show { display: block; animation: stampIn .4s cubic-bezier(.22,1,.36,1); }
   @keyframes stampIn { from { opacity: 0; transform: scale(.97) translateY(6px); } to { opacity: 1; transform: none; } }
   .badge { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-hl); background: var(--hl); padding: 5px 10px; margin-bottom: 14px; }
   .row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ink-2); font-size: 13.5px; }
@@ -114,7 +114,7 @@
   .pc-sub { font: 10px var(--font-mono); color: var(--faint); letter-spacing: .08em; text-transform: uppercase; }
   .thread { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
   .daystamp { text-align: center; font: 600 10px var(--font-mono); color: var(--faint); margin: 2px 0 6px; }
-  .bubble { max-width: 80%; font-size: 13px; line-height: 1.42; padding: 8px 12px; border-radius: 16px; animation: pop .26s cubic-bezier(.2,.7,.3,1.2); overflow-wrap: anywhere; }
+  .bubble { max-width: 80%; font-size: 13px; line-height: 1.42; padding: 8px 12px; border-radius: 16px; animation: pop .26s cubic-bezier(.22,1,.36,1); overflow-wrap: anywhere; }
   @keyframes pop { from { opacity: 0; transform: translateY(7px) scale(.96); } to { opacity: 1; transform: none; } }
   .bubble.agent { background: var(--ink-2); align-self: flex-start; border-bottom-left-radius: 5px; }
   .bubble.you { background: var(--paper); color: var(--ink); align-self: flex-end; border-bottom-right-radius: 5px; }
@@ -148,7 +148,7 @@
   .slot.open .b { font-style: italic; }
   .slot.offered { border-color: var(--signal); border-style: dashed; background: #eef6e6; }
   .slot.offered .b { color: var(--signal); font-style: normal; font-weight: 600; }
-  .slot.booked { background: var(--hl); border: 1px solid var(--paper); animation: bookPop .5s cubic-bezier(.2,.7,.3,1.2); }
+  .slot.booked { background: var(--hl); border: 1px solid var(--paper); animation: bookPop .5s cubic-bezier(.22,1,.36,1); }
   .slot.booked .t, .slot.booked .b { color: var(--on-hl); font-weight: 600; font-style: normal; }
   @keyframes bookPop { 0% { transform: scale(.95); } 45% { transform: scale(1.03); } 100% { transform: none; } }
   .cal-foot { margin-top: 14px; font-size: 12.5px; color: var(--muted); text-align: center; min-height: 20px; }
