@@ -224,6 +224,18 @@
     border-left: 1px solid var(--ink-3);
   }
 
+  .grid-section { margin-bottom: 72px; }
+  .grid-section:last-child { margin-bottom: 112px; }
+  .grid-section[hidden] { display: none; }
+  .grid-section .grid { margin-bottom: 0; }
+  .grid-head { width: calc(100% - 96px); max-width: 1104px; margin: 0 auto 24px; }
+  .grid-kicker { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .grid-section[data-section="ai"] .grid-kicker { color: var(--signal); }
+  .grid-section[data-section="ai"] .grid-kicker .status-dot { background: var(--signal); }
+  .grid-count { color: var(--paper); border: 1px solid var(--ink-3); padding: 1px 6px; font-size: 10px; letter-spacing: 0.06em; }
+  .grid-head h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.02em; line-height: 1.15; }
+  .grid-head p { color: var(--muted); max-width: 60ch; margin-top: 8px; font-size: 14.5px; }
+
   /* ── CARD ── */
   /* Hairlines as cell borders, so a short last row leaves no gray fill. */
   .card {
@@ -311,6 +323,10 @@
 
   .status-live .status-dot { background: var(--signal); }
   .status-live { color: var(--signal); }
+  .status-ai { color: var(--on-hl); background: var(--hl); padding: 4px 8px; border: 1px solid var(--paper); font-weight: 600; }
+  .status-ai .status-dot { background: var(--on-hl); }
+  .status-tool { color: var(--muted); }
+  .status-tool .status-dot { background: var(--ink-3); }
   .status-coming .status-dot { background: var(--muted); }
   .status-coming { color: var(--muted); }
 
@@ -411,7 +427,7 @@
     nav { padding: 0 20px; }
     .nav-wordmark { font-size: 14px; }
     .hero, .filter-bar { padding-left: 24px; padding-right: 24px; }
-    .grid { width: calc(100% - 48px); }
+    .grid, .grid-head { width: calc(100% - 48px); }
     .site-footer { padding: 48px 24px 28px; }
   }
   @media (max-width: 560px) {
@@ -469,7 +485,8 @@
 <div class="filter-bar">
   <span class="filter-label">Filter</span>
   <button class="filter-btn active" data-filter="all" onclick="filterCards(this, 'all')">All</button>
-  <button class="filter-btn" data-filter="live" onclick="filterCards(this, 'live')">Live demos</button>
+  <button class="filter-btn" data-filter="ai" onclick="filterCards(this, 'ai')">AI agents</button>
+  <button class="filter-btn" data-filter="tool" onclick="filterCards(this, 'tool')">Simple tools</button>
   <button class="filter-btn" data-filter="booking" onclick="filterCards(this, 'booking')">Booking</button>
   <button class="filter-btn" data-filter="finance" onclick="filterCards(this, 'finance')">Finance</button>
   <button class="filter-btn" data-filter="marketing" onclick="filterCards(this, 'marketing')">Marketing</button>
@@ -477,10 +494,18 @@
 </div>
 
 <!-- GRID -->
-<main class="grid" id="card-grid">
+<main id="card-grid">
+  <section class="grid-section" data-section="ai" aria-labelledby="sec-ai">
+    <div class="grid-head">
+      <div class="grid-kicker"><span class="status-dot"></span>Live AI agents <span class="grid-count">7</span></div>
+      <h2 id="sec-ai">Talk to these like a customer would.</h2>
+      <p>Each one runs a real AI agent on the other end. Type anything and watch the side panels respond to what it actually does.</p>
+    </div>
+    <div class="grid">
+
 
   <!-- LIVE AI: Instant Lead Response -->
-  <div class="card" data-categories="live booking marketing">
+  <div class="card" data-categories="ai booking marketing">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 6l-3 5h4l-3 5"/></svg>
@@ -488,8 +513,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Booking</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">Instant lead response</div>
       <p class="card-desc">Fill out a web form and a live AI agent texts you back in seconds, answers your questions, and books the job on the calendar. You play the customer.</p>
@@ -503,7 +528,7 @@
   </div>
 
   <!-- LIVE AI: Storm Estimate Intake -->
-  <div class="card" data-categories="live operations booking">
+  <div class="card" data-categories="ai operations booking">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M13 12l-2 3h3l-2 3"/></svg>
@@ -511,8 +536,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Operations</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">Storm estimate intake</div>
       <p class="card-desc">The morning after a hailstorm, a live AI chat agent takes the roofing intake, builds the job ticket, and ranks the inspection queue so active leaks get seen first.</p>
@@ -526,7 +551,7 @@
   </div>
 
   <!-- LIVE AI: Lead Reactivation -->
-  <div class="card" data-categories="live marketing">
+  <div class="card" data-categories="ai marketing">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>
@@ -534,8 +559,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">Lead reactivation</div>
       <p class="card-desc">A live AI agent writes a personal text for every lead that went cold. You approve them, then play a lead who texts back and watch the pipeline move to booked.</p>
@@ -549,7 +574,7 @@
   </div>
 
   <!-- LIVE AI: Review Reply Agent -->
-  <div class="card" data-categories="live marketing">
+  <div class="card" data-categories="ai marketing">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -557,8 +582,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Reviews</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">Review reply agent</div>
       <p class="card-desc">Leave a review, good or bad. A live AI agent drafts the public reply in the owner's voice, plus a private text that makes an unhappy visit right. You approve, then text back as the customer.</p>
@@ -572,7 +597,7 @@
   </div>
 
   <!-- LIVE AI: Promotion Builder -->
-  <div class="card" data-categories="live marketing">
+  <div class="card" data-categories="ai marketing">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -580,8 +605,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">AI promotion builder</div>
       <p class="card-desc">Type one line about your deal. A live AI copywriter writes the text blast, Facebook post, email, and a downloadable flyer, then rewrites any of it when you ask.</p>
@@ -595,7 +620,7 @@
   </div>
 
   <!-- LIVE AI: Digital Waitlist -->
-  <div class="card" data-categories="live booking operations">
+  <div class="card" data-categories="ai booking operations">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -603,8 +628,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Operations</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">AI digital waitlist</div>
       <p class="card-desc">Join a restaurant waitlist by text and ask the live AI agent anything a guest would: how much longer, the patio, running late, party size. The host's queue updates itself.</p>
@@ -618,7 +643,7 @@
   </div>
 
   <!-- LIVE AI: Missed-Call Text-Back -->
-  <div class="card" data-categories="live marketing operations">
+  <div class="card" data-categories="ai marketing operations">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/><path d="M15 3l6 6M21 3l-6 6"/></svg>
@@ -626,8 +651,8 @@
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-tag">AI agent</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live AI</span>
+        <span class="card-tag">Leads</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
       </div>
       <div class="card-title">Missed-call text-back</div>
       <p class="card-desc">Call a plumber who can't pick up. A live AI agent texts you back in seconds, finds out what's wrong and how urgent it is, and files a qualified lead in the CRM.</p>
@@ -640,8 +665,18 @@
     </div>
   </div>
 
+    </div>
+  </section>
+
+  <section class="grid-section" data-section="tool" aria-labelledby="sec-tool">
+    <div class="grid-head">
+      <div class="grid-kicker">Simple tools <span class="grid-count">3</span></div>
+      <h2 id="sec-tool">No AI, just handy.</h2>
+      <p>Small web apps a business can put to work on day one. Fast, free to run, nothing to learn.</p>
+    </div>
+    <div class="grid">
   <!-- LIVE: Invoice Generator -->
-  <div class="card" data-categories="live finance">
+  <div class="card" data-categories="tool finance">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/></svg>
@@ -650,7 +685,7 @@
     <div class="card-body">
       <div class="card-meta">
         <span class="card-tag">Finance</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
       </div>
       <div class="card-title">Invoice generator</div>
       <p class="card-desc">Fill in your client details, add line items, and print a clean PDF invoice. No accounting software needed — just open and go.</p>
@@ -664,7 +699,7 @@
   </div>
 
   <!-- LIVE: Open Today -->
-  <div class="card" data-categories="live marketing operations">
+  <div class="card" data-categories="tool marketing operations">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -673,7 +708,7 @@
     <div class="card-body">
       <div class="card-meta">
         <span class="card-tag">Marketing</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
       </div>
       <div class="card-title">"Open today?" page</div>
       <p class="card-desc">A shareable link that shows your hours, live open/closed status, and today's special. Drop it in your Instagram bio and never miss a call about hours again.</p>
@@ -687,7 +722,7 @@
   </div>
 
   <!-- LIVE: Loyalty Punch Card -->
-  <div class="card" data-categories="live marketing operations">
+  <div class="card" data-categories="tool marketing operations">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -696,7 +731,7 @@
     <div class="card-body">
       <div class="card-meta">
         <span class="card-tag">Marketing</span>
-        <span class="card-status status-live"><span class="status-dot"></span>Live demo</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
       </div>
       <div class="card-title">Loyalty punch card</div>
       <p class="card-desc">A digital version of the paper punch card, tied to a phone number. No app download required — customers visit a link, you tap a button, they earn their reward.</p>
@@ -709,6 +744,8 @@
     </div>
   </div>
 
+    </div>
+  </section>
 </main>
 
 <!-- FOOTER -->
@@ -758,6 +795,10 @@ function filterCards(btn, filter) {
     const cats = card.dataset.categories || '';
     const show = filter === 'all' || cats.includes(filter);
     card.style.display = show ? '' : 'none';
+  });
+  // A section whose cards are all filtered out drops its heading too.
+  document.querySelectorAll('.grid-section').forEach(sec => {
+    sec.hidden = ![...sec.querySelectorAll('.card')].some(c => c.style.display !== 'none');
   });
 }
 </script>
