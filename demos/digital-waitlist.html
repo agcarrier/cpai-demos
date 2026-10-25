@@ -3,209 +3,388 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Waitlist — Carrier Pigeon AI Demo</title>
+<title>AI Digital Waitlist — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Join a restaurant waitlist and text a live AI agent: how much longer, patio seating, running late, party size, cancel. The host's queue updates as you go.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/digital-waitlist">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
-  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
-  .demo-bar a:hover { text-decoration: underline; }
-  .demo-bar .sep { color: #45453f; }
-  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
-  .nav-back:hover { color: var(--ink); }
-  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
-  .page-header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  h1 { font-size: 16px; font-weight: 500; }
-  .page-sub { font-size: 12px; color: var(--ink-3); }
+  :root { --alert: #b4361a; }
 
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
-  .stat-num { font-size: 24px; font-weight: 600; line-height: 1.1; }
-  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+  /* 01 Join */
+  .field select { width: 100%; font: 14px var(--font-sans); color: var(--paper); background: var(--ink); border: 1px solid var(--ink-3); padding: 10px 12px; border-radius: 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ticket { border: 1px solid var(--paper); box-shadow: 4px 4px 0 var(--paper); background: #fff; padding: 18px; text-align: center; }
+  .ticket .lbl { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .ticket .pos { font: 600 64px var(--font-display); letter-spacing: -0.04em; line-height: 1; margin: 10px 0 4px; }
+  .ticket .eta { font: 600 13px var(--font-mono); letter-spacing: .06em; }
+  .ticket .who { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .ticket.ready { background: var(--hl); }
+  .ticket.cancelled { opacity: .55; }
+  .ticket.bump { animation: pulseIn .5s cubic-bezier(.22,1,.36,1); }
+  @keyframes pulseIn { 0% { transform: scale(.97); } 50% { transform: scale(1.02); } 100% { transform: none; } }
+  .tags { display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
 
-  .columns { display: grid; grid-template-columns: 320px 1fr; gap: 1rem; align-items: start; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
-  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
-
-  .form-group { margin-bottom: 0.85rem; }
-  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
-  .form-group input, .form-group select { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
-  .form-group input:focus, .form-group select:focus { border-color: var(--blue); }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  .btn-add { width: 100%; background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 0.4rem; }
-  .btn-add:hover { opacity: 0.92; }
-
-  .queue-empty { text-align: center; padding: 3rem 1rem; color: var(--ink-3); font-size: 13px; }
-  .queue-empty svg { width: 32px; height: 32px; stroke: var(--ink-4); fill: none; stroke-width: 1.5; margin-bottom: 10px; }
-
-  .queue-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .queue-item:last-child { border-bottom: none; }
-  .queue-pos { width: 30px; height: 30px; border-radius: 50%; background: var(--blue-light); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
-  .queue-info { flex: 1; min-width: 0; }
-  .queue-name { font-size: 13px; font-weight: 500; }
-  .queue-meta { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
-  .queue-wait { font-size: 11px; color: var(--ink-3); text-align: right; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
-  .queue-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .icon-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-3); transition: all 0.12s; }
-  .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .icon-btn:hover { border-color: var(--ink-3); color: var(--ink); }
-  .icon-btn.notify:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
-  .icon-btn.seat:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
-  .icon-btn.remove:hover { border-color: #E24B4A; color: #E24B4A; background: #fdecec; }
-
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120%); background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 99px; transition: transform 0.25s ease; z-index: 200; white-space: nowrap; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  @media (max-width: 680px) { .columns { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; } .stat-num { font-size: 19px; } }
+  /* 03 Host screen */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 14px; }
+  .stat { border: 1px solid var(--ink-3); background: #fff; padding: 10px; }
+  .stat .mv { font: 600 20px var(--font-mono); letter-spacing: -0.02em; }
+  .stat .ml { font: 500 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-top: 2px; }
+  .queue { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+  .party { display: grid; grid-template-columns: 22px 1fr auto; gap: 2px 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--ink-3); background: #fff; }
+  .party .rank { font: 600 11px var(--font-mono); color: var(--faint); grid-row: span 2; }
+  .party .nm { font-size: 13px; font-weight: 600; }
+  .party .meta { font-size: 11.5px; color: var(--muted); grid-column: 2; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .party .wt { font: 600 11px var(--font-mono); grid-row: span 2; grid-column: 3; text-align: right; }
+  .party.you { border-color: var(--paper); background: #f7fbef; box-shadow: 3px 3px 0 var(--paper); }
+  .party.bump { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } }
+  .pill { font: 600 9px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border: 1px solid var(--paper); color: var(--paper); background: #fff; white-space: nowrap; }
+  .pill.late { color: var(--alert); border-color: var(--alert); }
+  .pill.ready { background: var(--hl); color: var(--on-hl); }
+  .seat-btn { width: 100%; }
+  .empty-q { font-size: 13px; color: var(--faint); text-align: center; padding: 16px; border: 1px dashed var(--ink-3); }
 </style>
 </head>
 <body>
 
-<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
 
 <nav>
-  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
-  <span class="nav-badge">Live demo</span>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <div class="wrap">
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-      <div><h1>Digital waitlist</h1><div class="page-sub">Add walk-ins, track wait times, notify when ready</div></div>
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / AI digital waitlist</div>
+      <h1>"How much longer?" answered <em>without</em> the host.</h1>
+      <p class="hero-sub">Friday night, a forty minute wait, and the host stand is three deep with the same questions. Join the list at Crawfish Corner, then text the live AI agent anything a guest would ask. The host's screen updates on its own.</p>
     </div>
-  </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
 
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num" id="stat-waiting">0</div><div class="stat-label">Waiting now</div></div>
-    <div class="stat-card"><div class="stat-num" id="stat-wait">—</div><div class="stat-label">Est. wait (next)</div></div>
-    <div class="stat-card"><div class="stat-num" id="stat-seated">0</div><div class="stat-label">Seated today</div></div>
-  </div>
-
-  <div class="columns">
-    <div class="card">
-      <div class="section-head">Add to waitlist</div>
-      <div class="form-group"><label>Name</label><input type="text" id="in-name" placeholder="e.g. Marcus T."></div>
-      <div class="two-col">
-        <div class="form-group"><label>Party size</label><input type="number" id="in-size" min="1" value="2"></div>
-        <div class="form-group"><label>Phone (optional)</label><input type="text" id="in-phone" placeholder="(337) 555-0100"></div>
+  <div class="stages">
+    <!-- 01 Join the list -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">Join the list</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <form class="pad" id="form">
+          <div class="hd">Crawfish Corner</div>
+          <div class="hd-sub">Scan the code at the door. No app, just a text.</div>
+          <div class="field"><label for="f-name">Name</label><input id="f-name" value="Dana" maxlength="40"></div>
+          <div class="two">
+            <div class="field"><label for="f-size">Party size</label><select id="f-size"></select></div>
+            <div class="field"><label for="f-phone">Mobile</label><input id="f-phone" value="(337) 555-0161" maxlength="20"></div>
+          </div>
+          <button class="submit" id="join" type="submit">Join the waitlist →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </form>
+        <div class="pad" id="ticketView" hidden>
+          <div class="ticket" id="ticket">
+            <div class="lbl" id="tLbl">Your place in line</div>
+            <div class="pos" id="tPos">#4</div>
+            <div class="eta" id="tEta">About 32 min</div>
+            <div class="who" id="tWho"></div>
+            <div class="tags" id="tTags"></div>
+          </div>
+        </div>
       </div>
-      <button class="btn-add" onclick="addToQueue()">Add to waitlist</button>
     </div>
 
-    <div class="card">
-      <div class="section-head">Current queue</div>
-      <div id="queue-list"></div>
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 The text agent -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI text agent</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="timer" id="timer"><span class="timer-label" id="timerLabel">Questions answered</span><span class="timer-val" id="timerVal">0</span></div>
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span id="clock">9:41</span><span>5G</span></div>
+              <div class="av">CC</div>
+              <div class="pc-name">Crawfish Corner</div>
+              <div class="pc-sub">Waitlist</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 03 The host screen -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The host screen</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="stats">
+            <div class="stat"><div class="mv" id="v-waiting">3</div><div class="ml">Waiting</div></div>
+            <div class="stat"><div class="mv" id="v-next">8m</div><div class="ml">Next table</div></div>
+            <div class="stat"><div class="mv" id="v-asked">0</div><div class="ml">Host asked</div></div>
+          </div>
+          <ol class="queue" id="queue"></ol>
+          <button class="btn-ghost seat-btn" id="seat" type="button">Seat next party</button>
+          <div class="cal-foot" id="hFoot">Seat a party to move the line.</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-asked">0</div><div class="ml">Guest questions answered</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0</div><div class="ml">Trips to the host stand</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-changes">0</div><div class="ml">Changes made by text</div></div>
+    <div class="cta">
+      <p>On a busy night the host's real job is seating people. An agent like this handles the questions and keeps the list right while they do it.</p>
+      <a href="https://carrierpigeonai.dev/services/ai-agents">See AI agents →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The restaurant is made up. No texts are sent and nothing is stored.</p>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-let queue = [
-  { name: 'Jenna R.', size: 4, phone: '(337) 555-0148', addedAt: Date.now() - 18*60000 },
-  { name: 'The Boudreaux Party', size: 6, phone: '', addedAt: Date.now() - 9*60000 },
-  { name: 'Marcus T.', size: 2, phone: '(337) 555-0172', addedAt: Date.now() - 3*60000 },
-];
-let seatedToday = 12;
-const MIN_PER_PARTY = 12; // avg minutes added to wait per party ahead
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Crawfish Corner';
+  const MIN_PER_TABLE = 8;
+  const PATIO_SAVINGS = 10;
+  const AHEAD = [
+    { name: 'Jenna R.', size: 4 },
+    { name: 'The Boudreaux party', size: 6 },
+    { name: 'Marcus T.', size: 2 },
+  ];
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let ctx = null;       // per-run guest, queue and history
+  let queue = [];
 
-function fmtWait(mins){
-  if(mins <= 0) return 'Ready now';
-  if(mins < 60) return `~${mins} min`;
-  return `~${Math.floor(mins/60)}h ${mins%60}m`;
-}
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  const bump = el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
 
-function timeAgo(ts){
-  const mins = Math.floor((Date.now()-ts)/60000);
-  if(mins < 1) return 'just now';
-  if(mins === 1) return '1 min ago';
-  return `${mins} min ago`;
-}
+  // ── Queue math ──
+  const me = () => queue.find(p => p.you);
+  const position = () => { const i = queue.findIndex(p => p.you); return i === -1 ? 0 : i + 1; };
+  function waitFor(p, idx) { const base = (idx + 1) * MIN_PER_TABLE; return p.patio ? Math.max(0, base - PATIO_SAVINGS) : base; }
+  function guestWait() { const i = queue.findIndex(p => p.you); return i === -1 ? 0 : waitFor(queue[i], i); }
 
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(()=>t.classList.remove('show'), 2400);
-}
-
-function render(){
-  const list = document.getElementById('queue-list');
-  list.innerHTML = '';
-  if(queue.length === 0){
-    list.innerHTML = `<div class="queue-empty"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div>No one's waiting — queue is clear.</div></div>`;
-  } else {
-    queue.forEach((item, idx) => {
-      const wait = idx * MIN_PER_PARTY;
-      const row = document.createElement('div');
-      row.className = 'queue-item';
-      row.innerHTML = `
-        <div class="queue-pos">${idx+1}</div>
-        <div class="queue-info">
-          <div class="queue-name">${item.name}</div>
-          <div class="queue-meta">Party of ${item.size}${item.phone ? ' · ' + item.phone : ''} · added ${timeAgo(item.addedAt)}</div>
-        </div>
-        <div class="queue-wait">${fmtWait(wait)}</div>
-        <div class="queue-actions">
-          <button class="icon-btn notify" title="Text: table ready" onclick="notify(${idx})"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-          <button class="icon-btn seat" title="Seat party" onclick="seat(${idx})"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></button>
-          <button class="icon-btn remove" title="Remove" onclick="remove(${idx})"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>`;
-      list.appendChild(row);
+  // ── 03 Host screen ──
+  function renderQueue() {
+    $('queue').innerHTML = '';
+    if (!queue.length) $('queue').innerHTML = '<li class="empty-q">No one waiting.</li>';
+    queue.forEach((p, i) => {
+      const li = document.createElement('li'); li.className = 'party' + (p.you ? ' you' : '') + (p.bump ? ' bump' : '');
+      li.innerHTML = '<span class="rank"></span><span class="nm"></span><span class="wt"></span><span class="meta"></span>';
+      li.querySelector('.rank').textContent = String(i + 1).padStart(2, '0');
+      li.querySelector('.nm').textContent = p.name + (p.you ? ' (you)' : '');
+      const w = waitFor(p, i); li.querySelector('.wt').textContent = w ? w + 'm' : 'Next';
+      const meta = li.querySelector('.meta'); meta.append('Party of ' + p.size);
+      if (p.patio) { const t = document.createElement('span'); t.className = 'pill'; t.textContent = 'Patio'; meta.append(t); }
+      if (p.late) { const t = document.createElement('span'); t.className = 'pill late'; t.textContent = 'Late · held 15m'; meta.append(t); }
+      $('queue').appendChild(li); p.bump = false;
     });
+    $('v-waiting').textContent = queue.length;
+    $('v-next').textContent = queue.length ? MIN_PER_TABLE + 'm' : '—';
+    $('seat').disabled = !queue.length || !ctx || ctx.done;
   }
-  document.getElementById('stat-waiting').textContent = queue.length;
-  document.getElementById('stat-wait').textContent = queue.length ? fmtWait(0) : '—';
-  document.getElementById('stat-seated').textContent = seatedToday;
-}
+  function renderTicket() {
+    const p = me(), t = $('ticket');
+    $('tTags').innerHTML = '';
+    if (ctx.cancelled) { t.className = 'ticket cancelled'; $('tLbl').textContent = 'You left the list'; $('tPos').textContent = '—'; $('tEta').textContent = 'Come back anytime'; return; }
+    if (ctx.ready) { t.className = 'ticket ready'; $('tLbl').textContent = 'Your table is'; $('tPos').textContent = 'Ready'; $('tEta').textContent = 'Head to the host stand'; return; }
+    t.className = 'ticket';
+    $('tLbl').textContent = 'Your place in line';
+    $('tPos').textContent = '#' + position();
+    const w = guestWait(); $('tEta').textContent = w ? 'About ' + w + ' min' : 'You’re next';
+    $('tWho').textContent = p.name + ' · party of ' + p.size;
+    if (p.patio) { const s = document.createElement('span'); s.className = 'pill'; s.textContent = 'Patio'; $('tTags').appendChild(s); }
+    if (p.late) { const s = document.createElement('span'); s.className = 'pill late'; s.textContent = 'Spot held 15 min'; $('tTags').appendChild(s); }
+    bump(t);
+  }
+  // Queue movement texts are plain automation, not the AI.
+  function autoText(text) { ctx.history.push({ role: 'assistant', content: text }); bubble('agent', text); }
+  function seatNext() {
+    if (!queue.length || ctx?.done) return;
+    const seated = queue.shift();
+    if (seated.you) {
+      ctx.ready = true; ctx.done = true;
+      autoText(`${seated.name}, your table is ready! Head to the host stand and we’ll seat you now.`);
+      status(1, 'table ready', true); status(3, 'seated', true);
+      $('hFoot').textContent = 'Seated without a single question at the stand.';
+      composer(false); $('results').classList.add('show');
+    } else {
+      $('hFoot').textContent = 'Seated ' + seated.name + '.';
+      if (me() && position() === 1 && !ctx.toldNext) { ctx.toldNext = true; autoText('You’re next! Start heading toward the host stand.'); }
+      status(3, 'seating', true);
+    }
+    renderQueue(); if (me() || ctx.ready) renderTicket();
+  }
 
-function addToQueue(){
-  const name = document.getElementById('in-name').value.trim();
-  const size = parseInt(document.getElementById('in-size').value) || 1;
-  const phone = document.getElementById('in-phone').value.trim();
-  if(!name){ document.getElementById('in-name').focus(); return; }
-  queue.push({ name, size, phone, addedAt: Date.now() });
-  document.getElementById('in-name').value = '';
-  document.getElementById('in-phone').value = '';
-  document.getElementById('in-size').value = 2;
-  render();
-  showToast(`Added ${name} to the waitlist`);
-}
+  // ── 02 Text agent ──
+  function bubble(side, text) {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    if (!on) return;
+    const p = me();
+    const chips = ['How much longer?', p && !p.patio ? 'Can we sit on the patio?' : 'Can we wait at the bar?', p && !p.late ? 'Running 10 min late' : 'Is there a kids menu?', 'Add one more person', 'We need to cancel'];
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => guestSays(c); $('chips').appendChild(b); });
+    if (!matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function countAnswer() {
+    ctx.asked++;
+    $('timerVal').textContent = ctx.asked; $('r-asked').textContent = ctx.asked;
+    $('timer').classList.add('fired'); $('timerLabel').textContent = 'Questions answered';
+    if (ctx.asked >= 2) $('results').classList.add('show');
+  }
+  function applyAction(r) {
+    const p = me(); if (!p) return;
+    let changed = true;
+    if (r.action === 'size' && r.size) p.size = r.size;
+    else if (r.action === 'late') p.late = true;
+    else if (r.action === 'patio') p.patio = true;
+    else if (r.action === 'cancel') {
+      queue = queue.filter(x => !x.you); ctx.cancelled = true; ctx.done = true;
+      status(1, 'left list'); status(3, 'removed', true); $('hFoot').textContent = 'Removed by text. The next party moves up.';
+      composer(false);
+    } else changed = false;
+    if (!changed) return;
+    ctx.changes++; $('r-changes').textContent = ctx.changes;
+    p.bump = true; $('conn2').classList.add('on');
+    if (!ctx.cancelled) status(3, 'updated', true);
+    renderQueue(); renderTicket();
+  }
+  async function guestSays(text) {
+    text = text.trim(); if (!text || !ctx?.live || ctx.done) return;
+    const id = run;
+    $('msg').value = ''; composer(false); $('err').hidden = true;
+    ctx.history.push({ role: 'user', content: text }); bubble('you', text);
+    try {
+      await sleep(300, id); typing(true);
+      const p = me();
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        mode: 'waitlist', businessName: BIZ, messages: ctx.history,
+        party: { name: p.name, size: p.size, position: position(), wait: guestWait(), late: !!p.late, patio: !!p.patio } }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+      if (id !== run) return;
+      typing(false);
+      ctx.history.push({ role: 'assistant', content: d.content }); bubble('agent', d.content);
+      countAnswer(); applyAction(d);
+      if (!ctx.done) composer(true);
+    } catch (e) {
+      if (e === 'abort' || id !== run) return;
+      typing(false); ctx.history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text;
+      $('err').hidden = false; $('err').textContent = e.message; composer(true);
+    }
+  }
 
-function notify(idx){
-  const item = queue[idx];
-  showToast(item.phone ? `Texted ${item.name}: "Your table is ready!"` : `${item.name}: table ready (no phone on file)`);
-}
+  // ── Scripted replay ──
+  async function replay(id) {
+    const turns = [
+      ['you', 'How much longer?'],
+      ['agent', 'You’re number 4, so about 32 minutes. Feel free to grab a drink at the bar while you wait.', null],
+      ['you', 'Can we sit on the patio?'],
+      ['agent', 'Done, I’ve noted the patio for you. It usually seats about 10 minutes quicker.', { action: 'patio' }],
+      ['seat'], ['seat'],
+      ['you', 'Can we add one more person?'],
+      ['agent', 'No problem, you’re now a party of 3.', { action: 'size', size: 3 }],
+      ['seat'], ['seat'],
+    ];
+    for (const [side, text, r] of turns) {
+      if (side === 'seat') { await sleep(1300, id); seatNext(); continue; }
+      if (side === 'agent') { typing(true); await sleep(1500, id); typing(false); } else await sleep(1300, id);
+      bubble(side, text);
+      if (side === 'agent') { countAnswer(); if (r) applyAction(r); }
+      await sleep(500, id);
+    }
+    status(2, 'done');
+  }
 
-function seat(idx){
-  const item = queue[idx];
-  queue.splice(idx, 1);
-  seatedToday++;
-  render();
-  showToast(`Seated ${item.name} — enjoy!`);
-}
+  async function join(mode) {
+    const id = ++run;
+    const name = (mode === 'live' && $('f-name').value.trim()) || 'Dana';
+    const size = mode === 'live' ? +$('f-size').value : 2;
+    ctx = { live: mode === 'live', history: [], asked: 0, changes: 0, ready: false, cancelled: false, done: false, toldNext: false };
+    queue = AHEAD.map(p => ({ ...p })).concat([{ name, size, you: true, bump: true }]);
+    $('form').hidden = true; $('ticketView').hidden = false;
+    status(1, 'on the list', true); $('conn1').classList.add('on');
+    renderQueue(); renderTicket(); status(3, 'new party', true);
+    $('thread').innerHTML = '<div class="daystamp">Today</div>';
+    status(2, mode === 'live' ? 'live' : 'replay', true);
+    try {
+      await sleep(600, id);
+      autoText(`Hi ${name}, you’re on the list at ${BIZ}! You’re #${position()}, about ${guestWait()} minutes. Text this number with any questions.`);
+      if (mode === 'live') composer(true); else await replay(id);
+    } catch (e) { /* aborted by reset */ }
+  }
 
-function remove(idx){
-  const item = queue[idx];
-  queue.splice(idx, 1);
-  render();
-  showToast(`Removed ${item.name} from the waitlist`);
-}
+  function reset() {
+    run++; ctx = null; queue = AHEAD.map(p => ({ ...p }));
+    $('form').hidden = false; $('ticketView').hidden = true;
+    $('thread').innerHTML = '<div class="empty">Join the list and the confirmation lands here. Then text anything a guest would ask.</div>';
+    $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Questions answered'; $('timerVal').textContent = '0';
+    $('err').hidden = true;
+    [1, 2, 3].forEach(n => status(n, 'waiting'));
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('results').classList.remove('show'); $('r-asked').textContent = $('r-changes').textContent = '0';
+    $('hFoot').textContent = 'Seat a party to move the line.';
+    composer(false); renderQueue();
+    $('clock').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/, '');
+  }
 
-render();
+  for (let i = 1; i <= 8; i++) { const o = document.createElement('option'); o.value = i; o.textContent = i; if (i === 2) o.selected = true; $('f-size').appendChild(o); }
+  $('form').addEventListener('submit', e => { e.preventDefault(); join('live'); });
+  $('replay').addEventListener('click', () => join('replay'));
+  $('seat').addEventListener('click', seatNext);
+  $('composer').addEventListener('submit', e => { e.preventDefault(); guestSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
 </script>
 </body>
 </html>
