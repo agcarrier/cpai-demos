@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storm Estimate Intake — Carrier Pigeon AI Demo</title>
+<meta name="description" content="After a storm, a live AI chat agent takes the roofing intake, builds the job ticket, and ranks the inspection queue by urgency so leaks get seen first.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/storm-estimate-intake">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  :root { --alert: #b4361a; --alert-wash: #fbe9e3; }
+
+  .scenario { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border: 1px solid var(--paper); background: var(--paper); color: var(--ink); padding: 12px 16px; margin-bottom: 26px; font: 500 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+  .scenario b { color: var(--hl); font-weight: 600; }
+  .scenario .sep { color: #5a5953; }
+
+  /* 01 Website chat widget */
+  .widget { display: flex; flex-direction: column; flex: 1; min-height: 480px; max-height: 600px; }
+  .widget-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--ink-3); background: var(--ink); }
+  .widget-top .av { width: 30px; height: 30px; font-size: 11px; margin: 0; }
+  .widget-top .pc-name { font-size: 13px; }
+  .widget-top .online { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--signal); }
+  .widget-top .online::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--signal); }
+  .widget .timer { margin: 12px 12px 0; width: auto; }
+  .start { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 8px; }
+  .start .hd { font-size: 20px; }
+  .start p { font-size: 13px; color: var(--muted); max-width: 30ch; }
+  .start .submit { width: auto; padding: 13px 24px; margin-top: 10px; }
+  .composer .cam { background: #fff; color: var(--paper); border: 1px solid var(--ink-3); }
+  .composer .cam:hover:not(:disabled) { border-color: var(--paper); }
+  .bubble.photo { padding: 5px; width: 170px; }
+  .bubble.photo .img { height: 96px; border-radius: 12px; background: repeating-linear-gradient(135deg, #3a3a37 0 10px, #46453f 10px 20px); display: grid; place-items: center; color: #c9c7bf; font: 500 10px var(--font-mono); letter-spacing: .08em; }
+  .bubble.photo .cap { font-size: 11.5px; padding: 5px 6px 2px; color: #c9c7bf; }
+
+  /* 02 Job ticket */
+  .crm-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .crm-head .hd { font-size: 16px; }
+  .ticket-id { font: 500 11px var(--font-mono); color: var(--faint); letter-spacing: .08em; }
+  .pill { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; padding: 5px 9px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; white-space: nowrap; }
+  .pill.urgent { background: var(--alert); color: #fff; border-color: var(--alert); }
+  .pill.high { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .pill.standard { color: var(--paper); border-color: var(--paper); }
+  .pill.yes { background: var(--alert-wash); color: var(--alert); border-color: var(--alert); }
+  .pill.no { color: var(--paper); border-color: var(--paper); }
+  .row .v.empty { color: var(--ink-3); font-weight: 400; }
+  .row .v.fill { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: transparent; } }
+  .ready { display: none; margin-top: 14px; padding: 10px 12px; background: var(--hl); border: 1px solid var(--paper); color: var(--on-hl); font-size: 12.5px; font-weight: 600; }
+  .ready.show { display: block; animation: stampIn .4s cubic-bezier(.22,1,.36,1); }
+
+  /* 03 Inspection queue */
+  .q-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  .q-head .day { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+  .q-head .date { font: 500 11px var(--font-mono); color: var(--faint); letter-spacing: .1em; text-transform: uppercase; }
+  .queue { display: flex; flex-direction: column; gap: 7px; list-style: none; }
+  .job { display: grid; grid-template-columns: 22px 1fr auto; gap: 4px 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--ink-3); background: #fff; }
+  .job .rank { font: 600 11px var(--font-mono); color: var(--faint); grid-row: span 2; }
+  .job .who { font-size: 13px; font-weight: 600; }
+  .job .what { font-size: 12px; color: var(--muted); grid-column: 2; }
+  .job .eta { font: 500 10.5px var(--font-mono); color: var(--muted); text-align: right; grid-row: 2; grid-column: 3; }
+  .job .pill { grid-row: 1; grid-column: 3; justify-self: end; padding: 3px 7px; font-size: 9px; }
+  .job.you { border-color: var(--paper); background: #f7fbef; box-shadow: 3px 3px 0 var(--paper); }
+  .job.moved { animation: slideIn .6s cubic-bezier(.22,1,.36,1); }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Storm estimate intake</div>
+      <h1>The morning after a storm, <em>leaks</em> get seen first.</h1>
+      <p class="hero-sub">After a hailstorm, a roofer's phone and inbox flood all at once. Here a live AI agent takes every intake on the website, builds the job ticket while you chat, and slots you into the inspection queue by urgency. You're the homeowner. Tell it what the storm did.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="scenario"><span>Scenario</span><span class="sep">/</span><span>Last night: severe storm over Acadiana</span><span class="sep">/</span><span><b>1.25 in</b> hail</span><span class="sep">/</span><span><b>60 mph</b> gusts</span><span class="sep">/</span><span><b id="inbound">212</b> homeowners reaching out</span></div>
+
+  <div class="stages">
+    <!-- 01 Website chat -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The website chat</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel widget">
+        <div class="widget-top"><div class="av">CC</div><div class="pc-name">Coulee Crest Roofing</div><span class="online">Online</span></div>
+        <div class="timer" id="timer" hidden><span class="timer-label" id="timerLabel">Time to first reply</span><span class="timer-val" id="timerVal">0.0s</span></div>
+        <div class="start" id="start">
+          <div class="hd">Storm damage?</div>
+          <p>Get on the inspection list. It takes about a minute.</p>
+          <button class="submit" id="go" type="button">Start chat →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </div>
+        <div class="thread" id="thread" aria-live="polite" hidden></div>
+        <div class="err" id="err" hidden></div>
+        <div class="chips" id="chips"></div>
+        <form class="composer" id="composer">
+          <button type="button" class="cam" id="cam" disabled aria-label="Send a photo of the damage" title="Send a photo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+          <input id="msg" placeholder="Type a message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+          <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 Job ticket -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The job ticket</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="crm-head"><span class="hd">Inspection request <span class="ticket-id">#4213</span></span><span class="pill" id="f-priority">Not ranked</span></div>
+          <div class="row"><span class="k">Name</span><span class="v empty" id="f-name">—</span></div>
+          <div class="row"><span class="k">Area</span><span class="v empty" id="f-area">—</span></div>
+          <div class="row"><span class="k">Damage</span><span class="v empty" id="f-damage">—</span></div>
+          <div class="row"><span class="k">Water inside</span><span class="v empty" id="f-leaking">—</span></div>
+          <div class="row"><span class="k">Roof</span><span class="v empty" id="f-roof">—</span></div>
+          <div class="row"><span class="k">Insurance</span><span class="v empty" id="f-insurance">—</span></div>
+          <div class="row"><span class="k">Photos</span><span class="v empty" id="f-photos">—</span></div>
+          <div class="ready" id="ready">Ready to schedule. Travis will text a time.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 03 Inspection queue -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The inspection queue</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="q-head"><span class="day">Travis's list</span><span class="date" id="qCount">4 jobs</span></div>
+          <ol class="queue" id="queue"></ol>
+          <div class="cal-foot" id="qFoot">Ranked by urgency, not by who called first.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-first">—</div><div class="ml">Time to first reply</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-ticket">—</div><div class="ml">Chat to ready ticket</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0 min</div><div class="ml">Estimator time on intake</div></div>
+    <div class="cta">
+      <p>Storm weeks make or break a roofing year. An agent like this takes every intake at once and hands your crew a ranked list.</p>
+      <a href="https://carrierpigeonai.dev/services/ai-agents">See AI agents →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The storm, the company, and the photo are made up. Nothing you type is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Coulee Crest Roofing';
+  const TEXT_FIELDS = ['name', 'area', 'damage', 'roof'];
+  const INSURANCE_LABEL = { filed: 'Claim filed', not_filed: 'Not filed yet' };
+  const PRIORITY = { urgent: { label: 'Urgent', eta: 'Today', rank: 0 }, high: { label: 'High', eta: 'Tomorrow', rank: 1 }, standard: { label: 'Standard', eta: 'This week', rank: 2 } };
+  const QUEUE = [
+    { who: 'Guidry · Scott', what: 'Tree limb through roof, leaking', p: 'urgent' },
+    { who: 'Thibodeaux · Broussard', what: 'Missing shingles on ridge', p: 'high' },
+    { who: 'Savoie · Milton', what: 'Hail dents, gutter torn loose', p: 'high' },
+    { who: 'Breaux · Lafayette', what: 'Check-up, nothing visible', p: 'standard' },
+  ];
+  const PHOTO_NOTE = '[Sent a photo of the roof: several shingles missing near the ridge and exposed felt underneath]';
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let history = [];     // {role: 'assistant' | 'user', content}
+  let ctx = null;       // per-run mode + timing
+  let ticket = {};
+  let photos = 0;
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const secs = ms => ms < 60000 ? (ms / 1000).toFixed(1) + 's' : Math.floor(ms / 60000) + 'm ' + Math.round(ms % 60000 / 1000) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  const pill = (cls, text) => { const p = document.createElement('span'); p.className = 'pill ' + cls; p.textContent = text; return p; };
+
+  function bubble(side, text) {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function photoBubble() {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble you photo';
+    b.innerHTML = '<div class="img">IMG_2041.JPG</div><div class="cap">Roof, front side</div>';
+    t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on, chips = []) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('cam').disabled = !on || photos > 0;
+    $('chips').innerHTML = '';
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => customerSays(c); $('chips').appendChild(b); });
+    if (on && !matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+
+  // ── Queue, ranked by the server-computed priority ──
+  function renderQueue(highlight) {
+    const jobs = QUEUE.map(j => ({ ...j }));
+    if (ticket.priority) {
+      const mine = { who: (ticket.name || 'You') + (ticket.area ? ' · ' + ticket.area : ''), what: ticket.damage || 'Storm damage', p: ticket.priority, you: true };
+      // Same urgency waits behind whoever got there first.
+      const at = jobs.findIndex(j => PRIORITY[j.p].rank > PRIORITY[mine.p].rank);
+      jobs.splice(at === -1 ? jobs.length : at, 0, mine);
+    }
+    $('queue').innerHTML = '';
+    jobs.forEach((j, i) => {
+      const li = document.createElement('li');
+      li.className = 'job' + (j.you ? ' you' : '') + (j.you && highlight ? ' moved' : '');
+      li.innerHTML = '<span class="rank"></span><span class="who"></span><span class="what"></span><span class="eta"></span>';
+      li.querySelector('.rank').textContent = String(i + 1).padStart(2, '0');
+      li.querySelector('.who').textContent = j.who;
+      li.querySelector('.what').textContent = j.what;
+      li.querySelector('.eta').textContent = PRIORITY[j.p].eta;
+      li.appendChild(pill(j.p, PRIORITY[j.p].label));
+      $('queue').appendChild(li);
+    });
+    $('qCount').textContent = jobs.length + ' jobs';
+    return jobs.findIndex(j => j.you) + 1;
+  }
+
+  // ── Ticket, filled from the agent's `ticket` ──
+  function fill(el) { el.classList.remove('empty', 'fill'); void el.offsetWidth; el.classList.add('fill'); }
+  function applyTicket(next, done) {
+    if (!next) return;
+    let changed = false;
+    for (const k of TEXT_FIELDS) {
+      if (!next[k] || next[k] === ticket[k]) continue;
+      ticket[k] = next[k]; $('f-' + k).textContent = next[k]; fill($('f-' + k)); changed = true;
+    }
+    if (next.leaking !== null && next.leaking !== undefined && next.leaking !== ticket.leaking) {
+      ticket.leaking = next.leaking;
+      const el = $('f-leaking'); el.innerHTML = ''; el.appendChild(pill(next.leaking ? 'yes' : 'no', next.leaking ? 'Yes' : 'No')); fill(el); changed = true;
+    }
+    if (next.insurance && next.insurance !== ticket.insurance) {
+      ticket.insurance = next.insurance; $('f-insurance').textContent = INSURANCE_LABEL[next.insurance]; fill($('f-insurance')); changed = true;
+    }
+    if (changed) { $('conn1').classList.add('on'); if (!ctx.ready) status(2, 'building', true); }
+    if (next.priority && next.priority !== ticket.priority) {
+      ticket.priority = next.priority;
+      const el = $('f-priority'); el.className = 'pill ' + next.priority; el.textContent = PRIORITY[next.priority].label;
+      const pos = renderQueue(true);
+      $('conn2').classList.add('on'); status(3, 'ranked', true);
+      $('qFoot').textContent = 'You’re #' + pos + ' of ' + (QUEUE.length + 1) + (next.priority === 'urgent' ? ', ahead of everyone without a leak.' : '. Leaks go ahead of you.');
+    } else if (changed && ticket.priority) {
+      renderQueue(false);
+    }
+    if (done && !ctx.ready) {
+      ctx.ready = true;
+      $('ready').classList.add('show'); status(2, 'ready', true);
+      $('r-ticket').textContent = secs(performance.now() - ctx.t0);
+      $('results').classList.add('show');
+    }
+  }
+
+  // ── Timer ──
+  function startTimer(id) {
+    const t0 = performance.now();
+    (function tick() {
+      if (id !== run || $('timer').classList.contains('fired')) return;
+      $('timerVal').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+      requestAnimationFrame(tick);
+    })();
+  }
+  function fireTimer(ms) {
+    $('timer').classList.add('fired');
+    $('timerLabel').textContent = 'First reply sent';
+    $('timerVal').textContent = secs(ms);
+    $('r-first').textContent = secs(ms);
+  }
+
+  // ── Live agent ──
+  async function ask() {
+    const r = await fetch(API, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'stormintake', businessName: BIZ, messages: history }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  async function agentTurn(id) {
+    typing(true);
+    const r = await ask();
+    if (id !== run) return;
+    typing(false);
+    history.push({ role: 'assistant', content: r.content });
+    bubble('agent', r.content);
+    applyTicket(r.ticket, r.done);
+    return r;
+  }
+  function nextChips() {
+    if (ctx.ready) return ['Thank you!', 'Will y’all meet the adjuster?'];
+    if (!ticket.damage) return ['Shingles all over the yard', 'A tree limb hit the roof', 'Hail dents on the gutters'];
+    if (ticket.leaking === undefined) return ['Water’s dripping in the kitchen', 'No leaks inside'];
+    if (!ticket.name) return ['I’m Renee'];
+    if (!ticket.area) return ['Carencro', 'Near Ambassador Caffery'];
+    if (!ticket.roof) return ['Shingle, about 12 years old', 'Not sure'];
+    return ['Filed a claim this morning', 'Haven’t called insurance yet'];
+  }
+  async function send(text, isPhoto) {
+    if (!ctx || !ctx.live) return;
+    const id = run;
+    $('msg').value = '';
+    composer(false); showError('');
+    history.push({ role: 'user', content: text });
+    if (isPhoto) { photos = 1; photoBubble(); $('f-photos').textContent = '1 photo'; fill($('f-photos')); }
+    else bubble('you', text);
+    try {
+      await sleep(350, id);
+      await agentTurn(id);
+      composer(true, nextChips());
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove();
+      if (isPhoto) { photos = 0; $('f-photos').className = 'v empty'; $('f-photos').textContent = '—'; }
+      else $('msg').value = text;
+      showError(e.message); composer(true, nextChips());
+    }
+  }
+  const customerSays = text => { text = text.trim(); if (text) send(text, false); };
+
+  // ── Scripted replay (also the fallback when the API can't be reached) ──
+  async function replay(id) {
+    ctx.live = false;
+    const turns = [
+      ['agent', `Hi, this is ${BIZ}. That was a rough storm last night. What are you seeing at your place?`, {}],
+      ['you', 'A bunch of shingles are in the yard and there’s water dripping in the kitchen.'],
+      ['agent', 'I’m sorry. Put a bucket under the drip, move anything valuable away from it, and stay off the roof. I’m marking you urgent. What’s your first name?', { damage: 'Missing shingles, kitchen leak', leaking: true, priority: 'urgent' }],
+      ['photo'],
+      ['agent', 'Thanks, that photo helps Travis prepare. What part of town are you in?', { damage: 'Missing shingles, kitchen leak', leaking: true, priority: 'urgent' }],
+      ['you', 'I’m Renee, in Carencro.'],
+      ['agent', 'Thanks Renee. You’re on the inspection list as urgent, and Travis will text you a time shortly. Have you filed an insurance claim yet?', { name: 'Renee', area: 'Carencro', damage: 'Missing shingles, kitchen leak', leaking: true, priority: 'urgent' }, true],
+      ['you', 'Not yet.'],
+      ['agent', 'No problem. We work with all the major carriers and can meet your adjuster on site.', { name: 'Renee', area: 'Carencro', damage: 'Missing shingles, kitchen leak', leaking: true, insurance: 'not_filed', priority: 'urgent' }, true],
+    ];
+    for (const [i, [side, text, t, done]] of turns.entries()) {
+      if (side === 'agent') { typing(true); await sleep(i === 0 ? 2000 : 1500, id); typing(false); }
+      else await sleep(1300, id);
+      if (i === 0) fireTimer(2000);
+      if (side === 'photo') { photos = 1; photoBubble(); $('f-photos').textContent = '1 photo'; fill($('f-photos')); }
+      else bubble(side, text);
+      applyTicket(t, done);
+      await sleep(700, id);
+    }
+    status(1, 'done');
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', ready: false, t0: performance.now() };
+    history = []; ticket = {}; photos = 0;
+    $('start').hidden = true; $('thread').hidden = false; $('timer').hidden = false;
+    $('thread').innerHTML = '';
+    status(1, mode === 'live' ? 'live' : 'replay', true);
+    startTimer(id);
+    try {
+      if (mode === 'live') {
+        try {
+          await agentTurn(id);
+          fireTimer(performance.now() - ctx.t0);
+          composer(true, nextChips());
+        } catch (e) {
+          if (e === 'abort') throw e;
+          typing(false);
+          console.warn('[storm-intake] live agent failed:', e.message);
+          showError('The live agent is busy right now, so here’s a replay.');
+          status(1, 'replay', true);
+          await replay(id);
+        }
+      } else {
+        await replay(id);
+      }
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; history = []; ticket = {}; photos = 0;
+    $('start').hidden = false; $('thread').hidden = true; $('timer').hidden = true;
+    [1, 2, 3].forEach(n => status(n, 'waiting'));
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Time to first reply'; $('timerVal').textContent = '0.0s';
+    $('results').classList.remove('show'); $('r-first').textContent = $('r-ticket').textContent = '—';
+    const p = $('f-priority'); p.className = 'pill'; p.textContent = 'Not ranked';
+    ['name', 'area', 'damage', 'leaking', 'roof', 'insurance', 'photos'].forEach(k => { const el = $('f-' + k); el.className = 'v empty'; el.textContent = '—'; });
+    $('ready').classList.remove('show');
+    $('qFoot').textContent = 'Ranked by urgency, not by who called first.';
+    renderQueue(false);
+    showError(''); composer(false);
+  }
+
+  $('go').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); customerSays($('msg').value); });
+  $('cam').addEventListener('click', () => send(PHOTO_NOTE, true));
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

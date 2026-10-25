@@ -1,4 +1,5 @@
 /* Shared styles for the live AI agent demos (Studio system). */
+  [hidden] { display: none !important; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   /* Studio system, mirrored from the gallery index: ink = surfaces, paper = text. */
   :root {
@@ -112,7 +113,7 @@
   .typing span:nth-child(2) { animation-delay: .18s; }
   .typing span:nth-child(3) { animation-delay: .36s; }
   @keyframes tw { 0%,60%,100% { opacity: .3; transform: none; } 30% { opacity: 1; transform: translateY(-3px); } }
-  .empty { flex: 1; display: grid; place-items: center; padding: 30px; text-align: center; font-size: 13px; color: var(--faint); }
+  .thread > .empty { flex: 1; display: grid; place-items: center; padding: 30px; text-align: center; font-size: 13px; color: var(--faint); }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 8px; }
   .chip { font: 12px var(--font-sans); background: #fff; border: 1px solid var(--ink-3); border-radius: 999px; padding: 5px 10px; cursor: pointer; color: var(--paper); }
   .chip:hover { border-color: var(--paper); }

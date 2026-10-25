@@ -210,7 +210,7 @@
       el.classList.remove('empty', 'fill'); void el.offsetWidth; el.classList.add('fill');
       if (k === 'urgency') { el.innerHTML = ''; const p = document.createElement('span'); setPill(p, next[k], URGENCY_LABEL[next[k]]); el.appendChild(p); }
       else el.textContent = next[k];
-      $('conn2').classList.add('on'); status(3, 'updating', true);
+      $('conn2').classList.add('on'); if (!ctx.qualified) status(3, 'updating', true);
     }
     $('flag').classList.toggle('show', lead.urgency === 'emergency');
     if (done && !ctx.qualified) {
