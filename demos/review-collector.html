@@ -3,278 +3,511 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Review Collector — Carrier Pigeon AI Demo</title>
+<title>Review Reply Agent — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Leave a review for a local salon. A live AI agent drafts the public reply, and for an unhappy review a private recovery text, then talks it through with you.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/review-collector">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --amber: #D98E2B; --amber-light: #faf0e0; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
-  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
-  .demo-bar a:hover { text-decoration: underline; }
-  .demo-bar .sep { color: #45453f; }
-  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
-  .nav-back:hover { color: var(--ink); }
-  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-  .page-header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  h1 { font-size: 16px; font-weight: 500; }
-  .page-sub { font-size: 12px; color: var(--ink-3); }
+  :root { --alert: #b4361a; --star: #e8a317; }
 
-  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
-  .tab-btn { background: none; border: none; padding: 10px 4px; margin-right: 18px; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; font-family: 'Inter', sans-serif; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .tab-btn.active { color: var(--ink); border-bottom-color: var(--blue); }
+  /* 01 Review composer */
+  .stars { display: flex; gap: 4px; margin: 4px 0 6px; }
+  .star { background: none; border: none; cursor: pointer; padding: 2px; color: var(--ink-3); }
+  .star svg { width: 30px; height: 30px; fill: currentColor; display: block; }
+  .star.on { color: var(--star); }
+  .star:hover { transform: translateY(-1px); }
+  .star-label { font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); min-height: 16px; margin-bottom: 12px; }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; margin: -4px 0 14px; }
+  .posted { border: 1px solid var(--ink-3); background: #fff; padding: 14px; }
+  .posted .who { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .posted .av { width: 30px; height: 30px; font-size: 11px; margin: 0; }
+  .posted .nm { font-size: 13px; font-weight: 600; }
+  .posted .when { font: 500 10px var(--font-mono); color: var(--faint); letter-spacing: .08em; text-transform: uppercase; }
+  .mini-stars { color: var(--star); font-size: 14px; letter-spacing: 1px; }
+  .posted .tx { font-size: 13.5px; line-height: 1.5; margin-top: 4px; }
+  .owner-reply { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--paper); background: var(--ink); animation: stampIn .4s cubic-bezier(.22,1,.36,1); }
+  .owner-reply .lbl { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+  .owner-reply .tx { font-size: 13px; margin: 0; }
+  .note-honest { margin-top: 14px; font-size: 12px; color: var(--muted); }
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
-  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+  /* 02 Drafts */
+  .drafts-pad { padding: 18px; display: flex; flex-direction: column; height: 100%; gap: 12px; }
+  .placeholder { flex: 1; display: grid; place-items: center; text-align: center; font-size: 13px; color: var(--faint); padding: 30px; min-height: 300px; }
+  .writing { display: flex; align-items: center; gap: 10px; justify-content: center; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .draft { border: 1px solid var(--ink-3); background: #fff; padding: 12px; animation: pop .3s cubic-bezier(.22,1,.36,1); }
+  .draft.approved { border-color: var(--paper); box-shadow: 3px 3px 0 var(--paper); }
+  .draft .dh { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .draft .to { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .draft .tx { font-size: 13px; line-height: 1.5; }
+  .tog { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 5px 9px; border: 1px solid var(--paper); background: #fff; color: var(--paper); cursor: pointer; white-space: nowrap; }
+  .tog:hover:not(:disabled) { background: var(--ink-2); }
+  .draft.approved .tog { background: var(--hl); color: var(--on-hl); cursor: default; }
+  .play { margin-top: 8px; font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--paper); background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+  .play:hover { color: var(--signal); }
+  .gate { font-size: 12px; color: var(--muted); }
+  .back { align-self: flex-start; font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; background: none; border: none; color: var(--muted); cursor: pointer; padding: 0; }
+  .back:hover { color: var(--paper); }
+  .drafts-pad .phone { max-height: 520px; }
 
-  /* Customer view */
-  .review-prompt { text-align: center; padding: 1rem 0 0.5rem; }
-  .review-prompt h2 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
-  .review-prompt p { font-size: 13px; color: var(--ink-3); margin-bottom: 1.5rem; }
-  .stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 0.5rem; }
-  .star-btn { background: none; border: none; cursor: pointer; padding: 4px; line-height: 0; }
-  .star-btn svg { width: 38px; height: 38px; stroke: var(--ink-4); fill: none; stroke-width: 1.5; transition: all 0.1s; }
-  .star-btn.filled svg { stroke: var(--amber); fill: var(--amber); }
-  .star-btn:hover svg { stroke: var(--amber); transform: scale(1.08); }
-  .star-label { text-align: center; font-size: 12px; color: var(--ink-3); height: 18px; margin-bottom: 1rem; }
-
-  .result-panel { text-align: center; padding: 1rem 0; }
-  .result-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
-  .result-icon.good { background: var(--green-light); }
-  .result-icon.good svg { stroke: var(--green); }
-  .result-icon.bad { background: var(--amber-light); }
-  .result-icon.bad svg { stroke: var(--amber); }
-  .result-icon svg { width: 24px; height: 24px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .result-panel h2 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
-  .result-panel p { font-size: 13px; color: var(--ink-3); margin-bottom: 1.25rem; max-width: 38ch; margin-left: auto; margin-right: auto; }
-
-  .platform-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .platform-btn { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--ink); background: var(--surface); transition: border-color 0.15s; }
-  .platform-btn:hover { border-color: var(--ink-3); }
-  .platform-btn svg { width: 16px; height: 16px; }
-
-  .feedback-form textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif; resize: none; height: 90px; outline: none; margin-bottom: 0.75rem; }
-  .feedback-form textarea:focus { border-color: var(--blue); }
-  .btn-primary { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; }
-  .btn-primary:hover { opacity: 0.92; }
-  .btn-text { background: none; border: none; color: var(--ink-3); font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; text-decoration: underline; margin-top: 0.75rem; display: block; margin-left: auto; margin-right: auto; }
-
-  /* Dashboard */
-  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1.25rem; }
-  @media (min-width: 480px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
-  .stat-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
-  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
-
-  .feed-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .feed-item:last-child { border-bottom: none; }
-  .feed-stars { display: flex; gap: 1px; flex-shrink: 0; padding-top: 1px; }
-  .feed-stars svg { width: 13px; height: 13px; stroke: var(--amber); fill: var(--amber); }
-  .feed-stars svg.empty { stroke: var(--ink-4); fill: none; }
-  .feed-body { flex: 1; min-width: 0; }
-  .feed-name { font-size: 12px; font-weight: 500; }
-  .feed-text { font-size: 13px; color: var(--ink-2); margin-top: 3px; line-height: 1.5; }
-  .feed-time { font-size: 11px; color: var(--ink-4); margin-top: 4px; }
-  .feed-empty { text-align: center; padding: 2rem 1rem; color: var(--ink-3); font-size: 13px; }
-
-  .hidden { display: none !important; }
+  /* 03 Owner dashboard */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 16px; }
+  .tile { border: 1px solid var(--ink-3); background: #fff; padding: 10px; }
+  .tile .mv { font: 600 20px var(--font-mono); letter-spacing: -0.02em; }
+  .tile .ml { font: 500 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-top: 2px; }
+  .tile.bump { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: #fff; } }
+  .sec { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 4px 0 8px; }
+  .bars { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .bar { display: grid; grid-template-columns: 92px 1fr 22px; gap: 8px; align-items: center; font-size: 12.5px; }
+  .bar .track { height: 8px; background: var(--ink-2); }
+  .bar .fillb { height: 100%; background: var(--paper); transition: width .6s cubic-bezier(.22,1,.36,1); }
+  .bar.hot .fillb { background: var(--alert); }
+  .bar .n { font: 600 11px var(--font-mono); text-align: right; }
+  .recovery { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--ink-3); background: #fff; font-size: 13px; }
+  .pill { font: 600 9.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; padding: 4px 8px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; white-space: nowrap; }
+  .pill.open { color: var(--paper); border-color: var(--paper); }
+  .pill.callback { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .pill.resolved { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
 </style>
 </head>
 <body>
 
-<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
 
 <nav>
-  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
-  <span class="nav-badge">Live demo</span>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <div class="wrap">
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-      <div><h1>Review collector</h1><div class="page-sub">Smart review requests that route happy customers to Google/Yelp</div></div>
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Review reply agent</div>
+      <h1>Every review gets a reply. The bad ones get <em>fixed</em>.</h1>
+      <p class="hero-sub">Leave a review for Sunrise Hair Studio, good or bad. A live AI agent drafts the public reply in the owner's voice, and if you're unhappy, a private text that offers to make it right. Approve them, then text back as the customer.</p>
     </div>
-  </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
 
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-customer" onclick="showTab('customer')">Customer experience</button>
-    <button class="tab-btn" id="tab-dashboard" onclick="showTab('dashboard')">Owner dashboard</button>
-  </div>
-
-  <!-- CUSTOMER VIEW -->
-  <div id="view-customer" class="card">
-    <div id="step-rate">
-      <div class="review-prompt">
-        <h2>How was your visit to Sunrise Hair Studio?</h2>
-        <p>Tap a star to leave quick feedback — it takes 10 seconds.</p>
+  <div class="stages">
+    <!-- 01 The review -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The review</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <form class="pad" id="form">
+          <div class="hd">Review Sunrise Hair Studio</div>
+          <div class="hd-sub">Posted publicly on the business's Google profile.</div>
+          <div class="field"><label for="f-name">Your name</label><input id="f-name" value="Dana R." maxlength="40"></div>
+          <div class="field"><label>Rating</label>
+            <div class="stars" id="stars" role="radiogroup" aria-label="Rating"></div>
+            <div class="star-label" id="starLabel"></div>
+          </div>
+          <div class="field"><label for="f-text">Your review</label><textarea id="f-text" rows="4" maxlength="600"></textarea></div>
+          <div class="presets" id="presets"></div>
+          <button class="submit" id="post" type="submit">Post review →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </form>
+        <div class="pad" id="postedView" hidden>
+          <div class="posted">
+            <div class="who"><div class="av" id="pAv">DR</div><div><div class="nm" id="pName"></div><div class="when">Google review · just now</div></div></div>
+            <div class="mini-stars" id="pStars"></div>
+            <div class="tx" id="pText"></div>
+            <div class="owner-reply" id="ownerReply" hidden><div class="lbl">Response from the owner</div><div class="tx" id="ownerText"></div></div>
+          </div>
+          <p class="note-honest">Every customer is invited to post, happy or not. Filtering out unhappy customers breaks Google's review policy, so the reply does the work instead.</p>
+        </div>
       </div>
-      <div class="stars" id="stars"></div>
-      <div class="star-label" id="star-label"></div>
     </div>
 
-    <div id="step-good" class="result-panel hidden">
-      <div class="result-icon good"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
-      <h2>So glad you had a great experience!</h2>
-      <p>Mind sharing it publicly? It takes 30 seconds and helps other folks in Lafayette find us.</p>
-      <div class="platform-row">
-        <a class="platform-btn" href="#" onclick="return fakeRedirect(event,'Google')"><svg viewBox="0 0 24 24" fill="none"><path d="M21.6 12.23c0-.74-.07-1.45-.19-2.14H12v4.05h5.4a4.6 4.6 0 0 1-2 3.02v2.5h3.23c1.9-1.75 2.97-4.32 2.97-7.43z" fill="#4285F4"/><path d="M12 22c2.7 0 4.96-.9 6.62-2.43l-3.23-2.5c-.9.6-2.04.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H3.06v2.59A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 13.91A6 6 0 0 1 6.08 12c0-.66.11-1.3.32-1.91V7.5H3.06A10 10 0 0 0 2 12c0 1.61.39 3.14 1.06 4.5z" fill="#FBBC05"/><path d="M12 5.98c1.47 0 2.79.5 3.82 1.49l2.87-2.87C16.95 2.99 14.7 2 12 2A10 10 0 0 0 3.06 7.5l3.34 2.59c.8-2.36 3-4.11 5.6-4.11z" fill="#EA4335"/></svg> Google</a>
-        <a class="platform-btn" href="#" onclick="return fakeRedirect(event,'Yelp')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#D32323"/><path d="M11.1 12.6L7 14a1 1 0 0 1-1.27-1.21 6.9 6.9 0 0 1 2.65-3.78 1 1 0 0 1 1.55.46l1.5 4a1 1 0 0 1-.33 1.13zm.6 1.7l3.5 2.95a1 1 0 0 1-.27 1.66 6.9 6.9 0 0 1-4.6.16 1 1 0 0 1-.6-1.4l1.5-3.6a1 1 0 0 1 .47-.77zm1.7-1.9l4.3-.95a1 1 0 0 1 1.13 1.34 6.9 6.9 0 0 1-2.96 3.5 1 1 0 0 1-1.46-.6l-1.3-3.97a1 1 0 0 1 .29-1.32zm-.3-2.2l-1.05-4.25a1 1 0 0 1 1.04-1.24 6.9 6.9 0 0 1 4.06 1.96 1 1 0 0 1-.07 1.48L13.9 10.5a1 1 0 0 1-.8.2 1 1 0 0 1-.6-.5z" fill="#fff"/></svg> Yelp</a>
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 Drafts, then the recovery chat -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI reply agent</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="drafts-pad" id="draftsView">
+          <div class="timer" id="timer" hidden><span class="timer-label" id="timerLabel">Drafting replies</span><span class="timer-val" id="timerVal">0.0s</span></div>
+          <div class="placeholder" id="placeholder">Post the review and the drafts show up here for the owner to approve.</div>
+          <div id="drafts" hidden></div>
+          <div class="err" id="err" hidden></div>
+          <div class="gate" id="gate" hidden>Nothing posts or sends until the owner approves it.</div>
+        </div>
+        <div class="drafts-pad" id="chatView" hidden>
+          <button class="back" id="back" type="button">← Drafts</button>
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span id="clock">9:41</span><span>5G</span></div>
+              <div class="av">SH</div>
+              <div class="pc-name">Carla · Sunrise Hair</div>
+              <div class="pc-sub">You're the customer</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="chatErr" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
       </div>
-      <button class="btn-text" onclick="resetFlow()">Start over</button>
     </div>
 
-    <div id="step-bad" class="result-panel feedback-form hidden">
-      <div class="result-icon bad"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.29 3.86l-8.18 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.89-3.14l-8.18-14a2 2 0 0 0-3.42 0z"/></svg></div>
-      <h2 style="text-align:left">Sorry to hear that — tell us what happened</h2>
-      <p style="text-align:left;margin-left:0">This goes straight to the owner, not posted publicly. We'll follow up directly.</p>
-      <textarea id="feedback-text" placeholder="What could we have done better?"></textarea>
-      <button class="btn-primary" onclick="submitFeedback()">Send feedback privately</button>
-      <button class="btn-text" onclick="resetFlow()">Start over</button>
-    </div>
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
 
-    <div id="step-thanks" class="result-panel hidden">
-      <div class="result-icon good"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <h2>Thanks — we'll be in touch.</h2>
-      <p>Your feedback was sent privately to the business owner.</p>
-      <button class="btn-text" onclick="resetFlow()">Start over</button>
+    <!-- 03 Owner dashboard -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The owner dashboard</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="tiles">
+            <div class="tile" id="t-avg"><div class="mv" id="v-avg">4.6</div><div class="ml">Avg rating</div></div>
+            <div class="tile" id="t-replied"><div class="mv" id="v-replied">100%</div><div class="ml">Replied to</div></div>
+            <div class="tile" id="t-time"><div class="mv" id="v-time">6h</div><div class="ml" id="l-time">Avg reply time</div></div>
+          </div>
+          <div class="sec">What reviews mention</div>
+          <div class="bars" id="bars"></div>
+          <div class="sec">Recovery</div>
+          <div id="recovery"><div class="recovery"><span>No unhappy reviews waiting</span><span class="pill">—</span></div></div>
+          <div class="cal-foot" id="dFoot"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- DASHBOARD VIEW -->
-  <div id="view-dashboard" class="card hidden">
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-num" id="stat-sent">86</div><div class="stat-label">Requests sent</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-avg">4.6</div><div class="stat-label">Avg rating</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-public">61</div><div class="stat-label">Routed to Google/Yelp</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-private">3</div><div class="stat-label">Private feedback</div></div>
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-draft">—</div><div class="ml">Review to drafted reply</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-posted">—</div><div class="ml">Review to reply posted</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0 min</div><div class="ml">Owner time writing</div></div>
+    <div class="cta">
+      <p>Shoppers read the replies, not just the stars. An agent like this answers every review in your voice and catches the unhappy ones while you can still fix it.</p>
+      <a href="https://carrierpigeonai.dev/services/ai-agents">See AI agents →</a>
     </div>
-    <div class="section-head">Recent private feedback</div>
-    <div id="feed-list"></div>
   </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The salon is made up, nothing is posted to Google, and nothing you type is stored.</p>
 </div>
 
 <script>
-let selectedRating = 0;
-let stats = { sent: 86, ratingsSum: 396, ratingsCount: 86, public: 61, private: 3 };
-let feed = [
-  { name: 'Anonymous', rating: 2, text: "Waited almost 25 minutes past my appointment time with no update. The cut itself was fine.", time: '2 days ago' },
-  { name: 'Anonymous', rating: 3, text: "Loved the color, but the shop felt a little rushed today.", time: '5 days ago' },
-  { name: 'Anonymous', rating: 1, text: "Booked online for 2pm, got there and was told the stylist left for the day.", time: '1 week ago' },
-];
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Sunrise Hair Studio';
+  const STAR = '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+  const STAR_LABELS = ['', 'Terrible', 'Not great', 'Okay', 'Good', 'Excellent'];
+  const PRESETS = [
+    { label: '2★ long wait', rating: 2, text: 'Waited almost 25 minutes past my appointment with no update. The cut was fine but my stylist seemed rushed and barely talked to me.' },
+    { label: '1★ booking mixup', rating: 1, text: 'Booked online for 2pm, drove 20 minutes, and was told my stylist had already left for the day. Nobody called me.' },
+    { label: '5★ color fix', rating: 5, text: 'Carla fixed the box dye disaster I did at home. Color is perfect and she showed me how to style it. Booking again in 6 weeks!' },
+  ];
+  const ISSUES = { wait: 'Wait time', staff: 'Staff', quality: 'Quality', booking: 'Booking', price: 'Price', cleanliness: 'Cleanliness', other: 'Other' };
+  const BASE_TALLY = { wait: 4, staff: 2, quality: 3, booking: 1, price: 1, cleanliness: 0, other: 1 };
+  const BASE = { sum: 396, count: 86 };
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let ctx = null;       // per-run review, drafts and timing
+  let rating = 2;
 
-function buildStars(){
-  const wrap = document.getElementById('stars');
-  wrap.innerHTML = '';
-  for(let i=1;i<=5;i++){
-    const btn = document.createElement('button');
-    btn.className = 'star-btn';
-    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-    btn.onmouseenter = () => highlight(i);
-    btn.onmouseleave = () => highlight(selectedRating);
-    btn.onclick = () => rate(i);
-    wrap.appendChild(btn);
-  }
-}
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const secs = ms => ms < 60000 ? (ms / 1000).toFixed(1) + 's' : Math.floor(ms / 60000) + 'm ' + Math.round(ms % 60000 / 1000) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  const initials = s => s.replace(/[^A-Za-z ]/g, '').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'G';
+  const bump = id => { const el = $(id); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
 
-function highlight(n){
-  const labels = ['', 'Poor', 'Not great', 'Okay', 'Good', 'Excellent!'];
-  document.querySelectorAll('.star-btn').forEach((b, idx) => {
-    b.classList.toggle('filled', idx < n);
-  });
-  document.getElementById('star-label').textContent = labels[n] || '';
-}
-
-function rate(n){
-  selectedRating = n;
-  highlight(n);
-  stats.sent++; stats.ratingsSum += n; stats.ratingsCount++;
-  setTimeout(() => {
-    document.getElementById('step-rate').classList.add('hidden');
-    if(n >= 4){
-      stats.public++;
-      document.getElementById('step-good').classList.remove('hidden');
-    } else {
-      document.getElementById('step-bad').classList.remove('hidden');
+  // ── 01 Review composer ──
+  function renderStars() {
+    $('stars').innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'star' + (i <= rating ? ' on' : '');
+      b.innerHTML = STAR; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(i === rating)); b.setAttribute('aria-label', i + ' star' + (i > 1 ? 's' : ''));
+      b.onclick = () => { rating = i; renderStars(); };
+      $('stars').appendChild(b);
     }
-    refreshDashboard();
-  }, 350);
-}
-
-function fakeRedirect(e, platform){
-  e.preventDefault();
-  alert(`In a real deployment, this opens your ${platform} review page in a new tab.`);
-  return false;
-}
-
-function submitFeedback(){
-  const text = document.getElementById('feedback-text').value.trim();
-  if(!text){ document.getElementById('feedback-text').focus(); return; }
-  feed.unshift({ name: 'Anonymous', rating: selectedRating, text, time: 'just now' });
-  stats.private++;
-  document.getElementById('step-bad').classList.add('hidden');
-  document.getElementById('step-thanks').classList.remove('hidden');
-  document.getElementById('feedback-text').value = '';
-  refreshDashboard();
-}
-
-function resetFlow(){
-  selectedRating = 0;
-  highlight(0);
-  document.getElementById('step-good').classList.add('hidden');
-  document.getElementById('step-bad').classList.add('hidden');
-  document.getElementById('step-thanks').classList.add('hidden');
-  document.getElementById('step-rate').classList.remove('hidden');
-}
-
-function showTab(name){
-  document.getElementById('view-customer').classList.toggle('hidden', name !== 'customer');
-  document.getElementById('view-dashboard').classList.toggle('hidden', name !== 'dashboard');
-  document.getElementById('tab-customer').classList.toggle('active', name === 'customer');
-  document.getElementById('tab-dashboard').classList.toggle('active', name === 'dashboard');
-}
-
-function starsSvg(filled){
-  return `<svg class="${filled ? '' : 'empty'}" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-}
-
-function refreshDashboard(){
-  document.getElementById('stat-sent').textContent = stats.sent;
-  document.getElementById('stat-avg').textContent = (stats.ratingsSum / stats.ratingsCount).toFixed(1);
-  document.getElementById('stat-public').textContent = stats.public;
-  document.getElementById('stat-private').textContent = stats.private;
-
-  const list = document.getElementById('feed-list');
-  list.innerHTML = '';
-  if(feed.length === 0){
-    list.innerHTML = `<div class="feed-empty">No private feedback yet.</div>`;
-    return;
+    $('starLabel').textContent = STAR_LABELS[rating];
   }
-  feed.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'feed-item';
-    let starsHtml = '';
-    for(let i=1;i<=5;i++) starsHtml += starsSvg(i <= item.rating);
-    row.innerHTML = `
-      <div class="feed-stars">${starsHtml}</div>
-      <div class="feed-body">
-        <div class="feed-name">${item.name}</div>
-        <div class="feed-text">${item.text}</div>
-        <div class="feed-time">${item.time}</div>
-      </div>`;
-    list.appendChild(row);
-  });
-}
+  function renderPresets() {
+    PRESETS.forEach(p => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = p.label;
+      b.onclick = () => { rating = p.rating; $('f-text').value = p.text; renderStars(); };
+      $('presets').appendChild(b);
+    });
+  }
+  function showPosted(r) {
+    $('form').hidden = true; $('postedView').hidden = false;
+    $('pName').textContent = r.name; $('pAv').textContent = initials(r.name);
+    $('pStars').textContent = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    $('pText').textContent = r.text;
+    status(1, 'posted', true);
+  }
 
-buildStars();
-refreshDashboard();
+  // ── 03 Dashboard ──
+  function renderBars(hot) {
+    const tally = { ...BASE_TALLY };
+    if (ctx?.issue && ctx.issue !== 'none') tally[ctx.issue] = (tally[ctx.issue] || 0) + 1;
+    const max = Math.max(...Object.values(tally));
+    $('bars').innerHTML = '';
+    Object.keys(ISSUES).filter(k => tally[k]).sort((a, b) => tally[b] - tally[a]).slice(0, 5).forEach(k => {
+      const row = document.createElement('div'); row.className = 'bar' + (k === hot ? ' hot' : '');
+      row.innerHTML = '<span></span><div class="track"><div class="fillb"></div></div><span class="n"></span>';
+      row.firstChild.textContent = ISSUES[k]; row.querySelector('.n').textContent = tally[k];
+      row.querySelector('.fillb').style.width = (tally[k] / max * 100) + '%';
+      $('bars').appendChild(row);
+    });
+  }
+  function renderStats() {
+    const r = ctx?.review;
+    const avg = r ? (BASE.sum + r.rating) / (BASE.count + 1) : BASE.sum / BASE.count;
+    $('v-avg').textContent = avg.toFixed(2);
+    $('v-replied').textContent = r && !ctx.posted ? Math.round(BASE.count / (BASE.count + 1) * 100) + '%' : '100%';
+    $('v-time').textContent = ctx?.posted ? secs(ctx.postedAt) : '6h';
+    $('l-time').textContent = ctx?.posted ? 'This reply' : 'Avg reply time';
+  }
+  function setRecovery(st, text) {
+    $('recovery').innerHTML = '<div class="recovery"><span></span><span class="pill"></span></div>';
+    $('recovery').querySelector('span').textContent = text;
+    const p = $('recovery').querySelector('.pill'); p.className = 'pill ' + st; p.textContent = { open: 'Open', callback: 'Call today', resolved: 'Resolved', none: '—' }[st];
+    if (st === 'resolved') { $('dFoot').textContent = 'Recovered without asking anyone to change a review.'; status(3, 'resolved', true); }
+    else if (st === 'callback') { $('dFoot').textContent = 'Carla has a callback on her list for today.'; status(3, 'callback', true); }
+  }
+
+  // ── 02 Drafts and approvals ──
+  function draftCard(kind, label, text) {
+    const d = ctx.drafts[kind];
+    const card = document.createElement('div'); card.className = 'draft' + (d.approved ? ' approved' : '');
+    card.innerHTML = '<div class="dh"><span class="to"></span><button class="tog" type="button"></button></div><div class="tx"></div>';
+    card.querySelector('.to').textContent = label; card.querySelector('.tx').textContent = text;
+    const tog = card.querySelector('.tog');
+    tog.textContent = d.approved ? (kind === 'public' ? 'Posted ✓' : 'Sent ✓') : (kind === 'public' ? 'Approve & post' : 'Approve & send');
+    tog.disabled = d.approved || !ctx.live;
+    tog.onclick = () => approve(kind);
+    if (kind === 'private' && d.approved && ctx.live) {
+      const play = document.createElement('button'); play.type = 'button'; play.className = 'play';
+      play.textContent = (ctx.chat.length > 1 ? 'Continue as ' : 'Text back as ') + ctx.review.name.split(' ')[0] + ' →';
+      play.onclick = openChat; card.appendChild(play);
+    }
+    return card;
+  }
+  function renderDrafts() {
+    $('drafts').innerHTML = '';
+    $('drafts').style.cssText = 'display:flex;flex-direction:column;gap:10px';
+    $('drafts').appendChild(draftCard('public', 'Public reply on Google', ctx.drafts.public.text));
+    if (ctx.drafts.private) $('drafts').appendChild(draftCard('private', 'Private text to ' + ctx.review.name.split(' ')[0], ctx.drafts.private.text));
+  }
+  function approve(kind) {
+    const d = ctx.drafts[kind]; if (!d || d.approved) return;
+    d.approved = true;
+    if (kind === 'public') {
+      ctx.posted = true; ctx.postedAt = performance.now() - ctx.t0;
+      $('ownerReply').hidden = false; $('ownerText').textContent = d.text;
+      $('r-posted').textContent = secs(ctx.postedAt);
+      bump('t-replied'); bump('t-time');
+      $('results').classList.add('show');
+    } else {
+      ctx.chat = [{ role: 'assistant', content: d.text }];
+      setRecovery('open', ctx.review.name + ' · ' + (ISSUES[ctx.issue] || 'Issue'));
+    }
+    $('conn2').classList.add('on'); status(3, 'updated', true);
+    renderStats(); renderDrafts();
+    const left = ['public', 'private'].filter(k => ctx.drafts[k] && !ctx.drafts[k].approved).length;
+    status(2, left ? 'awaiting approval' : 'done', !!left);
+    $('gate').textContent = left ? 'Nothing posts or sends until the owner approves it.' : ctx.drafts.private && ctx.live ? 'Now be the customer. Text back and see how it handles you.' : 'All replies are out.';
+  }
+  async function api(body) {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ businessName: BIZ, review: ctx.review, ...body }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  function showDrafts(d) {
+    ctx.issue = d.issue;
+    ctx.drafts = { public: { text: d.public_reply, approved: false }, private: d.private_text ? { text: d.private_text, approved: false } : null };
+    $('placeholder').hidden = true; $('drafts').hidden = false; $('gate').hidden = false;
+    status(2, 'awaiting approval', true);
+    renderDrafts();
+    renderBars(d.issue !== 'none' ? d.issue : null); bump('t-avg'); renderStats();
+    $('conn2').classList.add('on'); status(3, 'new review', true);
+    if (ctx.drafts.private) setRecovery('none', ctx.review.name + ' · waiting on approval');
+    $('dFoot').textContent = d.issue === 'none' ? 'Happy customer. Reply and move on.' : 'Tagged ' + ISSUES[d.issue].toLowerCase() + '. It shows up in the trend above.';
+  }
+
+  // ── Recovery chat ──
+  function bubble(side, text) {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    if (!on) return;
+    const chips = ctx.recovery === 'resolved' || ctx.recovery === 'callback' ? ['Thank you, Carla', 'Will it be with you?']
+      : ctx.chat.length > 2 ? ['Okay, a redo sounds good', 'Can you just call me?']
+      : ['Honestly I was pretty upset', 'Thanks for reaching out', 'Will you take the review down?'];
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => customerSays(c); $('chips').appendChild(b); });
+    if (!matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function openChat() {
+    $('draftsView').hidden = true; $('chatView').hidden = false;
+    $('thread').innerHTML = '<div class="daystamp">Today</div>';
+    ctx.chat.forEach(m => bubble(m.role === 'assistant' ? 'agent' : 'you', m.content));
+    $('chatErr').hidden = true; status(2, 'chatting', true);
+    composer(ctx.live);
+  }
+  function closeChat() { $('chatView').hidden = true; $('draftsView').hidden = false; status(2, 'done'); renderDrafts(); }
+  async function customerSays(text) {
+    text = text.trim(); if (!text || !ctx?.live) return;
+    const id = run;
+    $('msg').value = ''; composer(false); $('chatErr').hidden = true;
+    ctx.chat.push({ role: 'user', content: text }); bubble('you', text);
+    try {
+      await sleep(350, id); typing(true);
+      const r = await api({ mode: 'reviewrecovery', messages: ctx.chat });
+      if (id !== run) return;
+      typing(false);
+      ctx.chat.push({ role: 'assistant', content: r.content }); bubble('agent', r.content);
+      ctx.recovery = r.status;
+      setRecovery(r.status, ctx.review.name + ' · ' + (ISSUES[ctx.issue] || 'Issue'));
+      $('conn2').classList.add('on');
+      composer(true);
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); ctx.chat.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text;
+      $('chatErr').hidden = false; $('chatErr').textContent = e.message; composer(true);
+    }
+  }
+
+  // ── Timer ──
+  function startTimer(id) {
+    const t0 = performance.now();
+    (function tick() {
+      if (id !== run || $('timer').classList.contains('fired')) return;
+      $('timerVal').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+      requestAnimationFrame(tick);
+    })();
+  }
+  function fireTimer(ms) {
+    $('timer').classList.add('fired'); $('timerLabel').textContent = 'Replies drafted';
+    $('timerVal').textContent = secs(ms); $('r-draft').textContent = secs(ms);
+  }
+
+  // ── Scripted replay (also the fallback when the API can't be reached) ──
+  const CANNED = {
+    public_reply: 'Dana, thank you for telling us. Waiting 25 minutes with no update isn’t okay, and neither is feeling rushed in the chair. We’re changing how we run late appointments so nobody waits without hearing from us. I’d love the chance to make it right, so please reach out to me directly. Carla',
+    private_text: 'Hi Dana, it’s Carla from Sunrise. I’m really sorry about your wait and how rushed your visit felt. I’d like to give you a free cut and style with me personally, whenever works for you.',
+    issue: 'wait',
+  };
+  async function replay(id) {
+    ctx.live = false;
+    await sleep(2400, id);
+    fireTimer(2400); showDrafts(CANNED);
+    await sleep(1600, id); approve('public');
+    await sleep(1400, id); approve('private');
+    await sleep(1200, id); openChat();
+    const turns = [
+      ['you', 'Thanks for reaching out. I was pretty frustrated.'],
+      ['agent', 'That’s completely fair, and I’m glad you told me. Would Saturday morning with me work for the redo?', 'open'],
+      ['you', 'Saturday works.'],
+      ['agent', 'Perfect, I’ve got you Saturday at 10 with me. See you then, Dana.', 'resolved'],
+    ];
+    for (const [side, text, st] of turns) {
+      if (side === 'agent') { typing(true); await sleep(1500, id); typing(false); } else await sleep(1300, id);
+      bubble(side, text);
+      if (st) { ctx.recovery = st; setRecovery(st, ctx.review.name + ' · Wait time'); }
+      await sleep(600, id);
+    }
+    status(2, 'done');
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    const text = $('f-text').value.trim();
+    if (mode === 'live' && !text) { $('f-text').focus(); return; }
+    ctx = { live: mode === 'live', t0: performance.now(), chat: [], recovery: null,
+      review: mode === 'live' ? { name: $('f-name').value.trim() || 'Guest', rating, text } : { name: 'Dana R.', rating: 2, text: PRESETS[0].text } };
+    showPosted(ctx.review);
+    $('conn1').classList.add('on');
+    status(2, mode === 'live' ? 'drafting' : 'replay', true);
+    $('timer').hidden = false;
+    $('placeholder').innerHTML = '<div class="writing"><span class="pulse"></span>Drafting replies…</div>';
+    startTimer(id);
+    try {
+      if (mode === 'live') {
+        try {
+          const d = await api({ mode: 'reviewreply', messages: [] });
+          if (id !== run) return;
+          if (!d.public_reply) throw new Error('No draft came back.');
+          fireTimer(performance.now() - ctx.t0);
+          showDrafts(d);
+        } catch (e) {
+          if (e === 'abort') throw e;
+          console.warn('[review-reply] live agent failed:', e.message);
+          $('err').hidden = false; $('err').textContent = 'The live agent is busy right now, so here’s a replay.';
+          ctx.review = { name: 'Dana R.', rating: 2, text: PRESETS[0].text }; showPosted(ctx.review);
+          status(2, 'replay', true);
+          await replay(id);
+        }
+      } else {
+        await replay(id);
+      }
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; rating = 2;
+    $('form').hidden = false; $('postedView').hidden = true; $('ownerReply').hidden = true;
+    $('f-text').value = PRESETS[0].text;
+    renderStars();
+    $('chatView').hidden = true; $('draftsView').hidden = false;
+    $('timer').hidden = true; $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Drafting replies'; $('timerVal').textContent = '0.0s';
+    $('placeholder').hidden = false; $('placeholder').textContent = 'Post the review and the drafts show up here for the owner to approve.';
+    $('drafts').hidden = true; $('drafts').innerHTML = ''; $('gate').hidden = true;
+    $('err').hidden = true; $('chatErr').hidden = true;
+    [1, 2, 3].forEach(n => status(n, 'waiting'));
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('results').classList.remove('show'); $('r-draft').textContent = $('r-posted').textContent = '—';
+    $('recovery').innerHTML = '<div class="recovery"><span>No unhappy reviews waiting</span><span class="pill">—</span></div>';
+    $('dFoot').textContent = '';
+    renderBars(null); renderStats(); composer(false);
+    $('clock').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/, '');
+  }
+
+  $('form').addEventListener('submit', e => { e.preventDefault(); start('live'); });
+  $('replay').addEventListener('click', () => start('replay'));
+  $('back').addEventListener('click', closeChat);
+  $('composer').addEventListener('submit', e => { e.preventDefault(); customerSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  renderPresets();
+  reset();
+})();
 </script>
 </body>
 </html>
