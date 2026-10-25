@@ -3,267 +3,423 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Promotion Builder — Carrier Pigeon AI Demo</title>
+<title>AI Promotion Builder — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Type one line about your deal. A live AI copywriter writes the text blast, Facebook post, email, and flyer, then revises them when you ask.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/promotion-builder">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Inter+Tight:wght@600;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --blue: #378ADD; --blue-light: #e8f0fa; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
-  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
-  .demo-bar a:hover { text-decoration: underline; }
-  .demo-bar .sep { color: #45453f; }
-  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
-  .nav-back:hover { color: var(--ink); }
-  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-  .page-header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  h1 { font-size: 16px; font-weight: 500; }
-  .page-sub { font-size: 12px; color: var(--ink-3); }
+  /* 01 The idea */
+  .biz-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+  .biz { font: 500 12px var(--font-sans); text-align: left; padding: 9px 10px; border: 1px solid var(--ink-3); background: #fff; cursor: pointer; color: var(--paper); line-height: 1.3; }
+  .biz small { display: block; font: 500 9.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-top: 2px; }
+  .biz.on { border-color: var(--paper); box-shadow: 3px 3px 0 var(--paper); }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; margin: -4px 0 14px; }
 
-  .columns { display: grid; grid-template-columns: 1fr 340px; gap: 1rem; align-items: start; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
-  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+  /* 02 The copywriter */
+  .copy-pad { padding: 18px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+  .placeholder { flex: 1; display: grid; place-items: center; text-align: center; font-size: 13px; color: var(--faint); padding: 30px; min-height: 300px; }
+  .writing { display: flex; align-items: center; gap: 10px; justify-content: center; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .assets { display: flex; flex-direction: column; gap: 9px; max-height: 380px; overflow-y: auto; padding: 0 4px 4px 0; }
+  .asset { border: 1px solid var(--ink-3); background: #fff; padding: 11px 12px; }
+  .asset.fresh { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: #fff; } }
+  .asset .ah { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .asset .kind { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .asset .meta { font: 500 10px var(--font-mono); color: var(--faint); letter-spacing: .06em; }
+  .asset .meta.over { color: #b4361a; }
+  .asset .tx { font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  .asset .subj { font-weight: 600; margin-bottom: 4px; }
+  .copy-btn { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 4px 8px; border: 1px solid var(--ink-3); background: #fff; color: var(--muted); cursor: pointer; }
+  .copy-btn:hover { border-color: var(--paper); color: var(--paper); }
+  .revise { border-top: 1px solid var(--ink-3); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .notes { display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto; }
+  .notes .bubble { max-width: 92%; font-size: 12.5px; }
+  .revise .composer { border: 1px solid var(--ink-3); }
+  .revise .chips { padding: 0; }
 
-  .form-group { margin-bottom: 1rem; }
-  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
-  .form-group input, .form-group textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
-  .form-group textarea { resize: none; height: 60px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  .swatches { display: flex; gap: 8px; }
-  .swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
-  .swatch:hover { transform: scale(1.08); }
-  .swatch.active { border-color: var(--ink); }
-
-  .file-row { display: flex; align-items: center; gap: 10px; }
-  .file-row input[type=file] { font-size: 12px; flex: 1; }
-  .btn-clear { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-size: 11px; cursor: pointer; color: var(--ink-3); font-family: 'Inter', sans-serif; }
-  .btn-clear:hover { border-color: var(--ink-3); color: var(--ink); }
-
-  .preview-wrap { position: sticky; top: 72px; }
-  .preview-canvas-holder { width: 100%; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 1rem; background: #fff; }
-  .preview-canvas-holder canvas { width: 100%; height: 100%; display: block; }
-
-  .format-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-  .format-btn { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 8px; font-size: 11px; font-weight: 500; cursor: pointer; color: var(--ink-3); font-family: 'Inter', sans-serif; }
-  .format-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
-
-  .btn-download { width: 100%; background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Inter', sans-serif; }
-  .btn-download:hover { opacity: 0.92; }
-  .btn-download svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-  @media (max-width: 760px) { .columns { grid-template-columns: 1fr; } .preview-wrap { position: static; max-width: 420px; margin: 0 auto; } }
+  /* 03 The flyer */
+  .flyer-pad { padding: 18px; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+  .canvas-holder { width: 100%; aspect-ratio: 1 / 1; border: 1px solid var(--paper); box-shadow: 5px 5px 0 var(--paper); background: #fff; overflow: hidden; }
+  .canvas-holder canvas { width: 100%; height: 100%; display: block; }
+  .row-ctl { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .swatches { display: flex; gap: 6px; }
+  .swatch { width: 24px; height: 24px; border: 1px solid var(--paper); cursor: pointer; padding: 0; }
+  .swatch.on { outline: 2px solid var(--paper); outline-offset: 2px; }
+  .formats { display: flex; }
+  .fmt { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 6px 9px; border: 1px solid var(--paper); background: #fff; color: var(--paper); cursor: pointer; margin-left: -1px; }
+  .fmt.on { background: var(--paper); color: var(--ink); }
+  .flyer-pad .btn-ghost { width: 100%; }
 </style>
 </head>
 <body>
 
-<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
 
 <nav>
-  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
-  <span class="nav-badge">Live demo</span>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <div class="wrap">
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M11 2a2 2 0 0 0-2 2v2H7a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2z"/><path d="M7 16v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/></svg></div>
-      <div><h1>Promotion builder</h1><div class="page-sub">Build a shareable flyer for your next deal</div></div>
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / AI promotion builder</div>
+      <h1>One line about your deal. A whole <em>campaign</em> back.</h1>
+      <p class="hero-sub">Pick a business and type the promotion the way you'd say it out loud. A live AI copywriter writes the text blast, the Facebook post, the email, and the flyer. Don't like something? Tell it, and it rewrites.</p>
     </div>
-  </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
 
-  <div class="columns">
-    <div class="card">
-      <div class="section-head">Promotion details</div>
-      <div class="form-group"><label>Business name</label><input type="text" id="biz-name" value="Sunrise Hair Studio" oninput="draw()"></div>
-      <div class="form-group"><label>Headline (the deal)</label><input type="text" id="headline" value="20% OFF" oninput="draw()"></div>
-      <div class="form-group"><label>Details</label><textarea id="details" oninput="draw()">All color services this weekend only. Mention this flyer when you book.</textarea></div>
-      <div class="two-col">
-        <div class="form-group"><label>Valid dates</label><input type="text" id="dates" value="June 14–15" oninput="draw()"></div>
-        <div class="form-group"><label>Footer note</label><input type="text" id="footer" value="(337) 555-0182 · @sunrisehairstudio" oninput="draw()"></div>
+  <div class="stages">
+    <!-- 01 The idea -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The idea</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <form class="pad" id="form">
+          <div class="hd">What's the deal?</div>
+          <div class="hd-sub">Say it like you'd tell a regular. The agent handles the rest.</div>
+          <div class="field"><label>Business</label><div class="biz-row" id="bizRow"></div></div>
+          <div class="field"><label for="idea">The promotion</label><textarea id="idea" rows="3" maxlength="200"></textarea></div>
+          <div class="presets" id="presets"></div>
+          <button class="submit" id="go" type="submit">Write the campaign →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label>Accent color</label>
-        <div class="swatches" id="swatches"></div>
-      </div>
-      <div class="form-group">
-        <label>Logo (optional, square works best)</label>
-        <div class="file-row">
-          <input type="file" id="logo-input" accept="image/*" onchange="loadLogo(event)">
-          <button class="btn-clear" onclick="clearLogo()">Clear</button>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 The AI copywriter -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI copywriter</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="copy-pad">
+          <div class="timer" id="timer" hidden><span class="timer-label" id="timerLabel">Writing the campaign</span><span class="timer-val" id="timerVal">0.0s</span></div>
+          <div class="placeholder" id="placeholder">The text blast, Facebook post, and email show up here.</div>
+          <div class="assets" id="assets" hidden></div>
+          <div class="err" id="err" hidden></div>
+          <div class="revise" id="revise" hidden>
+            <div class="notes" id="notes" aria-live="polite"></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Ask for a change" autocomplete="off" maxlength="200" disabled aria-label="Ask for a change">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="preview-wrap">
-      <div class="section-head">Preview</div>
-      <div class="preview-canvas-holder"><canvas id="canvas" width="1080" height="1080"></canvas></div>
-      <div class="format-row">
-        <button class="format-btn active" data-w="1080" data-h="1080" onclick="setFormat(this)">Square</button>
-        <button class="format-btn" data-w="1080" data-h="1920" onclick="setFormat(this)">Story</button>
-        <button class="format-btn" data-w="1200" data-h="630" onclick="setFormat(this)">Facebook</button>
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 03 The flyer -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The flyer</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="flyer-pad">
+          <div class="canvas-holder" id="holder"><canvas id="canvas" width="1080" height="1080" role="img" aria-label="Promotion flyer preview"></canvas></div>
+          <div class="row-ctl">
+            <div class="swatches" id="swatches"></div>
+            <div class="formats" id="formats">
+              <button class="fmt on" type="button" data-w="1080" data-h="1080">Square</button>
+              <button class="fmt" type="button" data-w="1080" data-h="1920">Story</button>
+              <button class="fmt" type="button" data-w="1200" data-h="630">Facebook</button>
+            </div>
+          </div>
+          <button class="btn-ghost" id="download" type="button">Download flyer</button>
+        </div>
       </div>
-      <button class="btn-download" onclick="download()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download image</button>
     </div>
   </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-time">—</div><div class="ml">Idea to full campaign</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">4</div><div class="ml">Formats written</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-rev">0</div><div class="ml">Revisions asked for</div></div>
+    <div class="cta">
+      <p>Most owners know the deal and run out of time on the words. An automation like this writes every channel in your voice and sends nothing until you say so.</p>
+      <a href="https://carrierpigeonai.dev/services/business-automation">See automation →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The businesses are made up. Nothing is posted or sent, and nothing you type is stored.</p>
 </div>
 
 <script>
-const COLORS = ['#378ADD', '#3FAE5C', '#D98E2B', '#C2487A', '#7A5FD9', '#0e0e0d'];
-let accent = COLORS[0];
-let logoImg = null;
-let format = { w: 1080, h: 1080 };
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BUSINESSES = [
+    { name: 'Sunrise Hair Studio', type: 'hair salon', short: 'Salon', footer: '(337) 555-0182 · Lafayette', ideas: ['20% off all color services this weekend, Nov 1-2', 'Free deep conditioning with any cut through November'] },
+    { name: 'Teche Ridge Plumbing', type: 'plumbing company', short: 'Plumber', footer: '(337) 555-0100 · Lafayette', ideas: ['$49 water heater flush through November 30', 'No trip charge on weekday calls this month'] },
+    { name: 'Crawfish Corner', type: 'seafood restaurant', short: 'Restaurant', footer: '(337) 555-0144 · Broussard', ideas: ['Crawfish are back: boiled crawfish $6.99 a pound on Fridays', 'Kids eat free Tuesdays with an adult meal'] },
+  ];
+  const COLORS = ['#161615', '#2e7d1e', '#b4361a', '#1f4e79', '#8a5a00'];
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let ctx = null;       // per-run business, history and campaign
+  let biz = BUSINESSES[0];
+  let accent = COLORS[0];
+  let fmt = { w: 1080, h: 1080 };
 
-function buildSwatches(){
-  const wrap = document.getElementById('swatches');
-  COLORS.forEach((c, i) => {
-    const sw = document.createElement('div');
-    sw.className = 'swatch' + (i === 0 ? ' active' : '');
-    sw.style.background = c;
-    sw.onclick = () => {
-      accent = c;
-      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-      sw.classList.add('active');
-      draw();
-    };
-    wrap.appendChild(sw);
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const secs = ms => ms < 60000 ? (ms / 1000).toFixed(1) + 's' : Math.floor(ms / 60000) + 'm ' + Math.round(ms % 60000 / 1000) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+
+  // ── 01 The idea ──
+  function renderBiz() {
+    $('bizRow').innerHTML = '';
+    BUSINESSES.forEach(b => {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'biz' + (b === biz ? ' on' : '');
+      el.innerHTML = '<span></span><small></small>';
+      el.firstChild.textContent = b.name; el.lastChild.textContent = b.short;
+      el.onclick = () => { if (ctx) return; biz = b; $('idea').value = b.ideas[0]; renderBiz(); draw(); };
+      $('bizRow').appendChild(el);
+    });
+    $('presets').innerHTML = '';
+    biz.ideas.forEach(i => { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip'; c.textContent = i; c.onclick = () => { $('idea').value = i; }; $('presets').appendChild(c); });
+  }
+
+  // ── 03 The flyer (canvas) ──
+  function wrapLines(g, text, maxW) {
+    const words = String(text || '').split(/\s+/).filter(Boolean), lines = [];
+    let line = '';
+    for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+    if (line) lines.push(line);
+    return lines;
+  }
+  function draw() {
+    const c = $('canvas'), g = c.getContext('2d'), W = c.width, H = c.height, u = Math.min(W, H), pad = u * 0.08;
+    const f = ctx?.campaign?.flyer || { headline: 'Your deal here', details: 'Type the promotion and the AI writes the flyer.', cta: '' };
+    g.fillStyle = '#f3f2ee'; g.fillRect(0, 0, W, H);
+    g.fillStyle = accent; g.fillRect(0, 0, W, u * 0.11);
+    g.fillStyle = '#f3f2ee'; g.font = `600 ${u * 0.034}px "JetBrains Mono", monospace`; g.textBaseline = 'middle';
+    g.fillText(biz.name.toUpperCase(), pad, u * 0.055);
+    g.textBaseline = 'alphabetic';
+    // Headline shrinks until it fits in three lines.
+    let size = u * 0.14, lines;
+    do { g.font = `800 ${size}px "Inter Tight", Inter, sans-serif`; lines = wrapLines(g, f.headline, W - pad * 2); size *= 0.9; } while (lines.length > 3 && size > u * 0.05);
+    const lh = size / 0.9 * 1.02;
+    let y = Math.max(u * 0.11 + pad + lh, H * 0.38 - (lines.length - 1) * lh / 2);
+    g.fillStyle = accent; lines.forEach((l, i) => g.fillText(l, pad, y + i * lh));
+    y += (lines.length - 1) * lh + u * 0.085;
+    g.fillStyle = '#3a3a37'; g.font = `400 ${u * 0.04}px Inter, sans-serif`;
+    wrapLines(g, f.details, W - pad * 2).slice(0, 4).forEach((l, i) => g.fillText(l, pad, y + i * u * 0.058));
+    if (f.cta) {
+      g.font = `600 ${u * 0.034}px "JetBrains Mono", monospace`;
+      const tw = g.measureText(f.cta.toUpperCase()).width, bh = u * 0.075, by = H - pad - u * 0.06 - bh;
+      g.fillStyle = '#9bff5b'; g.fillRect(pad, by, tw + u * 0.06, bh);
+      g.strokeStyle = '#161615'; g.lineWidth = u * 0.004; g.strokeRect(pad, by, tw + u * 0.06, bh);
+      g.fillStyle = '#161615'; g.textBaseline = 'middle'; g.fillText(f.cta.toUpperCase(), pad + u * 0.03, by + bh / 2); g.textBaseline = 'alphabetic';
+    }
+    g.fillStyle = '#5f5e59'; g.font = `500 ${u * 0.026}px "JetBrains Mono", monospace`;
+    g.fillText(biz.footer, pad, H - pad * 0.7);
+  }
+  function renderSwatches() {
+    $('swatches').innerHTML = '';
+    COLORS.forEach(col => {
+      const s = document.createElement('button'); s.type = 'button'; s.className = 'swatch' + (col === accent ? ' on' : '');
+      s.style.background = col; s.setAttribute('aria-label', 'Accent color ' + col);
+      s.onclick = () => { accent = col; renderSwatches(); draw(); };
+      $('swatches').appendChild(s);
+    });
+  }
+
+  // ── 02 The copywriter ──
+  function asset(kind, meta, body, subj) {
+    const el = document.createElement('div'); el.className = 'asset fresh';
+    el.innerHTML = '<div class="ah"><span class="kind"></span><span class="meta"></span><button class="copy-btn" type="button">Copy</button></div>' + (subj ? '<div class="tx subj"></div>' : '') + '<div class="tx body"></div>';
+    el.querySelector('.kind').textContent = kind;
+    const m = el.querySelector('.meta'); m.textContent = meta.text; m.classList.toggle('over', !!meta.over);
+    if (subj) el.querySelector('.subj').textContent = 'Subject: ' + subj;
+    el.querySelector('.body').textContent = body;
+    el.querySelector('.copy-btn').onclick = e => { navigator.clipboard?.writeText((subj ? subj + '\n\n' : '') + body).catch(() => {}); e.target.textContent = 'Copied'; };
+    return el;
+  }
+  function renderCampaign() {
+    const c = ctx.campaign;
+    $('placeholder').hidden = true; $('assets').hidden = false; $('revise').hidden = false;
+    $('assets').innerHTML = '';
+    $('assets').appendChild(asset('Text blast', { text: c.sms.length + ' chars', over: c.sms.length > 160 }, c.sms));
+    $('assets').appendChild(asset('Facebook post', { text: c.facebook.split(/\s+/).length + ' words' }, c.facebook));
+    $('assets').appendChild(asset('Email', { text: c.email.body.split(/\s+/).length + ' words' }, c.email.body, c.email.subject));
+    draw();
+    $('conn2').classList.add('on'); status(3, 'designed', true);
+  }
+  function note(side, text) {
+    const b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text;
+    $('notes').appendChild(b); $('notes').scrollTop = $('notes').scrollHeight;
+  }
+  function composer(on) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    if (!on) return;
+    ['Make it shorter', 'More playful', 'Add a line for regulars'].forEach(t => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.onclick = () => revise(t); $('chips').appendChild(b); });
+  }
+  async function api(messages) {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'promo', businessName: biz.name, businessType: biz.type, messages }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    if (!d.flyer || !d.sms) throw new Error('The copy came back incomplete. Try again.');
+    return d;
+  }
+  // The previous campaign goes back as the assistant's turn, so revisions edit it.
+  const asTurn = c => JSON.stringify({ flyer: c.flyer, sms: c.sms, facebook: c.facebook, email: c.email, note: c.note });
+  async function revise(text) {
+    text = text.trim(); if (!text || !ctx?.live) return;
+    const id = run;
+    $('msg').value = ''; composer(false); $('err').hidden = true;
+    note('you', text);
+    const messages = [...ctx.history, { role: 'user', content: text }];
+    status(2, 'revising', true);
+    try {
+      const d = await api(messages);
+      if (id !== run) return;
+      ctx.history = [...messages, { role: 'assistant', content: asTurn(d) }];
+      ctx.campaign = d; ctx.revisions++;
+      $('r-rev').textContent = ctx.revisions;
+      note('agent', d.note || 'Updated.');
+      renderCampaign(); status(2, 'ready', true);
+    } catch (e) {
+      if (id !== run) return;
+      $('notes').lastElementChild?.remove(); $('msg').value = text;
+      $('err').hidden = false; $('err').textContent = e.message; status(2, 'ready', true);
+    }
+    composer(true);
+  }
+
+  // ── Timer ──
+  function startTimer(id) {
+    const t0 = performance.now();
+    (function tick() {
+      if (id !== run || $('timer').classList.contains('fired')) return;
+      $('timerVal').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+      requestAnimationFrame(tick);
+    })();
+  }
+  function fireTimer(ms) {
+    $('timer').classList.add('fired'); $('timerLabel').textContent = 'Campaign written';
+    $('timerVal').textContent = secs(ms); $('r-time').textContent = secs(ms);
+  }
+
+  // ── Scripted replay (also the fallback when the API can't be reached) ──
+  const CANNED = [
+    { flyer: { headline: '20% Off Color', details: 'This weekend only, November 1 and 2. Every color service in the house.', cta: 'Call to book' },
+      sms: 'Sunrise Hair: 20% off all color this weekend, Nov 1 and 2. Call (337) 555-0182 to grab your spot. Reply STOP to opt out.',
+      facebook: 'Hey Lafayette, this weekend is the one to finally refresh that color. We’re taking 20% off every color service November 1 and 2. Give us a call to book your chair.',
+      email: { subject: '20% off color this weekend', body: 'Hi there,\n\nThis weekend only, November 1 and 2, every color service at Sunrise is 20% off. If you’ve been thinking about a change, this is the weekend. Call us to book your spot.\n\nSee you soon,\nSunrise Hair Studio' },
+      note: 'Wrote the full campaign for 20% off color, November 1 and 2.' },
+    { flyer: { headline: '20% Off Color', details: 'November 1 and 2. Walk ins welcome.', cta: 'Call or walk in' },
+      sms: 'Sunrise Hair: 20% off color Nov 1 and 2. Walk ins welcome. Reply STOP to opt out.',
+      facebook: '20% off every color service this weekend, November 1 and 2. Walk ins welcome, or call to book.',
+      email: { subject: '20% off color, Nov 1 and 2', body: 'Hi there,\n\n20% off every color service November 1 and 2. Walk ins welcome.\n\nSunrise Hair Studio' },
+      note: 'Shortened everything and added walk ins welcome.' },
+  ];
+  async function replay(id) {
+    ctx.live = false;
+    await sleep(2600, id);
+    fireTimer(2600); ctx.campaign = CANNED[0]; renderCampaign(); note('agent', CANNED[0].note);
+    status(2, 'ready', true); $('results').classList.add('show');
+    await sleep(2200, id);
+    note('you', 'Shorter, and say walk ins are welcome');
+    status(2, 'revising', true);
+    await sleep(2000, id);
+    ctx.campaign = CANNED[1]; ctx.revisions = 1; $('r-rev').textContent = 1;
+    note('agent', CANNED[1].note); renderCampaign(); status(2, 'done');
+  }
+
+  async function start(mode) {
+    const idea = $('idea').value.trim();
+    if (mode === 'live' && !idea) { $('idea').focus(); return; }
+    const id = ++run;
+    if (mode !== 'live') { biz = BUSINESSES[0]; $('idea').value = BUSINESSES[0].ideas[0]; renderBiz(); }
+    ctx = { live: mode === 'live', history: [{ role: 'user', content: idea || BUSINESSES[0].ideas[0] }], campaign: null, revisions: 0 };
+    $('go').hidden = $('replay').hidden = true; $('idea').readOnly = true;
+    status(1, 'sent', true); $('conn1').classList.add('on');
+    status(2, mode === 'live' ? 'writing' : 'replay', true);
+    $('timer').hidden = false;
+    $('placeholder').innerHTML = '<div class="writing"><span class="pulse"></span>Writing four formats…</div>';
+    startTimer(id);
+    try {
+      if (mode === 'live') {
+        try {
+          const t0 = performance.now();
+          const d = await api(ctx.history);
+          if (id !== run) return;
+          fireTimer(performance.now() - t0);
+          ctx.history.push({ role: 'assistant', content: asTurn(d) });
+          ctx.campaign = d; renderCampaign(); note('agent', d.note || 'Here’s the campaign.');
+          status(2, 'ready', true); composer(true);
+          $('results').classList.add('show');
+        } catch (e) {
+          if (e === 'abort') throw e;
+          console.warn('[promo] live agent failed:', e.message);
+          $('err').hidden = false; $('err').textContent = 'The live agent is busy right now, so here’s a replay.';
+          biz = BUSINESSES[0]; renderBiz();
+          await replay(id);
+        }
+      } else {
+        await replay(id);
+      }
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null;
+    $('go').hidden = $('replay').hidden = false; $('idea').readOnly = false; $('idea').value = biz.ideas[0];
+    $('timer').hidden = true; $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Writing the campaign'; $('timerVal').textContent = '0.0s';
+    $('placeholder').hidden = false; $('placeholder').textContent = 'The text blast, Facebook post, and email show up here.';
+    $('assets').hidden = true; $('assets').innerHTML = ''; $('revise').hidden = true; $('notes').innerHTML = '';
+    $('err').hidden = true;
+    [1, 2, 3].forEach(n => status(n, 'waiting'));
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('results').classList.remove('show'); $('r-time').textContent = '—'; $('r-rev').textContent = '0';
+    composer(false); renderBiz(); draw();
+  }
+
+  $('formats').addEventListener('click', e => {
+    const b = e.target.closest('.fmt'); if (!b) return;
+    document.querySelectorAll('.fmt').forEach(x => x.classList.toggle('on', x === b));
+    fmt = { w: +b.dataset.w, h: +b.dataset.h };
+    $('canvas').width = fmt.w; $('canvas').height = fmt.h; $('holder').style.aspectRatio = fmt.w + ' / ' + fmt.h;
+    draw();
   });
-}
-
-function setFormat(btn){
-  document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  format = { w: parseInt(btn.dataset.w), h: parseInt(btn.dataset.h) };
-  const canvas = document.getElementById('canvas');
-  canvas.width = format.w;
-  canvas.height = format.h;
-  document.querySelector('.preview-canvas-holder').style.aspectRatio = `${format.w}/${format.h}`;
-  draw();
-}
-
-function loadLogo(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const img = new Image();
-    img.onload = () => { logoImg = img; draw(); };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearLogo(){
-  logoImg = null;
-  document.getElementById('logo-input').value = '';
-  draw();
-}
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-  const words = text.split(' ');
-  let line = '';
-  let lines = [];
-  for(let i=0;i<words.length;i++){
-    const test = line + words[i] + ' ';
-    if(ctx.measureText(test).width > maxWidth && line !== ''){
-      lines.push(line.trim());
-      line = words[i] + ' ';
-    } else {
-      line = test;
-    }
-  }
-  lines.push(line.trim());
-  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
-  return lines.length;
-}
-
-function draw(){
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const pad = W * 0.07;
-
-  // Background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, W, H);
-
-  // Accent block at top
-  const bandH = H * 0.10;
-  ctx.fillStyle = accent;
-  ctx.fillRect(0, 0, W, bandH);
-
-  // Business name
-  ctx.fillStyle = '#0e0e0d';
-  ctx.font = `600 ${W*0.032}px Inter, sans-serif`;
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText(document.getElementById('biz-name').value || 'Your Business', pad, bandH + pad * 1.4);
-
-  // Logo (top right)
-  if(logoImg){
-    const size = bandH * 0.85;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(W - pad - size/2, bandH/2, size/2, 0, Math.PI*2);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(logoImg, W - pad - size, 0, size, size);
-    ctx.restore();
-  }
-
-  // Headline
-  ctx.fillStyle = accent;
-  ctx.font = `800 ${W*0.115}px Inter, sans-serif`;
-  const headlineY = H * 0.42;
-  ctx.fillText(document.getElementById('headline').value || 'YOUR DEAL', pad, headlineY);
-
-  // Details
-  ctx.fillStyle = '#3a3a37';
-  ctx.font = `400 ${W*0.034}px Inter, sans-serif`;
-  wrapText(ctx, document.getElementById('details').value || '', pad, headlineY + W*0.08, W - pad*2, W*0.05);
-
-  // Dates badge
-  const dates = document.getElementById('dates').value || '';
-  if(dates){
-    ctx.font = `600 ${W*0.03}px JetBrains Mono, monospace`;
-    const textW = ctx.measureText(dates).width;
-    const badgeY = H - pad * 2.6;
-    const badgePadX = W*0.025, badgePadY = W*0.018;
-    ctx.fillStyle = accent;
-    if(ctx.roundRect){
-      ctx.beginPath();
-      ctx.roundRect(pad, badgeY - W*0.04, textW + badgePadX*2, W*0.058, W*0.008);
-      ctx.fill();
-    } else {
-      ctx.fillRect(pad, badgeY - W*0.04, textW + badgePadX*2, W*0.058);
-    }
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(dates, pad + badgePadX, badgeY);
-  }
-
-  // Footer
-  ctx.fillStyle = '#7a7a74';
-  ctx.font = `500 ${W*0.022}px JetBrains Mono, monospace`;
-  ctx.fillText(document.getElementById('footer').value || '', pad, H - pad * 0.9);
-}
-
-function download(){
-  const canvas = document.getElementById('canvas');
-  const link = document.createElement('a');
-  link.download = 'promotion.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
-
-buildSwatches();
-draw();
+  $('download').addEventListener('click', () => {
+    const a = document.createElement('a'); a.download = 'promotion.png'; a.href = $('canvas').toDataURL('image/png'); a.click();
+  });
+  $('form').addEventListener('submit', e => { e.preventDefault(); start('live'); });
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); revise($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  renderSwatches();
+  reset();
+  document.fonts?.ready.then(draw);
+})();
 </script>
 </body>
 </html>
