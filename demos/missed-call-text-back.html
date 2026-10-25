@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missed-Call Text-Back — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Call a plumber who can't pick up. A live AI agent texts you back in seconds, finds out what's wrong, and drops a qualified lead into the CRM.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/missed-call-text-back">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  :root { --alert: #b4361a; --alert-wash: #fbe9e3; }
+
+  /* 01 The call */
+  .call { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 22px; gap: 6px; min-height: 380px; }
+  .call .av { width: 64px; height: 64px; font-size: 20px; margin-bottom: 10px; position: relative; }
+  .call .av::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--signal); opacity: 0; }
+  .call.ringing .av::after { animation: ring 1s cubic-bezier(.22,1,.36,1) infinite; }
+  @keyframes ring { from { opacity: .7; transform: scale(.9); } to { opacity: 0; transform: scale(1.35); } }
+  .call .who { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .call .num { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .06em; }
+  .call .state { margin-top: 14px; font: 500 11px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); min-height: 18px; }
+  .call.missed .state { color: var(--alert); }
+  .call .why { font-size: 13px; color: var(--muted); max-width: 28ch; min-height: 40px; }
+  .call .submit { margin-top: 18px; width: auto; padding: 14px 26px; }
+  .call .replay { margin-top: 4px; }
+
+  /* 03 The CRM card */
+  .crm-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .crm-head .hd { font-size: 16px; }
+  .pill { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; padding: 5px 9px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; }
+  .pill.new { color: var(--paper); border-color: var(--paper); }
+  .pill.qualified { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
+  .pill.emergency { background: var(--alert); color: #fff; border-color: var(--alert); }
+  .pill.soon { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .pill.flexible { color: var(--paper); border-color: var(--paper); }
+  .row .v.empty { color: var(--ink-3); font-weight: 400; }
+  .row .v.fill { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: transparent; } }
+  .flag { display: none; margin-top: 14px; padding: 10px 12px; background: var(--alert-wash); border: 1px solid var(--alert); color: var(--alert); font-size: 12.5px; font-weight: 500; }
+  .flag.show { display: block; animation: stampIn .4s cubic-bezier(.22,1,.36,1); }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Missed-call text-back</div>
+      <h1>A missed call turns into a <em>lead</em>, not a lost job.</h1>
+      <p class="hero-sub">Call the plumber below. The crew's out on a job, so nobody picks up, and a live AI agent texts you back within seconds. Tell it what's wrong and watch the CRM fill in as it figures out who you are and how urgent it is.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <!-- 01 The call -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The phone call</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <div class="call" id="call">
+          <div class="av">TR</div>
+          <div class="who">Teche Ridge Plumbing</div>
+          <div class="num">(337) 555-0100</div>
+          <div class="state" id="callState">You're the customer</div>
+          <div class="why" id="callWhy">Something's wrong with your plumbing and you call the first plumber you find.</div>
+          <button class="submit" id="dial" type="button">Call the shop →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 The text agent -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI text agent</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="timer" id="timer"><span class="timer-label" id="timerLabel">Missed call to first text</span><span class="timer-val" id="timerVal">0.0s</span></div>
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span id="clock">9:41</span><span>5G</span></div>
+              <div class="av">TR</div>
+              <div class="pc-name">Teche Ridge Plumbing</div>
+              <div class="pc-sub">Text message</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 03 The CRM -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The CRM</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="crm-head"><span class="hd">Lead</span><span class="pill" id="status">No lead yet</span></div>
+          <div class="row"><span class="k">Caller</span><span class="v" id="f-caller">—</span></div>
+          <div class="row"><span class="k">Name</span><span class="v empty" id="f-name">—</span></div>
+          <div class="row"><span class="k">Problem</span><span class="v empty" id="f-problem">—</span></div>
+          <div class="row"><span class="k">Urgency</span><span class="v empty" id="f-urgency">—</span></div>
+          <div class="row"><span class="k">Area</span><span class="v empty" id="f-area">—</span></div>
+          <div class="row"><span class="k">Call back</span><span class="v empty" id="f-callback">—</span></div>
+          <div class="row"><span class="k">Source</span><span class="v" id="f-source">—</span></div>
+          <div class="flag" id="flag">Emergency. Mike has been alerted to call back now.</div>
+          <div class="cal-foot" id="crmFoot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-first">—</div><div class="ml">Missed call to first text</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-qual">—</div><div class="ml">Call to qualified lead</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0</div><div class="ml">Leads lost to voicemail</div></div>
+    <div class="cta">
+      <p>Most callers don't leave a voicemail. They call the next name on the list. This is part of The Loft, wired to your own phone line and CRM.</p>
+      <a href="https://carrierpigeonai.dev/services/the-loft">See The Loft →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. No call is placed, no texts are sent, and nothing is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Teche Ridge Plumbing';
+  const CALLER = '(337) 555-0188';
+  const FIELDS = ['name', 'problem', 'urgency', 'area', 'callback'];
+  const URGENCY_LABEL = { emergency: 'Emergency', soon: 'This week', flexible: 'Flexible' };
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let history = [];     // {role: 'assistant' | 'user', content}
+  let ctx = null;       // per-run mode + timing
+  let lead = {};
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const clock = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const secs = ms => ms < 60000 ? (ms / 1000).toFixed(1) + 's' : Math.floor(ms / 60000) + 'm ' + Math.round(ms % 60000 / 1000) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+
+  function bubble(side, text) {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on, chips = []) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => customerSays(c); $('chips').appendChild(b); });
+    if (on && !matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+  function setPill(el, cls, text) { el.className = 'pill' + (cls ? ' ' + cls : ''); el.textContent = text; }
+
+  // ── CRM card, filled from the agent's `lead` ──
+  function applyLead(next, done) {
+    if (!next) return;
+    for (const k of FIELDS) {
+      if (!next[k] || next[k] === lead[k]) continue;
+      lead[k] = next[k];
+      const el = $('f-' + k);
+      el.classList.remove('empty', 'fill'); void el.offsetWidth; el.classList.add('fill');
+      if (k === 'urgency') { el.innerHTML = ''; const p = document.createElement('span'); setPill(p, next[k], URGENCY_LABEL[next[k]]); el.appendChild(p); }
+      else el.textContent = next[k];
+      $('conn2').classList.add('on'); status(3, 'updating', true);
+    }
+    $('flag').classList.toggle('show', lead.urgency === 'emergency');
+    if (done && !ctx.qualified) {
+      ctx.qualified = true;
+      setPill($('status'), 'qualified', 'Qualified');
+      status(3, 'qualified', true); status(2, 'done');
+      $('crmFoot').textContent = lead.urgency === 'emergency' ? 'Flagged for an immediate callback.' : 'Callback task created for Mike.';
+      $('r-qual').textContent = secs(performance.now() - ctx.t0);
+      $('results').classList.add('show');
+    }
+  }
+
+  // ── Timer ──
+  function startTimer(id) {
+    const t0 = performance.now();
+    (function tick() {
+      if (id !== run || $('timer').classList.contains('fired')) return;
+      $('timerVal').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+      requestAnimationFrame(tick);
+    })();
+  }
+  function fireTimer(ms) {
+    $('timer').classList.add('fired');
+    $('timerLabel').textContent = 'First text sent';
+    $('timerVal').textContent = secs(ms);
+    $('r-first').textContent = secs(ms);
+  }
+
+  // ── Live agent ──
+  async function ask() {
+    const r = await fetch(API, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'missedcall', businessName: BIZ, messages: history }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  async function agentTurn(id) {
+    typing(true);
+    const r = await ask();
+    if (id !== run) return;
+    typing(false);
+    history.push({ role: 'assistant', content: r.content });
+    bubble('agent', r.content);
+    applyLead(r.lead, r.done);
+    return r;
+  }
+  function nextChips() {
+    if (ctx.qualified) return ['Thanks!', 'How much will it cost?'];
+    if (!lead.problem) return ['My water heater is leaking', 'Toilet won’t stop running', 'Kitchen sink is backed up'];
+    if (!lead.urgency) return ['There’s water on the floor', 'It can wait a few days'];
+    if (!lead.name) return ['I’m Dana'];
+    if (!lead.area) return ['Youngsville', 'Near River Ranch'];
+    return ['Anytime today', 'After 5 works'];
+  }
+  async function customerSays(text) {
+    text = text.trim(); if (!text || !ctx || !ctx.live) return;
+    const id = run;
+    $('msg').value = '';
+    composer(false); showError('');
+    history.push({ role: 'user', content: text });
+    bubble('you', text);
+    try {
+      await sleep(350, id);
+      await agentTurn(id);
+      composer(true, nextChips());
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text; showError(e.message); composer(true, nextChips());
+    }
+  }
+
+  // ── Scripted replay (also the fallback when the API can't be reached) ──
+  async function replay(id) {
+    ctx.live = false;
+    const turns = [
+      ['agent', `Hey, this is ${BIZ}. Sorry we missed your call, the crew's out on a job. What's going on?`],
+      ['you', 'My water heater is leaking all over the garage floor.'],
+      ['agent', 'Oh no. Is it still leaking right now, or did it stop?', { problem: 'Water heater leaking in garage' }],
+      ['you', 'Still leaking, pretty steady.'],
+      ['agent', 'Got it, I’m flagging this as an emergency. You can shut the cold water valve on top of the heater to slow it down. What’s your first name?', { problem: 'Water heater leaking in garage', urgency: 'emergency' }],
+      ['you', 'Dana. I’m in Youngsville.'],
+      ['agent', 'Thanks Dana. Mike is calling you back right now.', { name: 'Dana', problem: 'Water heater leaking in garage', urgency: 'emergency', area: 'Youngsville', callback: 'Right away' }, true],
+    ];
+    for (const [i, [side, text, l, done]] of turns.entries()) {
+      if (side === 'agent') { typing(true); await sleep(i === 0 ? 2400 : 1500, id); typing(false); }
+      else await sleep(1300, id);
+      if (i === 0) fireTimer(2400);
+      bubble(side, text); applyLead(l, done);
+      await sleep(700, id);
+    }
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', qualified: false };
+    history = []; lead = {};
+    $('dial').hidden = $('replay').hidden = true;
+    $('call').classList.add('ringing'); $('callState').textContent = 'Calling…'; $('callWhy').textContent = '';
+    status(1, 'ringing', true);
+    try {
+      for (let i = 1; i <= 3; i++) { $('callWhy').textContent = 'Ring ' + i + '…'; await sleep(900, id); }
+      $('call').classList.remove('ringing'); $('call').classList.add('missed');
+      $('callState').textContent = 'Missed call · ' + clock();
+      $('callWhy').textContent = 'The crew is out on a job. No one picked up.';
+      status(1, 'missed');
+      ctx.t0 = performance.now();
+      $('f-caller').textContent = CALLER; $('f-source').textContent = 'Missed call';
+      setPill($('status'), 'new', 'New lead'); status(3, 'new lead', true);
+      await sleep(500, id);
+      $('conn1').classList.add('on');
+      status(2, mode === 'live' ? 'live' : 'replay', true);
+      $('thread').innerHTML = '<div class="daystamp">Today ' + clock() + '</div>';
+      startTimer(id);
+      if (mode === 'live') {
+        try {
+          await agentTurn(id);
+          fireTimer(performance.now() - ctx.t0);
+          composer(true, nextChips());
+        } catch (e) {
+          if (e === 'abort') throw e;
+          typing(false);
+          console.warn('[missed-call] live agent failed:', e.message);
+          showError('The live agent is busy right now, so here’s a replay.');
+          status(2, 'replay', true);
+          await replay(id);
+        }
+      } else {
+        await replay(id);
+      }
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; history = []; lead = {};
+    $('dial').hidden = $('replay').hidden = false;
+    $('call').className = 'call';
+    $('callState').textContent = 'You’re the customer';
+    $('callWhy').textContent = 'Something’s wrong with your plumbing and you call the first plumber you find.';
+    [1, 2, 3].forEach(n => status(n, 'waiting'));
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('thread').innerHTML = '<div class="empty">Call the shop. When nobody picks up, the agent texts you here. Reply like a real customer would.</div>';
+    $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Missed call to first text'; $('timerVal').textContent = '0.0s';
+    $('results').classList.remove('show'); $('r-first').textContent = $('r-qual').textContent = '—';
+    setPill($('status'), '', 'No lead yet');
+    ['caller', 'source'].forEach(k => $('f-' + k).textContent = '—');
+    FIELDS.forEach(k => { const el = $('f-' + k); el.className = 'v empty'; el.textContent = '—'; });
+    $('flag').classList.remove('show'); $('crmFoot').textContent = '';
+    showError(''); composer(false);
+    $('clock').textContent = clock().replace(/\s?[AP]M/, '');
+  }
+
+  $('dial').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); customerSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

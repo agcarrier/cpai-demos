@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/demos/missed-call-text-back", "destination": "/demos/missed-call-text-back.html" },
     { "source": "/demos/instant-lead-response", "destination": "/demos/instant-lead-response.html" },
     { "source": "/demos/appointment-scheduler", "destination": "/demos/appointment-scheduler.html" },
     { "source": "/demos/invoice-generator", "destination": "/demos/invoice-generator.html" },
