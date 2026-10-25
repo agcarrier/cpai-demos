@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Reactivation — Carrier Pigeon AI Demo</title>
+<meta name="description" content="A live AI agent writes a personal text for every lead that went cold. You approve them, then play a lead who replies and watch it book.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/lead-reactivation">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  :root { --alert: #b4361a; }
+
+  /* 01 Cold list */
+  .leads { list-style: none; }
+  .lead { padding: 11px 0; border-bottom: 1px solid var(--ink-2); }
+  .lead:last-child { border-bottom: none; }
+  .lead .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .lead .nm { font-size: 13.5px; font-weight: 600; }
+  .lead .ago { font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
+  .lead .why { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .list-foot { margin-top: 16px; }
+
+  /* 02 Drafts */
+  .drafts-pad { padding: 18px; display: flex; flex-direction: column; height: 100%; gap: 12px; }
+  .drafts { display: flex; flex-direction: column; gap: 9px; flex: 1; max-height: 560px; overflow-y: auto; padding: 0 4px 4px 0; }
+  .placeholder { flex: 1; display: grid; place-items: center; text-align: center; font-size: 13px; color: var(--faint); padding: 30px; min-height: 300px; }
+  .writing { display: flex; align-items: center; gap: 10px; justify-content: center; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .draft { border: 1px solid var(--ink-3); background: #fff; padding: 11px 12px; animation: pop .3s cubic-bezier(.22,1,.36,1); }
+  .draft.approved { border-color: var(--paper); box-shadow: 3px 3px 0 var(--paper); }
+  .draft .dh { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .draft .to { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .draft .tx { font-size: 13px; line-height: 1.45; }
+  .tog { font: 600 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 5px 9px; border: 1px solid var(--paper); background: #fff; color: var(--paper); cursor: pointer; white-space: nowrap; }
+  .tog:hover { background: var(--ink-2); }
+  .draft.approved .tog { background: var(--hl); color: var(--on-hl); }
+  .draft.sent .tog { border-color: var(--ink-3); background: var(--ink-2); color: var(--muted); cursor: default; }
+  .play { margin-top: 8px; font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--paper); background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+  .play:hover { color: var(--signal); }
+  .actions { display: flex; gap: 10px; align-items: center; }
+  .actions .submit { margin-top: 0; flex: 1; }
+  .gate { font-size: 12px; color: var(--muted); }
+  .back { align-self: flex-start; font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; background: none; border: none; color: var(--muted); cursor: pointer; padding: 0; }
+  .back:hover { color: var(--paper); }
+  .drafts-pad .phone { max-height: 520px; }
+
+  /* 03 Pipeline */
+  .p-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .p-head .day { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+  .p-head .date { font: 500 11px var(--font-mono); color: var(--faint); letter-spacing: .1em; text-transform: uppercase; }
+  .stage-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 12px; border: 1px solid var(--ink-3); background: #fff; margin-bottom: 7px; transition: background .3s, border-color .3s; }
+  .stage-row .nm { font-size: 13px; font-weight: 600; }
+  .stage-row .sub { font-size: 11.5px; color: var(--muted); }
+  .stage-row.bump { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: #fff; } }
+  .pill { font: 600 9.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; padding: 4px 8px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; white-space: nowrap; }
+  .pill.texted { color: var(--paper); border-color: var(--paper); }
+  .pill.reengaged { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .pill.booked { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
+  .pill.optout { color: var(--alert); border-color: var(--alert); }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Lead reactivation</div>
+      <h1>The leads you already paid for, <em>back</em> on the calendar.</h1>
+      <p class="hero-sub">Every business has a list of people who asked, almost booked, and went quiet. A live AI agent writes each one a personal text. Nothing goes out until you approve it. Then you play one of the leads, text back, and watch it book.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <!-- 01 Cold list -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The cold list</span><span class="s" id="s1">5 leads</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="hd">Cypress Lane Aesthetics</div>
+          <div class="hd-sub">Leads from the CRM that never booked or never came back.</div>
+          <ul class="leads" id="leads"></ul>
+          <div class="list-foot">
+            <button class="submit" id="draft" type="button">Draft their texts →</button>
+            <button class="replay" id="replay" type="button">or watch a replay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 Drafts, then the reply chat -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI agent</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="drafts-pad" id="draftsView">
+          <div class="timer" id="timer" hidden><span class="timer-label" id="timerLabel">Writing 5 texts</span><span class="timer-val" id="timerVal">0.0s</span></div>
+          <div class="placeholder" id="placeholder">Draft the texts and they show up here for your approval.</div>
+          <div class="drafts" id="drafts" hidden></div>
+          <div class="err" id="err" hidden></div>
+          <div class="actions" id="actions" hidden>
+            <button class="btn-ghost" id="approveAll" type="button">Approve all</button>
+            <button class="submit" id="send" type="button" disabled>Send approved</button>
+          </div>
+          <div class="gate" id="gate" hidden>Nothing sends until you approve it.</div>
+        </div>
+        <div class="drafts-pad" id="chatView" hidden>
+          <button class="back" id="back" type="button">← All drafts</button>
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span id="clock">9:41</span><span>5G</span></div>
+              <div class="av" id="chatAv">KN</div>
+              <div class="pc-name" id="chatName">Kim Nguyen</div>
+              <div class="pc-sub">You're playing this lead</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="chatErr" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 03 Pipeline -->
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The pipeline</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="p-head"><span class="day">Reactivation</span><span class="date" id="pCount">0 booked</span></div>
+          <div id="pipeline"></div>
+          <div class="cal-foot" id="pFoot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-drafts">—</div><div class="ml">5 personal texts written</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-booked">0</div><div class="ml">Booked from the cold list</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0 min</div><div class="ml">Staff time writing</div></div>
+    <div class="cta">
+      <p>Your cheapest new customer is one who already raised their hand. This is part of The Loft, running on your own CRM, with every send behind your approval.</p>
+      <a href="https://carrierpigeonai.dev/services/the-loft">See The Loft →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The spa and the leads are made up. No texts are sent and nothing is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Cypress Lane Aesthetics';
+  const LEADS = [
+    { id: 'amanda', name: 'Amanda Hebert', ago: 'Apr', need: 'Asked about laser hair removal pricing in April. Never booked.' },
+    { id: 'kim', name: 'Kim Nguyen', ago: 'Jun', need: 'Booked a Botox consult in June and did not show up.' },
+    { id: 'jess', name: 'Jessica Romero', ago: 'Mar', need: 'Had a facial in March and loved it. Never rebooked.' },
+    { id: 'tyler', name: 'Tyler Broussard', ago: 'Jul', need: 'Asked about Botox for forehead lines in July, said maybe after summer.' },
+    { id: 'monique', name: 'Monique Arceneaux', ago: 'May', need: 'Got a quote for a microneedling package in May and said it was too pricey.' },
+  ];
+  const STAGE_LABEL = { cold: 'Cold', texted: 'Texted', reengaged: 'Replied', booked: 'Booked', optout: 'Opted out' };
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0;          // bumps on reset so stale async work stops
+  let ctx = null;       // per-run mode + timing
+  let drafts = {};      // id -> {text, approved, sent}
+  let stage = {};       // id -> pipeline stage
+  let chats = {};       // id -> history [{role, content}]
+  let current = null;   // id of the lead being played
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const secs = ms => ms < 60000 ? (ms / 1000).toFixed(1) + 's' : Math.floor(ms / 60000) + 'm ' + Math.round(ms % 60000 / 1000) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  const first = id => LEADS.find(l => l.id === id).name.split(' ')[0];
+  const initials = name => name.split(' ').map(w => w[0]).join('').toUpperCase();
+
+  // ── 01 Cold list ──
+  function renderLeads() {
+    $('leads').innerHTML = '';
+    LEADS.forEach(l => {
+      const li = document.createElement('li'); li.className = 'lead';
+      li.innerHTML = '<div class="top"><span class="nm"></span><span class="ago"></span></div><div class="why"></div>';
+      li.querySelector('.nm').textContent = l.name;
+      li.querySelector('.ago').textContent = 'Last touch ' + l.ago;
+      li.querySelector('.why').textContent = l.need;
+      $('leads').appendChild(li);
+    });
+  }
+
+  // ── 03 Pipeline ──
+  function setStage(id, next) {
+    if (stage[id] === next) return;
+    stage[id] = next;
+    renderPipeline(id);
+  }
+  function renderPipeline(bumped) {
+    $('pipeline').innerHTML = '';
+    LEADS.forEach(l => {
+      const row = document.createElement('div');
+      row.className = 'stage-row' + (l.id === bumped ? ' bump' : '');
+      row.innerHTML = '<div><div class="nm"></div><div class="sub"></div></div><span class="pill"></span>';
+      row.querySelector('.nm').textContent = l.name;
+      row.querySelector('.sub').textContent = stage[l.id] === 'booked' && ctx?.slots?.[l.id] ? ctx.slots[l.id] : l.need.split('.')[0];
+      const p = row.querySelector('.pill'); p.className = 'pill ' + stage[l.id]; p.textContent = STAGE_LABEL[stage[l.id]];
+      $('pipeline').appendChild(row);
+    });
+    const booked = LEADS.filter(l => stage[l.id] === 'booked').length;
+    $('pCount').textContent = booked + ' booked';
+    $('r-booked').textContent = booked;
+    if (bumped) { $('conn2').classList.add('on'); status(3, 'moving', true); }
+  }
+
+  // ── 02 Drafts and the approval gate ──
+  function renderDrafts() {
+    $('drafts').innerHTML = '';
+    LEADS.filter(l => drafts[l.id]).forEach(l => {
+      const d = drafts[l.id];
+      const card = document.createElement('div');
+      card.className = 'draft' + (d.approved ? ' approved' : '') + (d.sent ? ' sent' : '');
+      card.innerHTML = '<div class="dh"><span class="to"></span><button class="tog" type="button"></button></div><div class="tx"></div>';
+      card.querySelector('.to').textContent = 'To ' + l.name;
+      card.querySelector('.tx').textContent = d.text;
+      const tog = card.querySelector('.tog');
+      tog.textContent = d.sent ? 'Sent ✓' : d.approved ? 'Approved ✓' : 'Approve';
+      tog.disabled = d.sent || !ctx.live;
+      tog.onclick = () => { d.approved = !d.approved; renderDrafts(); };
+      if (d.sent && ctx.live && stage[l.id] !== 'optout') {
+        const play = document.createElement('button'); play.type = 'button'; play.className = 'play';
+        play.textContent = (chats[l.id]?.length > 1 ? 'Continue as ' : 'Text back as ') + first(l.id) + ' →';
+        play.onclick = () => openChat(l.id);
+        card.appendChild(play);
+      }
+      $('drafts').appendChild(card);
+    });
+    const approved = LEADS.filter(l => drafts[l.id]?.approved && !drafts[l.id].sent).length;
+    const anySent = LEADS.some(l => drafts[l.id]?.sent);
+    $('send').disabled = !approved || !ctx.live;
+    $('send').textContent = approved ? 'Send approved (' + approved + ')' : anySent ? 'Sent' : 'Send approved';
+    $('approveAll').hidden = LEADS.every(l => !drafts[l.id] || drafts[l.id].sent);
+  }
+  function sendApproved() {
+    LEADS.forEach(l => {
+      const d = drafts[l.id];
+      if (!d?.approved || d.sent) return;
+      d.sent = true; setStage(l.id, 'texted');
+      chats[l.id] = [{ role: 'assistant', content: d.text }];
+    });
+    status(2, 'sent', true);
+    $('gate').textContent = 'Now play one of them. Pick a lead and text back.';
+    $('pFoot').textContent = 'Texted leads move as they reply.';
+    renderDrafts();
+  }
+
+  // ── Reply chat ──
+  function bubble(side, text) {
+    const t = $('thread'), b = document.createElement('div');
+    b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight;
+  }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    if (!on) return;
+    const s = stage[current];
+    const chips = s === 'booked' ? ['Thank you!', 'Do I need to bring anything?']
+      : s === 'optout' ? []
+      : (chats[current] || []).length > 2 ? ['Thursday works', 'Friday at 3:30 is perfect']
+      : ['Yes! What times do you have?', 'How much is it?', 'Please stop texting me'];
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => leadSays(c); $('chips').appendChild(b); });
+    if (!matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function openChat(id) {
+    current = id;
+    const l = LEADS.find(x => x.id === id);
+    $('draftsView').hidden = true; $('chatView').hidden = false;
+    $('chatName').textContent = l.name; $('chatAv').textContent = initials(l.name);
+    $('thread').innerHTML = '<div class="daystamp">Today</div>';
+    chats[id].forEach(m => bubble(m.role === 'assistant' ? 'agent' : 'you', m.content));
+    $('chatErr').hidden = true;
+    status(2, 'chatting', true);
+    composer(ctx.live && stage[id] !== 'optout');
+  }
+  function closeChat() {
+    current = null;
+    $('chatView').hidden = true; $('draftsView').hidden = false;
+    status(2, 'sent', true);
+    renderDrafts();
+  }
+  function applyReply(id, r) {
+    if (r.stage === 'booked' && r.slot) { ctx.slots[id] = r.slot; }
+    setStage(id, r.stage);
+    if (r.stage === 'booked') {
+      $('pFoot').textContent = first(id) + ' is booked for ' + r.slot + '.';
+      status(3, 'booked', true);
+      $('results').classList.add('show');
+    } else if (r.stage === 'optout') {
+      $('pFoot').textContent = first(id) + ' opted out. They won’t be texted again.';
+    }
+  }
+  async function api(body) {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ businessName: BIZ, ...body }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  async function leadSays(text) {
+    text = text.trim(); const id = current;
+    if (!text || !id || !ctx?.live) return;
+    const runId = run, hist = chats[id];
+    $('msg').value = ''; composer(false); $('chatErr').hidden = true;
+    hist.push({ role: 'user', content: text }); bubble('you', text);
+    if (stage[id] === 'texted') setStage(id, 'reengaged');
+    try {
+      await sleep(350, runId);
+      typing(true);
+      const l = LEADS.find(x => x.id === id);
+      const r = await api({ mode: 'reactivatereply', lead: { name: l.name, need: l.need }, messages: hist });
+      if (runId !== run || current !== id) return;
+      typing(false);
+      hist.push({ role: 'assistant', content: r.content }); bubble('agent', r.content);
+      applyReply(id, r);
+      composer(stage[id] !== 'optout');
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); hist.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text;
+      $('chatErr').hidden = false; $('chatErr').textContent = e.message; composer(true);
+    }
+  }
+
+  // ── Timer ──
+  function startTimer(id) {
+    const t0 = performance.now();
+    (function tick() {
+      if (id !== run || $('timer').classList.contains('fired')) return;
+      $('timerVal').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+      requestAnimationFrame(tick);
+    })();
+  }
+  function fireTimer(ms) {
+    $('timer').classList.add('fired');
+    $('timerLabel').textContent = '5 texts written';
+    $('timerVal').textContent = secs(ms);
+    $('r-drafts').textContent = secs(ms);
+  }
+  function showDrafts(list) {
+    list.forEach(d => { drafts[d.id] = { text: d.text, approved: false, sent: false }; });
+    $('placeholder').hidden = true; $('drafts').hidden = false; $('actions').hidden = false; $('gate').hidden = false;
+    status(2, 'awaiting approval', true);
+    renderDrafts();
+  }
+
+  // ── Scripted replay (also the fallback when the API can't be reached) ──
+  const CANNED = [
+    { id: 'amanda', text: 'Hi Amanda, it’s Brooke at Cypress Lane. You asked about laser hair removal back in April, and first treatments are 20% off through November 15 if you want to get started. Reply STOP to opt out.' },
+    { id: 'kim', text: 'Hi Kim, Brooke here from Cypress Lane. Still want to do that Botox consult? I have a couple of openings this week if you want to grab one. Reply STOP to opt out.' },
+    { id: 'jess', text: 'Hi Jessica, it’s Brooke at Cypress Lane. We’d love to have you back for another facial, and I have a few spots open this week. Reply STOP to opt out.' },
+    { id: 'tyler', text: 'Hi Tyler, Brooke from Cypress Lane. Summer’s behind us, so if you’re ready to talk about those forehead lines, first treatments are 20% off through November 15. Reply STOP to opt out.' },
+    { id: 'monique', text: 'Hi Monique, it’s Brooke at Cypress Lane. First treatments are 20% off through November 15, which takes a nice bite out of that microneedling package you asked about. Reply STOP to opt out.' },
+  ];
+  async function replay(id) {
+    ctx.live = false;
+    await sleep(2600, id);
+    fireTimer(2600); showDrafts(CANNED);
+    for (const d of CANNED) { await sleep(450, id); drafts[d.id].approved = true; renderDrafts(); }
+    await sleep(900, id); sendApproved();
+    await sleep(1400, id);
+    current = 'kim'; openChat('kim');
+    const turns = [
+      ['you', 'Yes, sorry I missed the last one! What do you have?'],
+      ['agent', 'No worries at all. I have Thursday at 11:00 AM or Friday at 3:30 PM, which works better?', { stage: 'reengaged' }],
+      ['you', 'Friday at 3:30'],
+      ['agent', 'You’re booked for Friday at 3:30 PM. See you then, Kim.', { stage: 'booked', slot: 'Friday at 3:30 PM' }],
+    ];
+    for (const [side, text, r] of turns) {
+      if (side === 'agent') { typing(true); await sleep(1500, id); typing(false); } else await sleep(1300, id);
+      bubble(side, text);
+      if (side === 'you' && stage.kim === 'texted') setStage('kim', 'reengaged');
+      if (r) applyReply('kim', r);
+      await sleep(600, id);
+    }
+    status(2, 'done');
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', slots: {} };
+    drafts = {}; chats = {}; current = null;
+    $('draft').hidden = $('replay').hidden = true;
+    $('conn1').classList.add('on');
+    status(1, 'sent to agent', true); status(2, mode === 'live' ? 'writing' : 'replay', true);
+    $('timer').hidden = false;
+    $('placeholder').innerHTML = '<div class="writing"><span class="pulse"></span>Writing 5 personal texts…</div>';
+    startTimer(id);
+    try {
+      if (mode === 'live') {
+        try {
+          const t0 = performance.now();
+          const r = await api({ mode: 'reactivate', messages: [], leads: LEADS.map(({ id, name, need }) => ({ id, name, need })) });
+          if (id !== run) return;
+          if (!r.drafts?.length) throw new Error('No drafts came back.');
+          fireTimer(performance.now() - t0);
+          showDrafts(r.drafts);
+        } catch (e) {
+          if (e === 'abort') throw e;
+          console.warn('[reactivation] live agent failed:', e.message);
+          $('err').hidden = false; $('err').textContent = 'The live agent is busy right now, so here’s a replay.';
+          status(2, 'replay', true);
+          await replay(id);
+        }
+      } else {
+        await replay(id);
+      }
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = { live: false, slots: {} }; drafts = {}; chats = {}; current = null;
+    LEADS.forEach(l => { stage[l.id] = 'cold'; });
+    $('draft').hidden = $('replay').hidden = false;
+    $('chatView').hidden = true; $('draftsView').hidden = false;
+    $('timer').hidden = true; $('timer').classList.remove('fired'); $('timerLabel').textContent = 'Writing 5 texts'; $('timerVal').textContent = '0.0s';
+    $('placeholder').hidden = false; $('placeholder').textContent = 'Draft the texts and they show up here for your approval.';
+    $('drafts').hidden = true; $('drafts').innerHTML = ''; $('actions').hidden = true; $('approveAll').hidden = false;
+    $('gate').hidden = true; $('gate').textContent = 'Nothing sends until you approve it.';
+    $('err').hidden = true; $('chatErr').hidden = true;
+    status(1, '5 leads'); status(2, 'waiting'); status(3, 'waiting');
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('results').classList.remove('show'); $('r-drafts').textContent = '—';
+    $('pFoot').textContent = 'Nobody has heard from you in months.';
+    renderPipeline(null);
+    composer(false);
+    $('clock').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/, '');
+  }
+
+  $('draft').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('approveAll').addEventListener('click', () => { LEADS.forEach(l => { if (drafts[l.id] && !drafts[l.id].sent) drafts[l.id].approved = true; }); renderDrafts(); });
+  $('send').addEventListener('click', sendApproved);
+  $('back').addEventListener('click', closeChat);
+  $('composer').addEventListener('submit', e => { e.preventDefault(); leadSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  renderLeads();
+  reset();
+})();
+</script>
+</body>
+</html>
