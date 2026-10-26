@@ -4,95 +4,116 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Loyalty Punch Card — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Look up a customer by phone, add a stamp, and the tenth visit earns the reward.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/loyalty-punch-card">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --blue: #378ADD; --blue-light: #e8f0fa; --green: #3FAE5C; --green-light: #e6f6ea; --amber: #D98E2B; --amber-light: #faf0e0; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
-  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
-  .demo-bar a:hover { text-decoration: underline; }
-  .demo-bar .sep { color: #45453f; }
-  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
-  .nav-back:hover { color: var(--ink); }
-  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .wrap { max-width: 520px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-  .page-header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  h1 { font-size: 16px; font-weight: 500; }
-  .page-sub { font-size: 12px; color: var(--ink-3); }
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.9rem; }
+  .card { background: var(--card); border: 1px solid var(--ink-3); border-radius: 0; padding: 1.5rem; margin-bottom: 1rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.9rem; }
 
   .form-row { display: flex; gap: 8px; }
-  .form-row input { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
-  .form-row input:focus { border-color: var(--blue); }
-  .btn-primary { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; }
+  .form-row input { flex: 1; padding: 10px 12px; border: 1px solid var(--ink-3); border-radius: 0; font-size: 13px; color: var(--paper); background: var(--card); font-family: var(--font-sans); outline: none; transition: border-color 0.15s; }
+  .form-row input:focus { border-color: var(--signal); }
+  .btn-primary { background: var(--signal); border: none; border-radius: 0; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); white-space: nowrap; }
   .btn-primary:hover { opacity: 0.92; }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .hint { font-size: 11px; color: var(--ink-4); margin-top: 8px; }
+  .hint { font-size: 11px; color: var(--faint); margin-top: 8px; }
 
-  .punch-empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink-3); font-size: 13px; }
-  .punch-empty svg { width: 32px; height: 32px; stroke: var(--ink-4); fill: none; stroke-width: 1.5; margin-bottom: 10px; }
+  .punch-empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: 13px; }
+  .punch-empty svg { width: 32px; height: 32px; stroke: var(--faint); fill: none; stroke-width: 1.5; margin-bottom: 10px; }
 
   .punch-customer { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 8px; }
   .punch-customer-name { font-size: 14px; font-weight: 500; }
-  .punch-customer-meta { font-size: 11px; color: var(--ink-3); }
+  .punch-customer-meta { font-size: 11px; color: var(--muted); }
 
   .punch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 1.25rem; }
-  .punch-cell { aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-  .punch-cell.filled { border-style: solid; border-color: var(--green); background: var(--green-light); }
-  .punch-cell.filled svg { stroke: var(--green); }
-  .punch-cell.reward { border-color: var(--amber); background: var(--amber-light); }
-  .punch-cell.reward svg { stroke: var(--amber); }
-  .punch-cell svg { width: 18px; height: 18px; fill: none; stroke: var(--ink-4); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .punch-cell { aspect-ratio: 1; border: 1.5px dashed var(--ink-3); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .punch-cell.filled { border-style: solid; border-color: var(--signal); background: #eef6e6; }
+  .punch-cell.filled svg { stroke: var(--signal); }
+  .punch-cell.reward { border-color: var(--signal); background: #eef6e6; }
+  .punch-cell.reward svg { stroke: var(--signal); }
+  .punch-cell svg { width: 18px; height: 18px; fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  .punch-progress { font-size: 13px; color: var(--ink-2); text-align: center; margin-bottom: 1rem; }
-  .punch-progress strong { color: var(--ink); }
+  .punch-progress { font-size: 13px; color: var(--paper); text-align: center; margin-bottom: 1rem; }
+  .punch-progress strong { color: var(--paper); }
 
-  .reward-banner { background: var(--amber-light); border: 1px solid var(--amber); border-radius: 8px; padding: 12px 14px; text-align: center; font-size: 13px; font-weight: 500; color: #8a5d12; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .reward-banner svg { width: 16px; height: 16px; stroke: #8a5d12; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .reward-banner { background: #eef6e6; border: 1px solid var(--signal); border-radius: 0; padding: 12px 14px; text-align: center; font-size: 13px; font-weight: 500; color: var(--paper); margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .reward-banner svg { width: 16px; height: 16px; stroke: var(--paper); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 
   .action-row { display: flex; gap: 8px; }
   .action-row button { flex: 1; }
-  .btn-secondary { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--ink); padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; }
-  .btn-secondary:hover { border-color: var(--ink-3); }
+  .btn-secondary { background: var(--card); border: 1px solid var(--ink-3); border-radius: 0; color: var(--paper); padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); }
+  .btn-secondary:hover { border-color: var(--muted); }
   .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+  .stat-card { background: var(--card); border: 1px solid var(--ink-3); border-radius: 0; padding: 1rem 1.1rem; }
   .stat-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
-  .stat-label { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120%); background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 99px; transition: transform 0.25s ease; z-index: 200; white-space: nowrap; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(calc(100% + 40px)); background: var(--paper); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 0; transition: transform 0.25s ease; z-index: 200; white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   @media (max-width: 420px) { .punch-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; } }
+
+  .tool { max-width: 640px; }
+  .section-head, .form-group label, .stat-label, .items-table th { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .card, .stat-card, .preview-card { background: var(--card); border-color: var(--ink-3); }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus, .form-row input:focus { border-color: var(--paper); background: #fff; }
+  .btn-primary { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-hl); background: var(--hl); border: 1px solid var(--paper); box-shadow: 3px 3px 0 var(--paper); transition: transform .12s, box-shadow .12s; }
+  .btn-primary:hover { opacity: 1; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--paper); }
+  .btn-primary:disabled { transform: none; box-shadow: none; }
+  .btn-primary svg { stroke: var(--on-hl); }
+  .btn-secondary, .copy-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-color: var(--paper); }
+  .stat-num { font-family: var(--font-mono); letter-spacing: -0.02em; }
+  .biz-title { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; }
 </style>
 <script src="/analytics.js"></script>
 </head>
 <body>
 
-<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
 
 <nav>
-  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
-  <span class="nav-badge">Live demo</span>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <div class="wrap">
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-      <div><h1>Loyalty punch card</h1><div class="page-sub">Look up a customer by phone, add a stamp, redeem rewards</div></div>
+  <section class="hero no-print">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Loyalty punch card</div>
+      <h1>A punch card that <em>can't</em> get lost.</h1>
+      <p class="hero-sub">Look a customer up by phone and add a stamp. The tenth visit earns the reward. Try (337) 555-0148, or any new number to start a card.</p>
     </div>
-  </div>
+  </section>
+  <div class="tool">
 
   <div class="card">
     <div class="section-head">Look up customer</div>
@@ -115,6 +136,7 @@
     <div class="stat-card"><div class="stat-num" id="stat-stamps">0</div><div class="stat-label">Stamps given</div></div>
     <div class="stat-card"><div class="stat-num" id="stat-rewards">0</div><div class="stat-label">Rewards redeemed</div></div>
   </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>

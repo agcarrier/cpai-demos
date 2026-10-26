@@ -4,14 +4,11 @@
     { "source": "/demos/storm-estimate-intake", "destination": "/demos/storm-estimate-intake.html" },
     { "source": "/demos/missed-call-text-back", "destination": "/demos/missed-call-text-back.html" },
     { "source": "/demos/instant-lead-response", "destination": "/demos/instant-lead-response.html" },
-    { "source": "/demos/appointment-scheduler", "destination": "/demos/appointment-scheduler.html" },
     { "source": "/demos/invoice-generator", "destination": "/demos/invoice-generator.html" },
     { "source": "/demos/open-today", "destination": "/demos/open-today.html" },
     { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" },
     { "source": "/demos/review-collector", "destination": "/demos/review-collector.html" },
     { "source": "/demos/loyalty-punch-card", "destination": "/demos/loyalty-punch-card.html" },
-    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" },
-    { "source": "/demos/expense-tracker", "destination": "/demos/expense-tracker.html" },
-    { "source": "/demos/tip-calculator", "destination": "/demos/tip-calculator.html" }
+    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" }
   ]
 }

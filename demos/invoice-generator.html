@@ -4,78 +4,97 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Invoice Generator — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Fill in a job and the totals work themselves out. Print the invoice or save it as a PDF.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/invoice-generator">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --blue: #378ADD; --blue-light: #e8f0fa; --ink: #0e0e0d; --ink-2: #3a3a37; --ink-3: #7a7a74; --ink-4: #b0b0a8; --surface: #fff; --bg: #f7f6f2; --border: rgba(14,14,13,0.12); }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-  .demo-bar { background: #0c0c0d; color: rgba(241,241,239,0.65); text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; padding: 10px 12px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid #2a2a2d; }
-  .demo-bar a { color: #9bff5b; text-decoration: none; font-weight: 500; }
-  .demo-bar a:hover { text-decoration: underline; }
-  .demo-bar .sep { color: #45453f; }
-  nav { position: sticky; top: 0; z-index: 100; background: rgba(247,246,242,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-back { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
-  .nav-back:hover { color: var(--ink); }
-  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge { font-size: 11px; background: var(--blue-light); color: var(--blue); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
-  .page-header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; }
-  .brand-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  h1 { font-size: 16px; font-weight: 500; }
-  .page-sub { font-size: 12px; color: var(--ink-3); }
-  .btn-print { background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 9px 16px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; }
-  .btn-print svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .form-group { margin-bottom: 1rem; }
-  .form-group label { font-size: 12px; color: var(--ink-3); display: block; margin-bottom: 5px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--ink); background: var(--surface); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); }
+  .form-group label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--ink-3); border-radius: 0; font-size: 13px; color: var(--paper); background: var(--card); font-family: var(--font-sans); outline: none; transition: border-color 0.15s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--signal); }
   .form-group textarea { resize: none; height: 56px; }
-  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); margin: 1.5rem 0 0.75rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .section-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin: 1.5rem 0 0.75rem; }
+  .card { background: var(--card); border: 1px solid var(--ink-3); border-radius: 0; padding: 1.25rem; margin-bottom: 1rem; }
   .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .items-table th { font-size: 11px; color: var(--ink-4); text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+  .items-table th { font-size: 11px; color: var(--faint); text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--ink-3); font-weight: 400; }
   .items-table th:last-child, .items-table td:last-child { text-align: right; }
-  .items-table td { padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .items-table td { padding: 8px 0; border-bottom: 1px solid var(--ink-3); vertical-align: middle; }
   .items-table tr:last-child td { border-bottom: none; }
-  .item-desc { width: 100%; border: none; background: transparent; font-size: 13px; color: var(--ink); font-family: 'Inter', sans-serif; padding: 0; outline: none; }
-  .item-num { width: 70px; border: 1px solid transparent; background: transparent; font-size: 13px; color: var(--ink); font-family: 'Inter', sans-serif; padding: 3px 4px; border-radius: 5px; text-align: right; outline: none; }
-  .item-num:focus { border-color: var(--border); }
-  .remove-btn { background: none; border: none; color: var(--ink-4); cursor: pointer; padding: 0 4px; font-size: 16px; line-height: 1; }
+  .item-desc { width: 100%; border: none; background: transparent; font-size: 13px; color: var(--paper); font-family: var(--font-sans); padding: 0; outline: none; }
+  .item-num { width: 70px; border: 1px solid transparent; background: transparent; font-size: 13px; color: var(--paper); font-family: var(--font-sans); padding: 3px 4px; border-radius: 0; text-align: right; outline: none; }
+  .item-num:focus { border-color: var(--ink-3); }
+  .remove-btn { background: none; border: none; color: var(--faint); cursor: pointer; padding: 0 4px; font-size: 16px; line-height: 1; }
   .remove-btn:hover { color: #E24B4A; }
-  .add-line { display: flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: 1px dashed var(--border); border-radius: 7px; padding: 8px 12px; color: var(--ink-3); font-size: 13px; cursor: pointer; width: 100%; font-family: 'Inter', sans-serif; }
-  .add-line:hover { background: var(--bg); }
+  .add-line { display: flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: 1px dashed var(--ink-3); border-radius: 0; padding: 8px 12px; color: var(--muted); font-size: 13px; cursor: pointer; width: 100%; font-family: var(--font-sans); }
+  .add-line:hover { background: var(--ink); }
   .add-line svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .totals { margin-top: 1rem; }
-  .totals-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--ink-3); }
-  .totals-row.total { font-size: 16px; font-weight: 500; color: var(--ink); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
-  .note-badge { font-size: 11px; color: var(--ink-4); background: var(--bg); border-radius: 5px; padding: 2px 7px; margin-left: 6px; }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+  .totals-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--muted); }
+  .totals-row.total { font-size: 16px; font-weight: 500; color: var(--paper); border-top: 1px solid var(--ink-3); padding-top: 10px; margin-top: 4px; }
+  .note-badge { font-size: 11px; color: var(--faint); background: var(--ink); border-radius: 0; padding: 2px 7px; margin-left: 6px; }
+  .divider { border: none; border-top: 1px solid var(--ink-3); margin: 1.25rem 0; }
   @media print { .no-print { display: none !important; } .wrap { padding: 0; } nav, .demo-bar { display: none !important; } body { background: #fff; } .card { border: none; padding: 0; } }
   @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } .page-header { flex-wrap: wrap; gap: 12px; } }
+
+  .tool { max-width: 640px; }
+  .section-head, .form-group label, .stat-label, .items-table th { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .card, .stat-card, .preview-card { background: var(--card); border-color: var(--ink-3); }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus, .form-row input:focus { border-color: var(--paper); background: #fff; }
+  .btn-primary { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-hl); background: var(--hl); border: 1px solid var(--paper); box-shadow: 3px 3px 0 var(--paper); transition: transform .12s, box-shadow .12s; }
+  .btn-primary:hover { opacity: 1; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--paper); }
+  .btn-primary:disabled { transform: none; box-shadow: none; }
+  .btn-primary svg { stroke: var(--on-hl); }
+  .btn-secondary, .copy-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-color: var(--paper); }
+  .stat-num { font-family: var(--font-mono); letter-spacing: -0.02em; }
+  .biz-title { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; }
 </style>
 <script src="/analytics.js"></script>
 </head>
 <body>
 
-<div class="demo-bar no-print"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="mailto:andrew@carrierpigeonai.dev">Get in touch →</a></div>
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
 
-<nav class="no-print">
-  <a class="nav-back" href="/"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg> All demos</a>
-  <span class="nav-badge">Live demo</span>
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
 </nav>
 
 <div class="wrap">
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div>
-      <div><h1>Invoice generator</h1><div class="page-sub">Fill in, then print or save as PDF</div></div>
+  <section class="hero no-print">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Invoice generator</div>
+      <h1>Bill a client in <em>two minutes</em>.</h1>
+      <p class="hero-sub">Fill in the job and the totals work themselves out. Print it or save a PDF. No account, and nothing leaves your browser.</p>
     </div>
-    <button class="btn-print no-print" onclick="window.print()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print / Save PDF</button>
-  </div>
+    <button class="btn-ghost no-print" onclick="window.print()">Print / Save PDF</button>
+  </section>
+  <div class="tool">
 
   <div class="two-col">
     <div style="grid-column:1/-1"><div class="section-head">Your business</div></div>
@@ -118,6 +137,7 @@
     </div>
   </div>
   <div class="form-group no-print"><label>Notes / payment instructions</label><textarea id="inv-notes" placeholder="e.g. Please pay via Venmo @rosadelgado within 14 days. Thank you!"></textarea></div>
+</div>
 </div>
 
 <script>
