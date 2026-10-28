@@ -15,13 +15,13 @@
 <style>
   .items { display: flex; flex-direction: column; gap: 6px; }
   .it { display: grid; grid-template-columns: 1fr 74px auto auto; gap: 6px; align-items: center; }
-  .it input[type=text], .it input[type=number] { font: 13px var(--font-sans); padding: 8px 9px; border: 1px solid var(--ink-3); background: var(--ink); color: var(--paper); border-radius: 0; min-width: 0; }
+  .it input[type=text], .it input[type=number] { font: 13px var(--font-sans); padding: 8px 10px; border: 1px solid var(--ink-3); background: var(--ink); color: var(--paper); border-radius: 0; min-width: 0; }
   .it input[type=number] { font-family: var(--font-mono); text-align: right; }
   .it input:focus { outline: none; border-color: var(--paper); background: #fff; }
-  .it .so { font: 600 9px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 9px 7px; border: 1px solid var(--ink-3); background: #fff; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .it .so { font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 10px 7px; border: 1px solid var(--ink-3); background: #fff; color: var(--muted); cursor: pointer; white-space: nowrap; }
   .it .so[aria-pressed="true"] { background: #b4361a; color: #fff; border-color: #b4361a; }
   .it .x { border: none; background: none; color: var(--faint); cursor: pointer; font-size: 16px; padding: 0 4px; }
-  .sec-name { font: 600 12px var(--font-sans); padding: 8px 9px; border: 1px solid var(--ink-3); background: #fff; width: 100%; margin: 14px 0 6px; border-radius: 0; }
+  .sec-name { font: 600 12px var(--font-sans); padding: 8px 10px; border: 1px solid var(--ink-3); background: #fff; width: 100%; margin: 14px 0 6px; border-radius: 0; }
   .add { margin-top: 6px; }
   .qr-wrap { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ink-3); }
   .qr { background: #fff; border: 1px solid var(--paper); padding: 8px; aspect-ratio: 1; }
@@ -31,14 +31,14 @@
   /* The menu customers see */
   .menu { flex: 1; overflow-y: auto; padding: 18px 16px; background: #fffdf8; }
   .menu .mn { font-family: var(--font-display); font-weight: 600; font-size: 24px; letter-spacing: -0.02em; line-height: 1.1; }
-  .menu .mt { font-size: 12.5px; color: var(--muted); margin: 4px 0 14px; }
+  .menu .mt { font-size: 12px; color: var(--muted); margin: 4px 0 14px; }
   .menu .ms { font: 600 10px var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--signal); margin: 16px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--ink-3); }
   .menu .mi { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; font-size: 14px; }
   .menu .mi .dots { flex: 1; border-bottom: 1px dotted var(--ink-3); transform: translateY(-3px); }
   .menu .mi .mp { font: 600 13px var(--font-mono); }
   .menu .mi.out { color: var(--faint); }
   .menu .mi.out .mp { text-decoration: line-through; }
-  .menu .mi .tag { font: 600 8.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #fff; background: #b4361a; padding: 2px 5px; }
+  .menu .mi .tag { font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #fff; background: #b4361a; padding: 2px 5px; }
   .menu .upd { font: 10px var(--font-mono); color: var(--faint); margin-top: 18px; text-align: center; }
   /* Opened from the QR code: just the menu, full screen */
   body.scan > *:not(#scan) { display: none !important; }
