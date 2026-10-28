@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/demos/ai-receptionist", "destination": "/demos/ai-receptionist.html" },
     { "source": "/demos/lead-reactivation", "destination": "/demos/lead-reactivation.html" },
     { "source": "/demos/storm-estimate-intake", "destination": "/demos/storm-estimate-intake.html" },
     { "source": "/demos/missed-call-text-back", "destination": "/demos/missed-call-text-back.html" },

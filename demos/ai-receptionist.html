@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Receptionist — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Talk out loud to an AI receptionist that answers as your business, built from your own website. Right in your browser.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/ai-receptionist">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  .stages.two { grid-template-columns: 1fr 40px 1fr; }
+
+  /* 01 The business */
+  .svc { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+  .svc span { font-size: 12px; border: 1px solid var(--ink-3); background: #fff; padding: 3px 8px; }
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 14px; }
+  .hint a { color: var(--paper); }
+  #ts { margin-top: 8px; }
+
+  /* 02 The call */
+  .call { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 22px; gap: 6px; min-height: 380px; }
+  .call .av { width: 72px; height: 72px; font-size: 22px; margin-bottom: 12px; position: relative; }
+  .call .av::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--signal); opacity: 0; }
+  .call.connecting .av::after { animation: ring 1s cubic-bezier(.22,1,.36,1) infinite; }
+  .call.talking .av::after { animation: ring .7s cubic-bezier(.22,1,.36,1) infinite; border-color: var(--hl); }
+  @keyframes ring { from { opacity: .7; transform: scale(.9); } to { opacity: 0; transform: scale(1.35); } }
+  .call .who { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .call .state { margin-top: 14px; font: 500 11px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); min-height: 18px; }
+  .call.live .state { color: var(--signal); }
+  .call .why { font-size: 13px; color: var(--muted); max-width: 32ch; min-height: 40px; }
+  .call .submit { margin-top: 18px; width: auto; padding: 14px 26px; }
+  .call .err { margin-top: 10px; max-width: 34ch; }
+  @media (max-width: 960px) { .stages.two { grid-template-columns: 1fr; } }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / AI receptionist</div>
+      <h1 id="title">Hear your front desk answered by <em>AI</em>.</h1>
+      <p class="hero-sub" id="sub">Put in your website. The receptionist reads it, learns your services and hours, and picks up as your business. Then call it from your browser and talk to it like a customer would.</p>
+    </div>
+  </section>
+
+  <div class="stages two">
+    <!-- 01 The business -->
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">What it knows</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <form id="build" hidden>
+            <div class="hd">Your business</div>
+            <div class="hd-sub">It only learns what your site says.</div>
+            <div class="field"><label for="url">Your website</label><input id="url" placeholder="bayoudental.com" autocomplete="url" required maxlength="200"></div>
+            <div id="ts"></div>
+            <button class="submit" id="buildBtn" type="submit">Build my receptionist →</button>
+            <div class="err" id="buildErr" hidden></div>
+          </form>
+
+          <div id="edit" hidden>
+            <div class="hd">Check the card</div>
+            <div class="hd-sub" id="editSub">Fix anything it got wrong. This is all it knows.</div>
+            <div class="field"><label for="f-business_name">Business name</label><input id="f-business_name" maxlength="300"></div>
+            <div class="field"><label for="f-descriptor">What you do</label><input id="f-descriptor" maxlength="300" placeholder="a family dental practice in Lafayette"></div>
+            <div class="field"><label for="f-services">Services, comma separated</label><input id="f-services" maxlength="600"></div>
+            <div class="field"><label for="f-hours">Hours</label><input id="f-hours" maxlength="300"></div>
+            <button class="replay" id="restart" type="button">use a different website</button>
+          </div>
+
+          <div id="view" hidden>
+            <div class="hd" id="v-name"></div>
+            <div class="hd-sub" id="v-desc"></div>
+            <div class="row"><span class="k">Services</span><span class="v svc" id="v-services"></span></div>
+            <div class="row"><span class="k">Hours</span><span class="v" id="v-hours"></span></div>
+            <p class="hint">Built from your website by Andrew at Carrier Pigeon AI. <a href="/demos/ai-receptionist">Try it with another site</a></p>
+          </div>
+
+          <div class="err" id="loadErr" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <!-- 02 The call -->
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The call</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="call" id="call">
+          <div class="av" id="av">?</div>
+          <div class="who" id="who">Your business</div>
+          <div class="state" id="state">Not connected</div>
+          <div class="why" id="why">Your browser will ask for the microphone. Talk like a customer calling in.</div>
+          <button class="submit" id="talk" type="button" disabled>Call the front desk →</button>
+          <button class="replay" id="end" type="button" hidden>hang up</button>
+          <div class="err" id="callErr" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl">24/7</div><div class="ml">Answers every call</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0</div><div class="ml">Calls sent to voicemail</div></div>
+    <div class="cta">
+      <p>That was built from your website in seconds. Tuned to your real prices, policies and booking, it answers your actual phone line.</p>
+      <a href="https://carrierpigeonai.dev/contact">Talk to Andrew →</a>
+    </div>
+  </div>
+  <p class="note">Live voice agent on Retell. Nothing is dialed: the call runs in your browser and ends after 3 minutes. Want to hear the real thing? Call (337) 273-0139.</p>
+</div>
+
+<script type="module">
+  import { RetellWebClient } from 'https://cdn.jsdelivr.net/npm/retell-client-js-sdk@3.0.2/+esm';
+
+  // ponytail: RetellWebClient is deprecated in SDK 3.x and removed in 4.0. The
+  // new RetellClient only does public-key calls, where the browser would pick
+  // the prompt variables. Pinned to 3.0.2 so this keeps working until Retell
+  // ships a server-created call path in the new client.
+  const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const API = LOCAL ? 'http://localhost:8799' : 'https://demo-line.REPLACE.workers.dev';
+  // Cloudflare's always-pass test key locally; the real one is set after the
+  // widget is created for demos.carrierpigeonai.dev.
+  const SITE_KEY = LOCAL ? '1x00000000000000000000AA' : 'REPLACE_WITH_TURNSTILE_SITE_KEY';
+  const FIELDS = ['business_name', 'descriptor', 'services', 'hours'];
+
+  const $ = id => document.getElementById(id);
+  const slug = new URLSearchParams(location.search).get('d');
+  const source = slug ? 'link' : 'self';
+  let profile = null;
+  let client = null;
+  let widget = null;
+
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  const showErr = (id, msg) => { $(id).hidden = !msg; $(id).textContent = msg || ''; };
+  const initials = name => (name.match(/\b[A-Za-z0-9]/g) || ['?']).slice(0, 2).join('').toUpperCase();
+
+  async function post(path, body) {
+    const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The demo line is unavailable right now.');
+    return d;
+  }
+
+  // Turnstile tokens are single-use, so each protected request asks for a fresh one.
+  function turnstileToken() {
+    return new Promise((resolve, reject) => {
+      const go = () => {
+        if (widget === null) {
+          widget = turnstile.render('#ts', {
+            sitekey: SITE_KEY, execution: 'execute', appearance: 'interaction-only',
+            callback: t => resolve(t), 'error-callback': () => reject(new Error('Couldn\'t verify you\'re a person. Refresh and try again.')),
+          });
+        } else {
+          turnstile.reset(widget);
+        }
+        turnstile.execute(widget, { callback: t => resolve(t) });
+      };
+      if (window.turnstile) go();
+      else window.addEventListener('load', () => window.turnstile ? go() : reject(new Error('Verification didn\'t load. Refresh and try again.')), { once: true });
+    });
+  }
+
+  function ready(p) {
+    profile = p;
+    $('who').textContent = p.business_name || 'Your business';
+    $('av').textContent = initials(p.business_name || '?');
+    $('talk').disabled = false;
+    $('conn1').classList.add('on');
+    status(1, 'ready', true);
+  }
+
+  function currentProfile() {
+    if (slug) return null;
+    const p = { ...profile };
+    for (const f of FIELDS) p[f] = $('f-' + f).value.trim();
+    p.services = p.services ? p.services.split(',').map(s => s.trim()).filter(Boolean) : [];
+    return p;
+  }
+
+  // ── Link mode: Andrew already built and tuned this one ──
+  async function loadLink() {
+    $('view').hidden = false;
+    status(1, 'loading');
+    try {
+      const r = await fetch(API + '/api/demo/' + encodeURIComponent(slug));
+      const card = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(card.error || 'This demo link didn\'t load.');
+      $('v-name').textContent = card.business_name;
+      $('v-desc').textContent = card.descriptor;
+      $('v-services').replaceChildren(...card.services.map(s => Object.assign(document.createElement('span'), { textContent: s })));
+      $('v-hours').textContent = card.hours || 'Not listed';
+      $('title').innerHTML = '';
+      $('title').append('Meet the front desk of ', Object.assign(document.createElement('em'), { textContent: card.business_name }), '.');
+      $('sub').textContent = 'This receptionist was built from your website and answers as your business. Call it from your browser and ask what a customer would ask: hours, services, getting an appointment.';
+      if (card.calls_left === 0) throw new Error('This demo has used all its calls. Text Andrew for a fresh link.');
+      ready(card);
+    } catch (e) {
+      $('view').hidden = true;
+      showErr('loadErr', e.message);
+      status(1, 'unavailable');
+    }
+  }
+
+  // ── Self-serve: build from the visitor's own site ──
+  $('build').onsubmit = async e => {
+    e.preventDefault();
+    showErr('buildErr', '');
+    $('buildBtn').disabled = true;
+    $('buildBtn').textContent = 'Reading your site…';
+    status(1, 'reading', true);
+    try {
+      const { profile: p, warning } = await post('/api/profile/public', { url: $('url').value, turnstile: await turnstileToken() });
+      for (const f of FIELDS) $('f-' + f).value = Array.isArray(p[f]) ? p[f].join(', ') : (p[f] || '');
+      $('editSub').textContent = warning || 'Fix anything it got wrong. This is all it knows.';
+      $('build').hidden = true;
+      $('edit').hidden = false;
+      ready(p);
+    } catch (err) {
+      showErr('buildErr', err.message);
+      status(1, 'waiting');
+    } finally {
+      $('buildBtn').disabled = false;
+      $('buildBtn').textContent = 'Build my receptionist →';
+    }
+  };
+  $('f-business_name').oninput = e => { $('who').textContent = e.target.value || 'Your business'; $('av').textContent = initials(e.target.value || '?'); };
+  $('restart').onclick = () => { $('edit').hidden = true; $('build').hidden = false; $('talk').disabled = true; status(1, 'waiting'); };
+
+  // ── The call ──
+  function callState(cls, state, why) {
+    $('call').className = 'call ' + cls;
+    $('state').textContent = state;
+    if (why !== undefined) $('why').textContent = why;
+  }
+
+  function hangUpUi(why) {
+    $('talk').hidden = false; $('talk').disabled = false; $('end').hidden = true;
+    $('edit').querySelectorAll('input').forEach(i => i.disabled = false);
+    callState('', 'Call ended', why);
+    status(2, 'ended');
+  }
+
+  $('talk').onclick = async () => {
+    showErr('callErr', '');
+    $('talk').disabled = true;
+    $('edit').querySelectorAll('input').forEach(i => i.disabled = true);
+    callState('connecting', 'Connecting', 'Allow the microphone when your browser asks.');
+    status(2, 'connecting', true);
+    try {
+      const body = slug ? { slug } : { profile: currentProfile(), turnstile: await turnstileToken() };
+      const call = await post('/api/webcall', body);
+      window.gtag && gtag('event', 'demo_used', { mode: 'receptionist', source, turn: 1 });
+      client = new RetellWebClient();
+      client.on('call_started', () => { callState('live', 'Live', 'Go ahead, ask it something.'); status(2, 'live', true); $('talk').hidden = true; $('end').hidden = false; });
+      client.on('agent_start_talking', () => $('call').classList.add('talking'));
+      client.on('agent_stop_talking', () => $('call').classList.remove('talking'));
+      client.on('call_ended', () => { hangUpUi('That\'s the whole demo. Call again any time.'); $('results').classList.add('show'); });
+      client.on('error', err => { client.stopCall(); hangUpUi(''); showErr('callErr', String(err?.message || err || 'The call dropped.')); });
+      await client.startCall({ accessToken: call.access_token, callId: call.call_id, transport: call.transport, iceServers: call.ice_servers });
+    } catch (e) {
+      hangUpUi('');
+      callState('', 'Not connected', '');
+      showErr('callErr', /permission|notallowed/i.test(String(e?.name) + e?.message)
+        ? 'The receptionist needs your microphone. Allow it in your browser, then try again.'
+        : e.message);
+    }
+  };
+  $('end').onclick = () => client && client.stopCall();
+
+  if (slug) loadLink();
+  else { $('build').hidden = false; }
+</script>
+</body>
+</html>
