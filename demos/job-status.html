@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Status Tracker — Carrier Pigeon AI Demo</title>
+<meta name="description" content="A status page your customer gets by text: tech on the way, working, done. Fewer 'where are you?' calls, and the invoice and review link at the end.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/job-status">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/demos/tool.css">
+<style>
+  .job { border: 1px solid var(--ink-3); background: #fff; padding: 14px; margin-bottom: 16px; }
+  .job .jt { font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+  .job .jd { font-size: 13px; color: var(--muted); }
+  .next { width: 100%; }
+  .eta { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; font-size: 13px; }
+  .eta input { width: 70px; font: 13px var(--font-mono); padding: 7px 9px; border: 1px solid var(--ink-3); background: var(--ink); border-radius: 0; }
+  .calls { margin-top: 18px; border: 1px solid var(--ink-3); background: var(--ink); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .calls b { font: 600 22px var(--font-mono); }
+  .calls span { font: 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+  /* Customer status page, inside the phone */
+  .sp { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; }
+  .sp .biz { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .sp .head { font-family: var(--font-display); font-weight: 600; font-size: 22px; line-height: 1.1; letter-spacing: -0.02em; }
+  .sp .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+  .track i { height: 6px; background: var(--ink-2); transition: background .4s; }
+  .track i.on { background: var(--signal); }
+  .track-l { display: grid; grid-template-columns: repeat(4, 1fr); font: 600 8.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin-top: 5px; }
+  .track-l span.on { color: var(--paper); }
+  .tech { display: flex; align-items: center; gap: 12px; border: 1px solid var(--ink-3); padding: 10px 12px; }
+  .tech .av { margin: 0; width: 38px; height: 38px; }
+  .tech .n { font-size: 14px; font-weight: 600; }
+  .tech .d { font-size: 12px; color: var(--muted); }
+  .bigeta { border: 1px solid var(--paper); background: var(--hl); padding: 12px; text-align: center; }
+  .bigeta b { display: block; font: 600 28px var(--font-mono); }
+  .bigeta span { font: 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .msgs { display: flex; flex-direction: column; gap: 6px; }
+  .msgs div { font-size: 12.5px; padding: 8px 10px; background: var(--ink-2); border-radius: 12px; border-bottom-left-radius: 4px; animation: pop .26s cubic-bezier(.22,1,.36,1); }
+  .msgs .t { display: block; font: 600 9px var(--font-mono); color: var(--faint); margin-bottom: 2px; }
+  .done-acts { display: flex; flex-direction: column; gap: 8px; }
+  .done-acts a { text-align: center; font: 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 12px; border: 1px solid var(--paper); text-decoration: none; color: var(--paper); }
+  .done-acts a.pay { background: var(--paper); color: var(--hl); }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Job status tracker</div>
+      <h1>No more "<em>where are you?</em>" calls.</h1>
+      <p class="hero-sub">The pizza tracker, for an AC repair. The tech taps one button as the job moves along, and the customer's status page updates and texts them. When it's done, the invoice and the review link are right there.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="split">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The tech's phone</span><span class="s" id="s1">today's job</span></div>
+      <div class="panel"><div class="pad">
+        <div class="job">
+          <div class="jt">AC not cooling · Mrs. Thibodeaux</div>
+          <div class="jd">208 Coolidge Blvd, Lafayette · window 1 to 3 PM</div>
+        </div>
+        <div class="eta" id="etaRow"><label for="eta">Drive time</label><input id="eta" type="number" min="5" max="120" value="25"> minutes</div>
+        <button class="submit next" id="next" type="button">I'm on my way →</button>
+        <div class="calls"><span>"Where are you?" calls today</span><b id="calls">0</b></div>
+        <p class="hd-sub" style="margin-top:12px">Every tap updates the page on the right and sends the customer one short text.</p>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The customer's status page</span><span class="s" id="s2">live</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>12:48</span><span>5G</span></div>
+              <div class="pc-name">cajuncomfort.com/job/4471</div>
+              <div class="pc-sub">Job status</div>
+            </div>
+            <div class="sp" id="sp"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">A working prototype. In a real build the tech's button press sends the text and updates a link only that customer has.</p>
+</div>
+
+<script>
+(function () {
+  const STEPS = [
+    { label: 'Scheduled', head: 'You’re on the schedule.', sub: 'Marcus will text when he heads your way.', btn: 'I’m on my way →' },
+    { label: 'On the way', head: 'Marcus is on the way.', sub: 'Silver Cajun Comfort van, plate 4KD 218.', btn: 'I’ve arrived, starting work →' },
+    { label: 'Working', head: 'Marcus is working on it.', sub: 'Checking the outdoor unit and refrigerant level.', btn: 'Job done, send invoice →' },
+    { label: 'Done', head: 'All done. Stay cool!', sub: 'Replaced a failed capacitor. System is cooling to 72°F.', btn: 'Done' },
+  ];
+  const $ = id => document.getElementById(id);
+  let step = 0, msgs = [], timer = null, etaEnd = 0;
+
+  const now = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  function text(s) { msgs.push([now(), s]); }
+
+  function draw() {
+    const s = STEPS[step];
+    const etaLeft = Math.max(0, Math.ceil((etaEnd - Date.now()) / 60000));
+    $('sp').innerHTML = `
+      <div><div class="biz">Cajun Comfort Air</div><div class="head">${s.head}</div><div class="sub">${s.sub}</div></div>
+      <div><div class="track">${STEPS.map((_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>
+        <div class="track-l">${STEPS.map((x, i) => `<span class="${i === step ? 'on' : ''}">${x.label}</span>`).join('')}</div></div>
+      ${step === 1 ? `<div class="bigeta"><b>${etaLeft} min</b><span>Estimated arrival</span></div>` : ''}
+      ${step < 3 ? `<div class="tech"><div class="av">MB</div><div><div class="n">Marcus B.</div><div class="d">EPA certified · 9 years with Cajun Comfort</div></div></div>` : ''}
+      ${step === 3 ? `<div class="done-acts"><a class="pay" href="#" onclick="return false">Pay invoice · $289</a><a href="#" onclick="return false">Leave a Google review</a></div>` : ''}
+      <div class="msgs">${msgs.slice().reverse().map(([t, m]) => `<div><span class="t">Text · ${t}</span>${m}</div>`).join('')}</div>`;
+    $('next').textContent = s.btn; $('next').disabled = step === 3;
+    $('etaRow').hidden = step !== 0;
+    $('s1').textContent = s.label.toLowerCase(); $('s1').classList.toggle('live', step > 0);
+  }
+
+  $('next').onclick = () => {
+    if (step >= 3) return;
+    step++;
+    if (step === 1) {
+      const m = Math.min(120, Math.max(5, Number($('eta').value) || 25));
+      etaEnd = Date.now() + m * 60000;
+      text(`Marcus from Cajun Comfort is on the way, about ${m} minutes. Track it here: cajuncomfort.com/job/4471`);
+      timer = setInterval(draw, 15000);
+    }
+    if (step === 2) { clearInterval(timer); text('Marcus has arrived and is starting on your AC.'); }
+    if (step === 3) { text('All done! Your invoice and a quick review link are on your job page. Thank you!'); $('s2').textContent = 'job closed'; $('s2').classList.add('live'); }
+    draw();
+  };
+
+  function reset() {
+    clearInterval(timer); step = 0; msgs = [];
+    text('You’re booked with Cajun Comfort Air today between 1 and 3 PM. We’ll text when your tech is on the way.');
+    $('s2').textContent = 'live'; $('s2').classList.remove('live');
+    $('calls').textContent = '0';
+    draw();
+  }
+  $('reset').onclick = reset;
+  reset();
+})();
+</script>
+</body>
+</html>

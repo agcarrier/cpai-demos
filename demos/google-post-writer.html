@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Post Writer — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Tell it the job you just finished. A live AI writer turns it into a Google Business Profile post with local search phrases, then revises it on request.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/google-post-writer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .photo { border: 1px solid var(--ink-3); background: #fff; padding: 0; cursor: pointer; display: flex; flex-direction: column; }
+  .photo svg { display: block; width: 100%; height: auto; }
+  .photo span { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 6px; color: var(--muted); }
+  .photo[aria-pressed="true"] { border-color: var(--paper); box-shadow: 3px 3px 0 var(--paper); }
+  .photo[aria-pressed="true"] span { background: var(--hl); color: var(--on-hl); }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; margin: -4px 0 12px; }
+  .field textarea { min-height: 92px; }
+  /* 03 Google post preview */
+  .gpost { border: 1px solid #dadce0; border-radius: 12px; background: #fff; overflow: hidden; font-family: Arial, Helvetica, sans-serif; color: #202124; }
+  .gpost .gh { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .gpost .gav { width: 36px; height: 36px; border-radius: 50%; background: #1a73e8; color: #fff; display: grid; place-items: center; font: 700 14px Arial, sans-serif; }
+  .gpost .gn { font-size: 14px; font-weight: 700; }
+  .gpost .gt { font-size: 12px; color: #5f6368; }
+  .gpost .gimg svg { display: block; width: 100%; height: auto; }
+  .gpost .gb { padding: 12px 14px 4px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; min-height: 90px; }
+  .gpost .gb.empty { color: #9aa0a6; }
+  .gpost .gcta { margin: 8px 14px 14px; display: inline-block; font: 500 14px Arial, sans-serif; color: #1a73e8; border: 1px solid #dadce0; border-radius: 18px; padding: 7px 18px; }
+  .gpost .gb.fill { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: #f0ffe6; } to { background: #fff; } }
+  .kw { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; min-height: 26px; }
+  .kw span { font: 600 10px var(--font-mono); letter-spacing: .06em; padding: 4px 8px; border: 1px solid var(--paper); background: var(--hl); color: var(--on-hl); }
+  .kw-h { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-top: 14px; }
+  .note-line { font-size: 12.5px; color: var(--muted); margin-top: 10px; min-height: 18px; }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Google post writer</div>
+      <h1>One line about the job, one <em>Google post</em> a week.</h1>
+      <p class="hero-sub">Posting to your Google Business Profile every week helps you show up in local searches, but nobody has time to write them. Tell a live AI writer what job you just finished and where. It writes the post, picks the button, and works in the local search phrases. Then ask for changes.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The job you finished</span><span class="s" id="s1">your turn</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="field"><label>Pick the job photo</label></div>
+          <div class="photos" id="photos"></div>
+          <div class="field"><label for="job">What did you do, and where?</label><textarea id="job" maxlength="400"></textarea></div>
+          <button class="submit" id="write" type="button">Write the post →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI writer</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>6:05</span><span>5G</span></div>
+              <div class="av">AI</div>
+              <div class="pc-name">Post writer</div>
+              <div class="pc-sub">Ask for changes</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Shorter, mention gutters…" autocomplete="off" maxlength="300" disabled aria-label="Change request">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">Your Google profile</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="gpost">
+            <div class="gh"><div class="gav">A</div><div><div class="gn">Acadiana Pressure Pros</div><div class="gt" id="gt">Update · draft</div></div></div>
+            <div class="gimg" id="gimg"></div>
+            <div class="gb empty" id="gb">Your post appears here.</div>
+            <span class="gcta" id="gcta">Call now</span>
+          </div>
+          <div class="kw-h">Local search phrases used</div>
+          <div class="kw" id="kw"></div>
+          <div class="note-line" id="note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-time">—</div><div class="ml">One line to a finished post</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-kw">—</div><div class="ml">Local phrases worked in</div></div>
+    <div class="cta">
+      <p>Snap a photo after the job, text one line, approve the post. Your profile stays active every week without you writing a word.</p>
+      <a href="https://carrierpigeonai.dev/services/business-automation">See Business Automation →</a>
+    </div>
+  </div>
+
+  <p class="note">Live writer: Claude Haiku via the Carrier Pigeon demo API. It only uses facts you give it. Nothing is posted to Google.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Acadiana Pressure Pros';
+  const CTA = { CALL: 'Call now', BOOK: 'Book', LEARN_MORE: 'Learn more' };
+  // Drawn stand-ins for the owner's job photo.
+  const PHOTOS = {
+    Driveway: `<svg viewBox="0 0 120 80"><rect width="120" height="80" fill="#cfe3f2"/><rect x="62" y="16" width="46" height="30" fill="#f3efe6"/><path d="M58 18 L85 4 L112 18Z" fill="#6b4f3a"/><rect x="72" y="30" width="16" height="16" fill="#8a8f96"/><path d="M0 46 H120 V80 H0Z" fill="#7fb05a"/><path d="M70 46 H92 L120 80 H40Z" fill="#e9e6df"/><path d="M76 46 L68 80" stroke="#d6d2c8" stroke-width="1"/><path d="M86 46 L96 80" stroke="#d6d2c8" stroke-width="1"/></svg>`,
+    Roof: `<svg viewBox="0 0 120 80"><rect width="120" height="80" fill="#d7e8f4"/><path d="M10 44 L60 12 L110 44Z" fill="#3c4148"/><path d="M22 36 H98 M30 30 H90 M40 24 H80" stroke="#545a62" stroke-width="1.5"/><rect x="18" y="44" width="84" height="26" fill="#efe9dc"/><rect x="30" y="52" width="12" height="10" fill="#9fb6c8"/><rect x="78" y="52" width="12" height="10" fill="#9fb6c8"/><rect x="54" y="52" width="12" height="18" fill="#7a5a43"/><rect y="70" width="120" height="10" fill="#7fb05a"/></svg>`,
+    Deck: `<svg viewBox="0 0 120 80"><rect width="120" height="80" fill="#dcebe0"/><rect x="0" y="0" width="120" height="34" fill="#eef1ea"/><rect x="0" y="34" width="120" height="46" fill="#b98a5e"/><path d="M0 42 H120 M0 50 H120 M0 58 H120 M0 66 H120 M0 74 H120" stroke="#a5784f" stroke-width="1.2"/><path d="M8 34 V14 M112 34 V14 M8 16 H112 M8 24 H112" stroke="#8f6744" stroke-width="2.5"/></svg>`,
+  };
+  const PRESETS = {
+    Driveway: 'Driveway and front walk in Youngsville. 20 years of mildew and tire marks, took about 3 hours.',
+    Roof: 'Soft washed a roof in River Ranch, black streaks gone, no pressure on the shingles.',
+    Deck: 'Cleaned a big back deck in Broussard so the owners can restain it before the holidays.',
+  };
+  const $ = id => document.getElementById(id);
+  let run = 0, history = [], photo = 'Driveway', t0 = 0, busy = false;
+
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  function bubble(side, text) { const t = $('thread'), b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight; }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    if (on) ['Make it shorter', 'Add that we do free estimates', 'Use a Book button'].forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => send(c); $('chips').appendChild(b); });
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+
+  function pickPhoto(name) {
+    photo = name;
+    [...$('photos').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.p === name));
+    $('gimg').innerHTML = PHOTOS[name];
+    $('job').value = PRESETS[name];
+  }
+
+  function render(d) {
+    if (!d.post) throw new Error('The writer came back empty. Try again.');
+    $('gb').className = 'gb'; void $('gb').offsetWidth; $('gb').classList.add('fill');
+    $('gb').textContent = d.post;
+    $('gcta').textContent = CTA[d.cta];
+    $('gt').textContent = 'Update · just now';
+    $('kw').innerHTML = ''; d.keywords.forEach(k => { const s = document.createElement('span'); s.textContent = k; $('kw').appendChild(s); });
+    $('note').textContent = d.note || '';
+    $('conn2').classList.add('on'); status(3, 'ready to post', true);
+    if (!$('results').classList.contains('show')) $('r-time').textContent = ((performance.now() - t0) / 1000).toFixed(1) + 's';
+    $('r-kw').textContent = d.keywords.length;
+    $('results').classList.add('show');
+  }
+
+  async function send(text) {
+    text = text.trim(); if (!text || busy) return;
+    const id = run; busy = true;
+    $('msg').value = ''; composer(false); showError('');
+    const first = history.length === 0;
+    if (first) { t0 = performance.now(); text = `Photo: ${photo.toLowerCase()}. ${text}`; $('write').disabled = true; status(1, 'sent'); $('conn1').classList.add('on'); }
+    history.push({ role: 'user', content: text });
+    bubble('you', first ? text.replace(/^Photo: \w+\. /, '') : text);
+    status(2, 'writing', true); typing(true);
+    try {
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'gbppost', businessName: BIZ, messages: history }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'The writer is unavailable right now.');
+      if (id !== run) return;
+      typing(false);
+      render(d);
+      // The post comes back as the assistant's JSON so revisions keep the format.
+      history.push({ role: 'assistant', content: JSON.stringify({ post: d.post, cta: d.cta, keywords: d.keywords, note: d.note }) });
+      bubble('agent', d.note || 'Here’s your post.');
+      status(2, 'done');
+    } catch (e) {
+      if (id !== run) return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); showError(e.message);
+      if (first) { $('write').disabled = false; status(1, 'your turn'); } else $('msg').value = text;
+    } finally { if (id === run) { busy = false; composer(history.length > 0); } }
+  }
+
+  function reset() {
+    run++; history = []; busy = false;
+    $('photos').innerHTML = Object.keys(PHOTOS).map(p => `<button class="photo" type="button" data-p="${p}" aria-pressed="false">${PHOTOS[p]}<span>${p}</span></button>`).join('');
+    [...$('photos').children].forEach(b => b.onclick = () => { if (!history.length) pickPhoto(b.dataset.p); });
+    pickPhoto('Driveway');
+    $('write').disabled = false;
+    $('gb').className = 'gb empty'; $('gb').textContent = 'Your post appears here.'; $('gcta').textContent = 'Call now'; $('gt').textContent = 'Update · draft';
+    $('kw').innerHTML = ''; $('note').textContent = '';
+    $('thread').innerHTML = '<div class="empty">Describe the job and hit write. Then ask for any changes here.</div>';
+    status(1, 'your turn'); status(2, 'waiting'); status(3, 'waiting');
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('results').classList.remove('show'); showError(''); composer(false);
+  }
+
+  $('write').addEventListener('click', () => send($('job').value));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); send($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

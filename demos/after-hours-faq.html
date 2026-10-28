@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>After-Hours FAQ Bot — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Paste in your business facts and a live AI chat answers customer questions from them after hours, handing anything it can't answer to you by morning.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/after-hours-faq">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  .facts textarea { min-height: 300px; font-size: 13px; line-height: 1.55; resize: vertical; }
+  .facts .hint { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .facts .count { font: 10px var(--font-mono); color: var(--faint); letter-spacing: .1em; text-align: right; margin-top: 4px; }
+  .report-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .report-h .d { font: 500 11px var(--font-mono); color: var(--faint); letter-spacing: .1em; text-transform: uppercase; }
+  .tally { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .tally div { border: 1px solid var(--ink-3); background: #fff; padding: 10px 12px; }
+  .tally b { display: block; font: 600 22px var(--font-mono); }
+  .tally span { font: 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .tally .you { background: var(--hl); border-color: var(--paper); }
+  .qs { display: flex; flex-direction: column; gap: 6px; }
+  .q { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--ink-3); background: #fff; font-size: 13px; animation: stampIn .35s cubic-bezier(.22,1,.36,1); }
+  .q .tp { flex: 1; }
+  .q .t { font: 500 10.5px var(--font-mono); color: var(--faint); }
+  .tag { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border: 1px solid var(--ink-3); color: var(--muted); }
+  .q.you { border-color: var(--paper); }
+  .q.you .tag { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
+  .qs .empty { font-size: 13px; color: var(--faint); padding: 18px 4px; text-align: center; }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / After-hours FAQ bot</div>
+      <h1>Answers at 10 PM, from <em>your</em> facts.</h1>
+      <p class="hero-sub">It's after closing at a dog grooming shop. The chat on the website answers from the owner's own notes: prices, hours, policies. Edit the facts if you like, then ask it anything. What it can't answer, it hands to the owner for the morning instead of making something up.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">Your business facts</span><span class="s" id="s1">editable</span></div>
+      <div class="panel">
+        <div class="pad facts">
+          <div class="field"><label for="facts">What the bot knows</label><textarea id="facts" maxlength="3000"></textarea></div>
+          <div class="count" id="count"></div>
+          <p class="hint">Change a price or add a rule. The very next answer uses it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The website chat</span><span class="s" id="s2">after hours</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>10:14</span><span>Wi-Fi</span></div>
+              <div class="av">MP</div>
+              <div class="pc-name">Magnolia Paws Grooming</div>
+              <div class="pc-sub">Closed · replies instantly</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Ask a question" autocomplete="off" maxlength="300" aria-label="Your question">
+              <button id="msgSend" aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">Jess's morning report</span><span class="s" id="s3">waiting</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="report-h"><span class="hd">Overnight chat</span><span class="d">Ready at 7:00 AM</span></div>
+          <div class="tally"><div><b id="nAns">0</b><span>Answered</span></div><div class="you"><b id="nYou">0</b><span>Need you</span></div></div>
+          <div class="qs" id="qs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-ans">—</div><div class="ml">Questions answered while closed</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv">0</div><div class="ml">Answers made up</div></div>
+    <div class="cta">
+      <p>Built from your own price sheet and policies, on your site, and it tells you every morning what people asked.</p>
+      <a href="https://carrierpigeonai.dev/services/ai-agents">See AI agents →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API, answering only from the facts in panel 01. Nothing is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Magnolia Paws Grooming';
+  const FACTS = `Magnolia Paws Grooming, 412 Kaliste Saloom Rd, Lafayette.
+Hours: Tuesday to Saturday, 8 AM to 5 PM. Closed Sunday and Monday.
+Full groom (bath, haircut, nails, ears): small dogs $55, medium $70, large $90, giant breeds $110 and up.
+Bath and brush only: from $35.
+Nail trim: $15, walk-ins welcome Tuesday and Thursday 8 to 10 AM.
+Add-ons: teeth brushing $10, de-shedding treatment $20, flea bath $15.
+Book online at magnoliapaws.com/book or call (337) 555-0163.
+Every dog needs a current rabies record before the first visit.
+We groom dogs only, no cats.
+Pickup is usually 3 to 4 hours after drop-off; we text when your dog is ready.
+More than 15 minutes late may need to reschedule. Cancel with 24 hours notice, no fee.`;
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0, history = [], asked = { ans: 0, you: 0 }, busy = false;
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  function bubble(side, text) { const t = $('thread'), b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight; }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+  function chips() {
+    $('chips').innerHTML = '';
+    ['How much for a large dog?', 'Do you groom cats?', 'Can I walk in for nails?', 'Do you board dogs overnight?'].forEach(c => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => customerAsks(c); $('chips').appendChild(b);
+    });
+  }
+
+  function report(r) {
+    const you = r.answered === false;
+    asked[you ? 'you' : 'ans']++;
+    $('nAns').textContent = asked.ans; $('nYou').textContent = asked.you;
+    $('qs').querySelector('.empty')?.remove();
+    const row = document.createElement('div'); row.className = 'q' + (you ? ' you' : '');
+    row.innerHTML = '<span class="t"></span><span class="tp"></span><span class="tag"></span>';
+    row.querySelector('.t').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/, '');
+    row.querySelector('.tp').textContent = r.topic;
+    row.querySelector('.tag').textContent = you ? 'Text them' : 'Answered';
+    $('qs').appendChild(row);
+    $('conn2').classList.add('on'); status(3, 'updated', true);
+    $('r-ans').textContent = asked.ans;
+    if (asked.ans + asked.you >= 2) $('results').classList.add('show');
+  }
+
+  async function customerAsks(text) {
+    text = text.trim(); if (!text || busy) return;
+    const id = run; busy = true;
+    $('msg').value = ''; showError('');
+    history.push({ role: 'user', content: text }); bubble('you', text);
+    $('conn1').classList.add('on'); status(2, 'answering', true);
+    typing(true);
+    try {
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'faq', businessName: BIZ, facts: $('facts').value, messages: history }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'The chat is unavailable right now.');
+      if (id !== run) return;
+      typing(false);
+      history.push({ role: 'assistant', content: d.content }); bubble('agent', d.content);
+      report(d); status(2, 'after hours');
+    } catch (e) {
+      if (id !== run) return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text; showError(e.message);
+    } finally { if (id === run) busy = false; }
+  }
+
+  function reset() {
+    run++; history = []; asked = { ans: 0, you: 0 }; busy = false;
+    $('facts').value = FACTS; count();
+    $('thread').innerHTML = '<div class="daystamp">Today 10:14 PM</div>';
+    bubble('agent', 'Hi! We’re closed for the night, but I can answer questions about grooming, prices and booking. What can I help with?');
+    $('qs').innerHTML = '<div class="empty">Questions show up here as customers ask them.</div>';
+    $('nAns').textContent = $('nYou').textContent = '0';
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    status(1, 'editable'); status(2, 'after hours'); status(3, 'waiting');
+    $('results').classList.remove('show'); showError(''); chips();
+  }
+  function count() { $('count').textContent = $('facts').value.length + ' / 3000'; }
+
+  $('facts').addEventListener('input', () => { count(); status(1, 'edited', true); });
+  $('composer').addEventListener('submit', e => { e.preventDefault(); customerAsks($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

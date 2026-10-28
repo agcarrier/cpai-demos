@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No-Show Saver — Carrier Pigeon AI Demo</title>
+<meta name="description" content="A live AI agent sends the appointment reminder, handles the reply, and when someone cancels, texts the waitlist until the chair is filled.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/no-show-saver">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  .start { margin-top: 14px; }
+  .slot .who { font-weight: 600; color: var(--paper); font-style: normal; }
+  .slot.mine { border-color: var(--paper); }
+  .slot.confirmed { background: #eef6e6; border-color: var(--signal); }
+  .slot.confirmed .b { color: var(--signal); font-weight: 600; }
+  .slot .st { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .later { margin-top: 16px; }
+  .later .k { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+  .wl { display: flex; flex-direction: column; gap: 7px; }
+  .wp { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border: 1px solid var(--ink-3); background: #fff; transition: background .3s, border-color .3s; }
+  .wp .av { margin: 0; width: 30px; height: 30px; font-size: 11px; flex-shrink: 0; }
+  .wp .n { font-size: 13.5px; font-weight: 600; }
+  .wp .w { font-size: 12px; color: var(--muted); }
+  .wp .st { margin-left: auto; font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); text-align: right; }
+  .wp.texted { border-style: dashed; border-color: var(--signal); }
+  .wp.texted .st { color: var(--signal); }
+  .wp.won { background: var(--hl); border: 1px solid var(--paper); animation: bookPop .5s cubic-bezier(.22,1,.36,1); }
+  .wp.won .st { color: var(--on-hl); }
+  .wl-note { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / No-show saver</div>
+      <h1>A cancellation becomes a <em>filled chair</em>.</h1>
+      <p class="hero-sub">You're Monique, booked for a cut and color tomorrow. A live AI agent texts the reminder. Confirm, move it, or cancel. If the 10:00 opens up, watch it text the salon's waitlist and fill the spot before anyone at the front desk has to.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">Nicole's book</span><span class="s" id="s1">tomorrow</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="cal-head"><span class="day">Wednesday</span><span class="date">Oak &amp; Ivy Salon</span></div>
+          <div class="slots">
+            <div class="slot busy"><span class="t">9:00 AM</span><span class="b">Ava · blowout</span></div>
+            <div class="slot mine" id="mine"><span class="t">10:00 AM</span><span class="b" id="mineB"><span class="who">Monique</span> · cut &amp; color</span><span class="st" id="mineSt">Reminder due</span></div>
+            <div class="slot busy"><span class="t">12:30 PM</span><span class="b">Lunch</span></div>
+            <div class="slot busy"><span class="t">1:00 PM</span><span class="b">Kayla · highlights</span></div>
+            <div class="slot busy"><span class="t">3:30 PM</span><span class="b">Renee · trim</span></div>
+          </div>
+          <div class="later"><div class="k">Open later this week</div>
+            <div class="slots" id="later"></div>
+          </div>
+          <button class="submit start" id="send" type="button">Send tomorrow's reminders →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">Monique's phone</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>4:00</span><span>5G</span></div>
+              <div class="av">OI</div>
+              <div class="pc-name">Oak &amp; Ivy Salon</div>
+              <div class="pc-sub">Text message</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The waitlist</span><span class="s" id="s3">standing by</span></div>
+      <div class="panel">
+        <div class="pad">
+          <p class="wl-note" id="wlNote">Three clients asked to be told if a Wednesday morning opens up.</p>
+          <div class="wl" id="wl"></div>
+          <div class="cal-foot" id="foot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-fill">—</div><div class="ml" id="r-fill-l">Cancellation to filled chair</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-saved">$185</div><div class="ml">Kept on the books</div></div>
+    <div class="cta">
+      <p>No-shows and late cancels are a salon's quietest leak. This runs on your own booking calendar and client list.</p>
+      <a href="https://carrierpigeonai.dev/services/the-loft">See The Loft →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. The waitlist step is scripted. No texts are sent and nothing is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Oak & Ivy Salon';
+  const LATER = ['Thursday at 2:00 PM', 'Friday at 9:30 AM', 'Saturday at 11:00 AM'];
+  const WAIT = [['JL', 'Jade L.', 'Any morning, color touch-up'], ['TB', 'Tasha B.', 'Before noon, trim'], ['CR', 'Claire R.', 'Wednesdays, cut']];
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0, history = [], ctx = null;
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const secs = ms => (ms / 1000).toFixed(1) + 's';
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  function bubble(side, text) { const t = $('thread'), b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight; }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on, chips = []) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => clientSays(c); $('chips').appendChild(b); });
+    if (on && !matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+
+  // ── Schedule + waitlist, driven by the agent's action ──
+  async function apply(r, id) {
+    if (!r || ctx.settled || r.action === 'none') return;
+    ctx.settled = true;
+    composer(true, ['Thank you!']);
+    if (r.action === 'confirm') {
+      $('mine').className = 'slot confirmed'; $('mineSt').textContent = 'Confirmed';
+      status(1, 'confirmed', true); $('foot').textContent = 'Monique confirmed, so nobody on the waitlist was bothered.';
+      $('r-fill').textContent = 'Confirmed'; $('r-fill-l').textContent = 'Reminder to reply';
+      $('results').classList.add('show');
+      return;
+    }
+    if (r.action === 'reschedule') {
+      const el = [...$('later').children].find(s => s.dataset.t === r.slot);
+      if (el) { el.className = 'slot booked'; el.querySelector('.b').innerHTML = '<span class="who">Monique</span> · cut &amp; color'; }
+    }
+    // The 10:00 is open now: work the waitlist.
+    $('mine').className = 'slot open'; $('mineB').textContent = 'Open'; $('mineSt').textContent = r.action === 'cancel' ? 'Cancelled' : 'Moved';
+    status(1, '10:00 open', true);
+    const t0 = performance.now();
+    $('conn2').classList.add('on'); status(3, 'texting', true);
+    $('wlNote').textContent = 'The 10:00 just opened. Texting the waitlist, first to say yes gets it.';
+    const rows = [...$('wl').children];
+    for (const row of rows) { row.classList.add('texted'); row.querySelector('.st').textContent = 'Texted'; await sleep(350, id); }
+    await sleep(2200, id);
+    rows[0].className = 'wp won'; rows[0].querySelector('.st').textContent = '“Yes, I’ll take it!”';
+    rows.slice(1).forEach(r => r.querySelector('.st').textContent = 'Told it’s taken');
+    $('mine').className = 'slot booked'; $('mineB').innerHTML = '<span class="who">Jade L.</span> · color touch-up'; $('mineSt').textContent = 'From waitlist';
+    status(1, 'filled', true); status(3, 'filled', true);
+    $('foot').textContent = 'Nicole’s 10:00 is full again. Nobody had to pick up the phone.';
+    $('r-fill').textContent = secs(performance.now() - t0); $('r-fill-l').textContent = 'Cancellation to filled chair';
+    $('results').classList.add('show');
+  }
+
+  async function ask() {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'noshow', businessName: BIZ, messages: history }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  async function agentTurn(id) {
+    typing(true);
+    const r = await ask();
+    if (id !== run) return;
+    typing(false);
+    history.push({ role: 'assistant', content: r.content }); bubble('agent', r.content);
+    return r;
+  }
+  const chips = () => ctx.settled ? ['Thank you!'] : ['Yes, see you then', 'Can I move it to later this week?', 'I have to cancel, sorry'];
+  async function clientSays(text) {
+    text = text.trim(); if (!text || !ctx || !ctx.live) return;
+    const id = run;
+    $('msg').value = ''; composer(false); showError('');
+    history.push({ role: 'user', content: text }); bubble('you', text);
+    try {
+      await sleep(300, id);
+      const r = await agentTurn(id);
+      composer(true, chips());
+      await apply(r, id);
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text; showError(e.message); composer(true, chips());
+    }
+  }
+
+  async function replay(id) {
+    ctx.live = false;
+    const turns = [
+      ['agent', 'Hi Monique, it’s Oak & Ivy. Reminder: you’re with Nicole tomorrow, Wednesday, at 10:00 AM for a cut and color. Reply to confirm, or let me know if you need to move it.'],
+      ['you', 'Ugh, my kid is sick. I have to cancel, sorry.'],
+      ['agent', 'Oh no, I hope they feel better soon. You’re all cancelled, just text us anytime to rebook.', { action: 'cancel' }],
+    ];
+    for (const [side, text, a] of turns) {
+      if (side === 'agent') { typing(true); await sleep(1500, id); typing(false); } else await sleep(1400, id);
+      bubble(side, text);
+      if (a) await apply(a, id);
+      await sleep(600, id);
+    }
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', settled: false };
+    history = [];
+    $('send').hidden = $('replay').hidden = true;
+    $('mineSt').textContent = 'Reminder sent'; status(1, 'reminders out', true);
+    $('conn1').classList.add('on'); status(2, mode === 'live' ? 'live' : 'replay', true);
+    $('thread').innerHTML = '<div class="daystamp">Today 4:00 PM</div>';
+    try {
+      if (mode === 'live') {
+        try { await agentTurn(id); composer(true, chips()); }
+        catch (e) {
+          if (e === 'abort') throw e;
+          typing(false); showError('The live agent is busy right now, so here’s a replay.'); status(2, 'replay', true);
+          await replay(id);
+        }
+      } else await replay(id);
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; history = [];
+    $('send').hidden = $('replay').hidden = false;
+    $('mine').className = 'slot mine'; $('mineB').innerHTML = '<span class="who">Monique</span> · cut &amp; color'; $('mineSt').textContent = 'Reminder due';
+    $('later').innerHTML = LATER.map(t => `<div class="slot open" data-t="${t}"><span class="t">${t.slice(0, 3)} ${t.split(' at ')[1].replace(':00', '')}</span><span class="b">Open</span></div>`).join('');
+    $('wl').innerHTML = WAIT.map(([i, n, w]) => `<div class="wp"><span class="av">${i}</span><div><div class="n">${n}</div><div class="w">${w}</div></div><span class="st">Waiting</span></div>`).join('');
+    $('wlNote').textContent = 'Three clients asked to be told if a Wednesday morning opens up.';
+    $('foot').textContent = '';
+    status(1, 'tomorrow'); status(2, 'waiting'); status(3, 'standing by');
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('thread').innerHTML = '<div class="empty">Send the reminders. Monique’s text lands here, and you reply as her.</div>';
+    $('results').classList.remove('show'); showError(''); composer(false);
+  }
+
+  $('send').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); clientSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

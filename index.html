@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Automations for Local Businesses — The Lab | Carrier Pigeon AI</title>
-<meta name="description" content="Live demos of AI and web tools for small businesses in Lafayette and Acadiana: booking, invoicing, waitlists, reviews, loyalty cards, and more. Try them, then have one built for yours.">
+<meta name="description" content="Live demos of AI and web tools for small businesses in Lafayette and Acadiana: call screening, quotes, reminders, waitlists, reviews, gift cards, and more. Try them, then have one built for yours.">
 <link rel="canonical" href="https://demos.carrierpigeonai.dev/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%230c0c0d'/><g fill='%23f1f1ef'><rect x='17.5' y='8.7' width='8' height='8' rx='0.8'/><rect x='26.2' y='8.7' width='8' height='8' rx='0.8'/><rect x='60' y='8.7' width='8' height='8' rx='0.8'/><rect x='68.7' y='8.7' width='8' height='8' rx='0.8'/><rect x='8.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='17.5' y='17.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='35' y='17.5' width='8' height='8' rx='0.8'/><rect x='60' y='17.5' width='8' height='8' rx='0.8'/><rect x='68.7' y='17.5' width='8' height='8' rx='0.8'/><rect x='86.2' y='17.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='26.2' width='8' height='8' rx='0.8'/><rect x='35' y='26.2' width='8' height='8' rx='0.8'/><rect x='43.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='52.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='60' y='26.2' width='8' height='8' rx='0.8'/><rect x='68.7' y='26.2' width='8' height='8' rx='0.8'/><rect x='77.5' y='26.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='35' width='8' height='8' rx='0.8'/><rect x='35' y='35' width='8' height='8' rx='0.8'/><rect x='43.7' y='35' width='8' height='8' rx='0.8'/><rect x='52.5' y='35' width='8' height='8' rx='0.8'/><rect x='60' y='35' width='8' height='8' rx='0.8'/><rect x='68.7' y='35' width='8' height='8' rx='0.8'/><rect x='26.2' y='43.7' width='8' height='8' rx='0.8'/><rect x='35' y='43.7' width='8' height='8' rx='0.8'/><rect x='43.7' y='43.7' width='8' height='8' rx='0.8'/><rect x='52.5' y='43.7' width='8' height='8' rx='0.8'/><rect x='60' y='43.7' width='8' height='8' rx='0.8'/><rect x='17.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='26.2' y='52.5' width='8' height='8' rx='0.8'/><rect x='35' y='52.5' width='8' height='8' rx='0.8'/><rect x='43.7' y='52.5' width='8' height='8' rx='0.8'/><rect x='52.5' y='52.5' width='8' height='8' rx='0.8'/><rect x='8.7' y='61.2' width='8' height='8' rx='0.8'/><rect x='17.5' y='61.2' width='8' height='8' rx='0.8'/><rect x='26.2' y='61.2' width='8' height='8' rx='0.8'/><rect x='35' y='61.2' width='8' height='8' rx='0.8'/><rect x='0' y='70' width='8' height='8' rx='0.8'/><rect x='8.7' y='70' width='8' height='8' rx='0.8'/></g><rect x='77.5' y='17.5' width='8' height='8' rx='0.8' fill='%239bff5b'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -483,22 +483,21 @@
 </section>
 
 <!-- FILTER BAR -->
-<div class="filter-bar">
-  <span class="filter-label">Filter</span>
-  <button class="filter-btn active" data-filter="all" onclick="filterCards(this, 'all')">All</button>
-  <button class="filter-btn" data-filter="ai" onclick="filterCards(this, 'ai')">AI agents</button>
-  <button class="filter-btn" data-filter="tool" onclick="filterCards(this, 'tool')">Simple tools</button>
-  <button class="filter-btn" data-filter="booking" onclick="filterCards(this, 'booking')">Booking</button>
-  <button class="filter-btn" data-filter="finance" onclick="filterCards(this, 'finance')">Finance</button>
-  <button class="filter-btn" data-filter="marketing" onclick="filterCards(this, 'marketing')">Marketing</button>
-  <button class="filter-btn" data-filter="operations" onclick="filterCards(this, 'operations')">Operations</button>
+<div class="filter-bar" role="group" aria-label="Filter by type of business">
+  <span class="filter-label">Your business</span>
+  <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+  <button class="filter-btn" data-filter="home" aria-pressed="false">Home services</button>
+  <button class="filter-btn" data-filter="food" aria-pressed="false">Restaurants &amp; food</button>
+  <button class="filter-btn" data-filter="beauty" aria-pressed="false">Salons &amp; spas</button>
+  <button class="filter-btn" data-filter="health" aria-pressed="false">Clinics &amp; health</button>
+  <button class="filter-btn" data-filter="retail" aria-pressed="false">Retail shops</button>
 </div>
 
 <!-- GRID -->
 <main id="card-grid">
   <section class="grid-section" data-section="ai" aria-labelledby="sec-ai">
     <div class="grid-head">
-      <div class="grid-kicker"><span class="status-dot"></span>Live AI agents <span class="grid-count">8</span></div>
+      <div class="grid-kicker"><span class="status-dot"></span>Live AI agents <span class="grid-count">13</span></div>
       <h2 id="sec-ai">Talk to these like a customer would.</h2>
       <p>Each one runs a real AI agent on the other end. Type anything and watch the side panels respond to what it actually does.</p>
     </div>
@@ -506,7 +505,7 @@
 
 
   <!-- LIVE AI: AI Receptionist (voice, demo-line Worker) -->
-  <div class="card" data-categories="ai operations">
+  <div class="card" data-industries="any">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/><path d="M18 17v1a3 3 0 0 1-3 3h-3"/></svg>
@@ -529,7 +528,7 @@
   </div>
 
   <!-- LIVE AI: Instant Lead Response -->
-  <div class="card" data-categories="ai booking marketing">
+  <div class="card" data-industries="home">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 6l-3 5h4l-3 5"/></svg>
@@ -552,7 +551,7 @@
   </div>
 
   <!-- LIVE AI: Storm Estimate Intake -->
-  <div class="card" data-categories="ai operations booking">
+  <div class="card" data-industries="home">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M13 12l-2 3h3l-2 3"/></svg>
@@ -575,7 +574,7 @@
   </div>
 
   <!-- LIVE AI: Lead Reactivation -->
-  <div class="card" data-categories="ai marketing">
+  <div class="card" data-industries="beauty health">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>
@@ -598,7 +597,7 @@
   </div>
 
   <!-- LIVE AI: Review Reply Agent -->
-  <div class="card" data-categories="ai marketing">
+  <div class="card" data-industries="any">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -621,7 +620,7 @@
   </div>
 
   <!-- LIVE AI: Promotion Builder -->
-  <div class="card" data-categories="ai marketing">
+  <div class="card" data-industries="food retail beauty">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -644,7 +643,7 @@
   </div>
 
   <!-- LIVE AI: Digital Waitlist -->
-  <div class="card" data-categories="ai booking operations">
+  <div class="card" data-industries="food">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -667,7 +666,7 @@
   </div>
 
   <!-- LIVE AI: Missed-Call Text-Back -->
-  <div class="card" data-categories="ai marketing operations">
+  <div class="card" data-industries="home">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/><path d="M15 3l6 6M21 3l-6 6"/></svg>
@@ -689,18 +688,134 @@
     </div>
   </div>
 
+
+  <!-- LIVE AI: Spam call screener -->
+  <div class="card" data-industries="home beauty">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Phones</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Spam call screener</div>
+      <p class="card-desc">Call an electrician as a customer or a spammer. A live AI screener answers, works out which you are, and only rings the owner for real work.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/spam-call-screener">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: After-hours FAQ bot -->
+  <div class="card" data-industries="any">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Website</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">After-hours FAQ bot</div>
+      <p class="card-desc">Paste in your prices and policies. A live AI chat answers customers from them at 10 PM, and hands anything it can’t answer to you for the morning.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/after-hours-faq">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: No-show saver -->
+  <div class="card" data-industries="beauty health">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="0"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Booking</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">No-show saver</div>
+      <p class="card-desc">A live AI agent sends the appointment reminder and handles the reply. When someone cancels, it texts the waitlist and fills the chair.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/no-show-saver">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: Quote follow-up -->
+  <div class="card" data-industries="home">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Sales</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Quote follow-up</div>
+      <p class="card-desc">A quote went quiet. A live AI agent follows up, handles "too expensive" or "need to ask my wife", and moves the deal to booked or a call.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/quote-follow-up">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: Google post writer -->
+  <div class="card" data-industries="any">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Local SEO</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Google post writer</div>
+      <p class="card-desc">Tell it the job you just finished. A live AI writer turns it into a Google Business Profile post with local search phrases, then revises on request.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/google-post-writer">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
     </div>
   </section>
 
   <section class="grid-section" data-section="tool" aria-labelledby="sec-tool">
     <div class="grid-head">
-      <div class="grid-kicker">Simple tools <span class="grid-count">3</span></div>
+      <div class="grid-kicker">Simple tools <span class="grid-count">8</span></div>
       <h2 id="sec-tool">No AI, just handy.</h2>
       <p>Small web apps a business can put to work on day one. Fast, free to run, nothing to learn.</p>
     </div>
     <div class="grid">
   <!-- LIVE: Invoice Generator -->
-  <div class="card" data-categories="tool finance">
+  <div class="card" data-industries="home any">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/></svg>
@@ -723,7 +838,7 @@
   </div>
 
   <!-- LIVE: Open Today -->
-  <div class="card" data-categories="tool marketing operations">
+  <div class="card" data-industries="food retail beauty">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -746,7 +861,7 @@
   </div>
 
   <!-- LIVE: Loyalty Punch Card -->
-  <div class="card" data-categories="tool marketing operations">
+  <div class="card" data-industries="food retail beauty">
     <div class="card-thumb">
       <div class="card-thumb-icon">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -762,6 +877,122 @@
     </div>
     <div class="card-footer">
       <a class="btn-demo" href="/demos/loyalty-punch-card">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- LIVE: Instant quote calculator -->
+  <div class="card" data-industries="home">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Sales</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
+      </div>
+      <div class="card-title">Instant quote calculator</div>
+      <p class="card-desc">Customers pick their yard size and extras and see a price range on the spot, then book. You set the prices once.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/instant-quote">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: Job status tracker -->
+  <div class="card" data-industries="home">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Operations</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
+      </div>
+      <div class="card-title">Job status tracker</div>
+      <p class="card-desc">The pizza tracker, for an AC repair. The tech taps one button and the customer’s page shows on the way, working, done, with the invoice at the end.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/job-status">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: QR menu -->
+  <div class="card" data-industries="food retail">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
+      </div>
+      <div class="card-title">QR menu</div>
+      <p class="card-desc">Edit your menu or price list and the QR code on the window always shows the latest, sold-out items included. The demo code really scans.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/qr-menu">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: Digital gift cards -->
+  <div class="card" data-industries="food retail beauty">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13"/><path d="M12 7v13M2 12h20"/><path d="M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Finance</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
+      </div>
+      <div class="card-title">Digital gift cards</div>
+      <p class="card-desc">Sell gift cards from your site, text them to the recipient, and redeem the code at the counter. Partial balances track themselves.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/gift-cards">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE: Before & after gallery -->
+  <div class="card" data-industries="home beauty">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M12 4v16"/><path d="M8 10l-2 2 2 2M16 10l2 2-2 2"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Marketing</span>
+        <span class="card-status status-tool"><span class="status-dot"></span>Web tool</span>
+      </div>
+      <div class="card-title">Before & after gallery</div>
+      <p class="card-desc">A drag slider for your best ad: the before and after. Try the samples or drop in two of your own photos.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/before-after">
         View demo
         <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
       </a>
@@ -812,19 +1043,33 @@
 </footer>
 
 <script>
-function filterCards(btn, filter) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.card').forEach(card => {
-    const cats = card.dataset.categories || '';
-    const show = filter === 'all' || cats.includes(filter);
-    card.style.display = show ? '' : 'none';
+// Cards tagged "any" fit every kind of business, so they stay under every filter.
+// The choice rides in the URL (?for=home) so a link can open the gallery pre-filtered.
+function filterCards(filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    const on = b.dataset.filter === filter;
+    b.classList.toggle('active', on); b.setAttribute('aria-pressed', on);
   });
-  // A section whose cards are all filtered out drops its heading too.
+  document.querySelectorAll('.card').forEach(card => {
+    const ind = (card.dataset.industries || '').split(' ');
+    card.style.display = filter === 'all' || ind.includes(filter) || ind.includes('any') ? '' : 'none';
+  });
+  // A section whose cards are all filtered out drops its heading too; the counts follow the filter.
   document.querySelectorAll('.grid-section').forEach(sec => {
-    sec.hidden = ![...sec.querySelectorAll('.card')].some(c => c.style.display !== 'none');
+    const shown = [...sec.querySelectorAll('.card')].filter(c => c.style.display !== 'none').length;
+    sec.hidden = !shown;
+    sec.querySelector('.grid-count').textContent = shown;
   });
 }
+document.querySelectorAll('.filter-btn').forEach(b => b.addEventListener('click', () => {
+  filterCards(b.dataset.filter);
+  const u = new URL(location.href);
+  b.dataset.filter === 'all' ? u.searchParams.delete('for') : u.searchParams.set('for', b.dataset.filter);
+  history.replaceState(null, '', u);
+  window.gtag?.('event', 'gallery_filter', { industry: b.dataset.filter });
+}));
+const pre = new URLSearchParams(location.search).get('for');
+if (document.querySelector(`.filter-btn[data-filter="${pre}"]`)) filterCards(pre);
 </script>
 
 </body>

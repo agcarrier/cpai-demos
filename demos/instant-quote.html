@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant Quote Calculator — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Customers pick their job and see a price range on the spot, then book. You set the prices once and get leads that already know what it costs.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/instant-quote">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/demos/tool.css">
+<style>
+  .est { border: 1px solid var(--paper); background: #fff; padding: 16px; margin: 4px 0 16px; }
+  .est .k { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .est .why { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .est .big.bump { animation: flash .4s ease; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Instant quote calculator</div>
+      <h1>They see the price <em>before</em> they call.</h1>
+      <p class="hero-sub">A lawn care company puts its prices in once. Customers pick their yard size, how often, and any extras, and see a price range on the spot. The ones who book already know what it costs, so nobody wastes a drive out to quote a $40 job.</p>
+    </div>
+  </section>
+
+  <div class="split">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">Your prices</span><span class="s" id="s1">set once</span></div>
+      <div class="panel"><div class="pad">
+        <div class="sub-h">Per cut, by yard size</div>
+        <div class="prices" id="pSize"></div>
+        <div class="sub-h">How often</div>
+        <div class="prices" id="pFreq"></div>
+        <div class="sub-h">Extras, per visit</div>
+        <div class="prices" id="pAdd"></div>
+        <p class="hd-sub" style="margin-top:14px">Change any number. The customer's quote on the right updates as you type.</p>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">On your website</span><span class="s" id="s2">customer view</span></div>
+      <div class="panel"><div class="pad" id="cust">
+        <div class="hd">Get a price for Bayou Lawn Co.</div>
+        <div class="hd-sub">Lafayette, Youngsville, Broussard, Scott</div>
+        <div class="field"><label>How big is your yard?</label></div>
+        <div class="seg" id="size"></div>
+        <div class="field"><label>How often?</label></div>
+        <div class="seg" id="freq"></div>
+        <div class="field"><label>Extras</label></div>
+        <div class="checks" id="adds"></div>
+        <div class="est">
+          <div class="k">Your estimate</div>
+          <div class="big" id="price">—</div>
+          <div class="why" id="why"></div>
+        </div>
+        <form id="book" novalidate>
+          <div class="two">
+            <div class="field"><label for="bn">First name</label><input id="bn" maxlength="40" autocomplete="off"></div>
+            <div class="field"><label for="bt">Town</label><input id="bt" maxlength="40" autocomplete="off" placeholder="Youngsville"></div>
+          </div>
+          <button class="submit" type="submit">Book my first cut →</button>
+        </form>
+      </div></div>
+    </div>
+  </div>
+
+  <p class="note">A working prototype. Booking here shows the lead the owner would get; nothing is sent or stored.</p>
+</div>
+
+<script>
+(function () {
+  const SIZE = [['small', 'Small', 'Under ¼ acre', 35], ['medium', 'Medium', '¼ to ½ acre', 50], ['large', 'Large', '½ to 1 acre', 70], ['acre', '1 acre +', 'Over an acre', 95]];
+  const FREQ = [['weekly', 'Weekly', -10], ['biweekly', 'Every 2 weeks', 0], ['once', 'One time', 20]];
+  const ADDS = [['edge', 'Edging and blowing', 10], ['hedge', 'Hedge trimming', 25], ['leaf', 'Leaf cleanup', 40], ['beds', 'Weed the flower beds', 20]];
+  const $ = id => document.getElementById(id);
+  const price = {}, pick = { size: 'medium', freq: 'biweekly', adds: new Set(['edge']) };
+  SIZE.forEach(s => price[s[0]] = s[3]); FREQ.forEach(f => price[f[0]] = f[2]); ADDS.forEach(a => price[a[0]] = a[2]);
+  const money = n => '$' + n.toLocaleString('en-US');
+  const round5 = n => Math.round(n / 5) * 5;
+
+  function priceRows(el, rows, unit) {
+    el.innerHTML = rows.map(r => `<div class="pr"><span>${r[1]}</span><input type="number" step="1" data-k="${r[0]}" value="${price[r[0]]}" aria-label="${r[1]} ${unit}">${unit === '%' ? '<small>%</small>' : ''}</div>`).join('');
+  }
+  function seg(el, rows, key) {
+    el.innerHTML = rows.map(r => `<button type="button" data-v="${r[0]}" title="${r[2] && typeof r[2] === 'string' ? r[2] : ''}">${r[1]}</button>`).join('');
+    el.onclick = e => { const b = e.target.closest('button'); if (!b) return; pick[key] = b.dataset.v; draw(); };
+  }
+
+  function quote() {
+    const base = price[pick.size] + [...pick.adds].reduce((t, a) => t + price[a], 0);
+    const per = base * (1 + price[pick.freq] / 100);
+    return { low: round5(per * 0.95), high: round5(per * 1.1) };
+  }
+  function draw() {
+    ['size', 'freq'].forEach(k => [...$(k).children].forEach(b => b.setAttribute('aria-pressed', b.dataset.v === pick[k])));
+    const q = quote();
+    const el = $('price');
+    el.innerHTML = `${money(q.low)}–${money(q.high)} <small>per visit</small>`;
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    const sz = SIZE.find(s => s[0] === pick.size), fq = FREQ.find(f => f[0] === pick.freq);
+    $('why').textContent = `${sz[1]} yard (${sz[2].toLowerCase()}), ${fq[1].toLowerCase()}${pick.adds.size ? ', plus ' + pick.adds.size + ' extra' + (pick.adds.size > 1 ? 's' : '') : ''}. Final price confirmed at the first visit.`;
+  }
+
+  priceRows($('pSize'), SIZE, '$'); priceRows($('pFreq'), FREQ.map(f => [f[0], f[1] + (f[2] < 0 ? ' discount' : f[2] > 0 ? ' surcharge' : '')]), '%'); priceRows($('pAdd'), ADDS, '$');
+  document.querySelectorAll('.prices input').forEach(i => i.oninput = () => { price[i.dataset.k] = Number(i.value) || 0; $('s1').textContent = 'edited'; $('s1').classList.add('live'); draw(); });
+  seg($('size'), SIZE, 'size'); seg($('freq'), FREQ, 'freq');
+  $('adds').innerHTML = ADDS.map(a => `<label><input type="checkbox" data-a="${a[0]}" ${pick.adds.has(a[0]) ? 'checked' : ''}>${a[1]}<span class="p" data-p="${a[0]}"></span></label>`).join('');
+  $('adds').onchange = e => { const a = e.target.dataset.a; e.target.checked ? pick.adds.add(a) : pick.adds.delete(a); draw(); };
+  const drawAddPrices = () => document.querySelectorAll('[data-p]').forEach(s => s.textContent = '+' + money(price[s.dataset.p]));
+  document.querySelectorAll('#pAdd input').forEach(i => i.addEventListener('input', drawAddPrices));
+  drawAddPrices(); draw();
+
+  $('book').onsubmit = e => {
+    e.preventDefault();
+    const q = quote(), sz = SIZE.find(s => s[0] === pick.size), fq = FREQ.find(f => f[0] === pick.freq);
+    const extras = ADDS.filter(a => pick.adds.has(a[0])).map(a => a[1]).join(', ') || 'None';
+    const card = document.createElement('div');
+    card.className = 'stamp-card';
+    card.innerHTML = `<div class="k">What the owner gets</div>
+      <div class="row"><span class="k">Customer</span><span class="v"></span></div>
+      <div class="row"><span class="k">Job</span><span class="v">${sz[1]} yard, ${fq[1].toLowerCase()}</span></div>
+      <div class="row"><span class="k">Extras</span><span class="v">${extras}</span></div>
+      <div class="row"><span class="k">Saw price</span><span class="v">${money(q.low)}–${money(q.high)}</span></div>`;
+    card.querySelector('.v').textContent = ($('bn').value.trim() || 'New customer') + (($('bt').value.trim() && ', ' + $('bt').value.trim()) || '');
+    $('book').replaceWith(card);
+    $('s2').textContent = 'booked'; $('s2').classList.add('live');
+  };
+})();
+</script>
+</body>
+</html>

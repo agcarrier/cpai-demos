@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Follow-Up — Carrier Pigeon AI Demo</title>
+<meta name="description" content="An estimate went out and the homeowner went quiet. A live AI agent follows up, handles the objection, and moves the deal.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/quote-follow-up">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  .quote { border: 1px solid var(--paper); background: #fff; padding: 16px; box-shadow: 3px 3px 0 var(--paper); }
+  .quote .qk { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .quote .qt { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin: 4px 0 2px; }
+  .quote .qd { font-size: 13px; color: var(--muted); }
+  .quote .qp { font: 600 24px var(--font-mono); margin-top: 10px; letter-spacing: -0.02em; }
+  .cad { margin-top: 18px; display: flex; flex-direction: column; }
+  .step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ink-2); align-items: center; font-size: 13px; }
+  .step:last-child { border-bottom: none; }
+  .step .d { font: 600 10.5px var(--font-mono); color: var(--faint); width: 48px; flex-shrink: 0; letter-spacing: .06em; }
+  .step .w { flex: 1; }
+  .step .st { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .step.done .st { color: var(--signal); }
+  .step.now { background: #eef6e6; margin: 0 -10px; padding: 10px; }
+  .step.now .st { color: var(--signal); }
+  .step.skip .w { color: var(--faint); text-decoration: line-through; }
+  .pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 16px; }
+  .pipe span { font: 600 9px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; text-align: center; padding: 8px 2px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; }
+  .pipe span.on { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .pipe span.won { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
+  .pipe span.lost { background: var(--ink-2); color: var(--muted); border-color: var(--muted); }
+  .pill { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; padding: 5px 9px; border: 1px solid var(--ink-3); color: var(--faint); background: #fff; }
+  .pill.set { color: var(--paper); border-color: var(--paper); }
+  .row .v.fill { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: transparent; } }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Quote follow-up</div>
+      <h1>The estimate went quiet. The <em>follow-up</em> didn't.</h1>
+      <p class="hero-sub">A fence company sent Chris a $6,480 quote two days ago and heard nothing. A live AI agent sends the follow-up. You're Chris: push back on price, say you need to ask your partner, or say you got a cheaper bid, and watch it handle you like a good estimator would.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The quote</span><span class="s" id="s1">no reply, 2 days</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="quote">
+            <div class="qk">Estimate #2214 · Cypress Fence Co.</div>
+            <div class="qt">Cedar privacy fence for Chris</div>
+            <div class="qd">180 ft, 6 ft tall, one walk gate. Milton, LA.</div>
+            <div class="qp">$6,480</div>
+          </div>
+          <div class="cad" id="cad">
+            <div class="step done"><span class="d">Day 0</span><span class="w">Quote emailed</span><span class="st">Sent</span></div>
+            <div class="step" id="c2"><span class="d">Day 2</span><span class="w">Text follow-up</span><span class="st">Due</span></div>
+            <div class="step" id="c5"><span class="d">Day 5</span><span class="w">Text: financing option</span><span class="st">Scheduled</span></div>
+            <div class="step" id="c10"><span class="d">Day 10</span><span class="w">Email: price held 30 days</span><span class="st">Scheduled</span></div>
+          </div>
+          <button class="submit" id="go" type="button">Run the day 2 follow-up →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">Chris's phone</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>11:20</span><span>5G</span></div>
+              <div class="av">CF</div>
+              <div class="pc-name">Luke · Cypress Fence</div>
+              <div class="pc-sub">Text message</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Text message" autocomplete="off" maxlength="300" disabled aria-label="Your reply">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">The deal</span><span class="s" id="s3">quoted</span></div>
+      <div class="panel">
+        <div class="pad">
+          <div class="pipe" id="pipe"><span data-s="quoted">Quoted</span><span data-s="open">Talking</span><span data-s="callback">Call</span><span data-s="booked">Booked</span></div>
+          <div class="row"><span class="k">Customer</span><span class="v">Chris · Milton</span></div>
+          <div class="row"><span class="k">Value</span><span class="v">$6,480</span></div>
+          <div class="row"><span class="k">Objection</span><span class="v" id="obj"><span class="pill">None yet</span></span></div>
+          <div class="row"><span class="k">Next step</span><span class="v" id="next">Day 2 text</span></div>
+          <div class="cal-foot" id="foot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-stage">—</div><div class="ml">Where the deal landed</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-obj">—</div><div class="ml">Objection handled</div></div>
+    <div class="cta">
+      <p>Most quotes that go quiet are never followed up at all. This one follows up on schedule, stops the moment they reply, and hands the estimator a warm deal.</p>
+      <a href="https://carrierpigeonai.dev/services/the-loft">See The Loft →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. It can offer financing, phasing, and a walkthrough, never a discount. No texts are sent.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Cypress Fence Co.';
+  const OBJ = { price: 'Price', timing: 'Timing', spouse: 'Partner', competitor: 'Other bid', trust: 'Trust', none: 'None' };
+  const STAGE = { open: 'Talking', callback: 'Call today', booked: 'Booked', lost: 'Lost' };
+  const NEXT = { open: 'Keep talking by text', callback: 'Luke calls this afternoon', booked: 'Deposit link + install date', lost: 'Closed, no more texts' };
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0, history = [], ctx = null;
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+  function bubble(side, text) { const t = $('thread'), b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight; }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on, chips = []) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => chrisSays(c); $('chips').appendChild(b); });
+    if (on && !matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+  function flash(el) { el.classList.remove('fill'); void el.offsetWidth; el.classList.add('fill'); }
+
+  function setStage(stage) {
+    [...$('pipe').children].forEach(s => {
+      s.className = '';
+      if (s.dataset.s === stage) s.className = stage === 'booked' ? 'won' : 'on';
+    });
+    if (stage === 'lost') { const last = $('pipe').lastElementChild; last.className = 'lost'; last.textContent = 'Lost'; }
+    else $('pipe').lastElementChild.textContent = 'Booked';
+  }
+
+  function apply(r) {
+    if (!r || !ctx.replied) return;
+    if (r.objection && r.objection !== 'none' && r.objection !== ctx.objection) {
+      ctx.objection = r.objection;
+      $('obj').innerHTML = '<span class="pill set"></span>'; $('obj').firstChild.textContent = OBJ[r.objection]; flash($('obj'));
+    }
+    setStage(r.stage); status(3, STAGE[r.stage].toLowerCase(), true);
+    $('next').textContent = NEXT[r.stage]; flash($('next'));
+    $('conn2').classList.add('on');
+    if (r.stage !== 'open') {
+      $('foot').textContent = r.stage === 'lost' ? 'Closed out politely. No more follow-ups go to Chris.' : 'Luke gets a warm deal, not a cold quote.';
+      $('r-stage').textContent = STAGE[r.stage]; $('r-obj').textContent = OBJ[ctx.objection || 'none'];
+      $('results').classList.add('show');
+    }
+  }
+  function cadenceReplied() {
+    if (ctx.replied) return;
+    ctx.replied = true;
+    $('c2').className = 'step done'; $('c2').querySelector('.st').textContent = 'Replied';
+    ['c5', 'c10'].forEach(c => { $(c).className = 'step skip'; $(c).querySelector('.st').textContent = 'Not needed'; });
+    status(1, 'chris replied', true);
+  }
+
+  async function ask() {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'quotefollow', businessName: BIZ, messages: history }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The agent is unavailable right now.');
+    return d;
+  }
+  async function agentTurn(id) {
+    typing(true);
+    const r = await ask();
+    if (id !== run) return;
+    typing(false);
+    history.push({ role: 'assistant', content: r.content }); bubble('agent', r.content);
+    apply(r);
+    return r;
+  }
+  const chips = () => !ctx.replied
+    ? ['Honestly it’s more than we expected', 'I need to talk to my wife first', 'Got a cheaper bid from another guy', 'Looks good, what’s next?']
+    : ['Tell me about the financing', 'Could we do just the back yard?', 'Okay, let’s do it', 'Can you call me?'];
+  async function chrisSays(text) {
+    text = text.trim(); if (!text || !ctx || !ctx.live) return;
+    const id = run;
+    $('msg').value = ''; composer(false); showError('');
+    history.push({ role: 'user', content: text }); bubble('you', text);
+    cadenceReplied();
+    try {
+      await sleep(300, id);
+      await agentTurn(id);
+      composer(true, chips());
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text; showError(e.message); composer(true, chips());
+    }
+  }
+
+  async function replay(id) {
+    ctx.live = false;
+    const turns = [
+      ['agent', 'Hi Chris, Luke with Cypress Fence. Did the cedar layout on your quote look right for the back yard? Reply STOP to opt out.'],
+      ['you', 'Honestly it’s more than we expected.'],
+      ['agent', 'Totally fair. A lot of folks do 12 months same as cash through our lending partner, or we start with just the back yard and do the sides later. Want me to price the back yard by itself?', { stage: 'open', objection: 'price' }],
+      ['you', 'Yeah, can you call me about that?'],
+      ['agent', 'Sure thing, I’ll call you this afternoon.', { stage: 'callback', objection: 'price' }],
+    ];
+    for (const [side, text, a] of turns) {
+      if (side === 'agent') { typing(true); await sleep(1500, id); typing(false); } else { await sleep(1400, id); cadenceReplied(); }
+      bubble(side, text); if (a) apply(a);
+      await sleep(600, id);
+    }
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', replied: false, objection: null };
+    history = [];
+    $('go').hidden = $('replay').hidden = true;
+    $('c2').className = 'step now'; $('c2').querySelector('.st').textContent = 'Sending';
+    setStage('quoted'); status(1, 'following up', true);
+    $('conn1').classList.add('on'); status(2, mode === 'live' ? 'live' : 'replay', true);
+    $('thread').innerHTML = '<div class="daystamp">Thursday 11:20 AM</div>';
+    try {
+      if (mode === 'live') {
+        try { await agentTurn(id); composer(true, chips()); $('c2').querySelector('.st').textContent = 'Sent'; }
+        catch (e) {
+          if (e === 'abort') throw e;
+          typing(false); showError('The live agent is busy right now, so here’s a replay.'); status(2, 'replay', true);
+          await replay(id);
+        }
+      } else await replay(id);
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; history = [];
+    $('go').hidden = $('replay').hidden = false;
+    $('c2').className = 'step'; $('c2').querySelector('.st').textContent = 'Due';
+    $('c5').className = 'step'; $('c5').querySelector('.st').textContent = 'Scheduled';
+    $('c10').className = 'step'; $('c10').querySelector('.st').textContent = 'Scheduled';
+    setStage('quoted');
+    $('obj').innerHTML = '<span class="pill">None yet</span>'; $('next').textContent = 'Day 2 text'; $('foot').textContent = '';
+    status(1, 'no reply, 2 days'); status(2, 'waiting'); status(3, 'quoted');
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('thread').innerHTML = '<div class="empty">Run the follow-up. Luke’s text lands here, and you reply as Chris.</div>';
+    $('results').classList.remove('show'); showError(''); composer(false);
+  }
+
+  $('go').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); chrisSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

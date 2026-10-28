@@ -1,15 +1,88 @@
 {
   "rewrites": [
-    { "source": "/demos/ai-receptionist", "destination": "/demos/ai-receptionist.html" },
-    { "source": "/demos/lead-reactivation", "destination": "/demos/lead-reactivation.html" },
-    { "source": "/demos/storm-estimate-intake", "destination": "/demos/storm-estimate-intake.html" },
-    { "source": "/demos/missed-call-text-back", "destination": "/demos/missed-call-text-back.html" },
-    { "source": "/demos/instant-lead-response", "destination": "/demos/instant-lead-response.html" },
-    { "source": "/demos/invoice-generator", "destination": "/demos/invoice-generator.html" },
-    { "source": "/demos/open-today", "destination": "/demos/open-today.html" },
-    { "source": "/demos/digital-waitlist", "destination": "/demos/digital-waitlist.html" },
-    { "source": "/demos/review-collector", "destination": "/demos/review-collector.html" },
-    { "source": "/demos/loyalty-punch-card", "destination": "/demos/loyalty-punch-card.html" },
-    { "source": "/demos/promotion-builder", "destination": "/demos/promotion-builder.html" }
+    {
+      "source": "/demos/ai-receptionist",
+      "destination": "/demos/ai-receptionist.html"
+    },
+    {
+      "source": "/demos/lead-reactivation",
+      "destination": "/demos/lead-reactivation.html"
+    },
+    {
+      "source": "/demos/storm-estimate-intake",
+      "destination": "/demos/storm-estimate-intake.html"
+    },
+    {
+      "source": "/demos/missed-call-text-back",
+      "destination": "/demos/missed-call-text-back.html"
+    },
+    {
+      "source": "/demos/instant-lead-response",
+      "destination": "/demos/instant-lead-response.html"
+    },
+    {
+      "source": "/demos/invoice-generator",
+      "destination": "/demos/invoice-generator.html"
+    },
+    {
+      "source": "/demos/open-today",
+      "destination": "/demos/open-today.html"
+    },
+    {
+      "source": "/demos/digital-waitlist",
+      "destination": "/demos/digital-waitlist.html"
+    },
+    {
+      "source": "/demos/review-collector",
+      "destination": "/demos/review-collector.html"
+    },
+    {
+      "source": "/demos/loyalty-punch-card",
+      "destination": "/demos/loyalty-punch-card.html"
+    },
+    {
+      "source": "/demos/promotion-builder",
+      "destination": "/demos/promotion-builder.html"
+    },
+    {
+      "source": "/demos/spam-call-screener",
+      "destination": "/demos/spam-call-screener.html"
+    },
+    {
+      "source": "/demos/after-hours-faq",
+      "destination": "/demos/after-hours-faq.html"
+    },
+    {
+      "source": "/demos/no-show-saver",
+      "destination": "/demos/no-show-saver.html"
+    },
+    {
+      "source": "/demos/quote-follow-up",
+      "destination": "/demos/quote-follow-up.html"
+    },
+    {
+      "source": "/demos/google-post-writer",
+      "destination": "/demos/google-post-writer.html"
+    },
+    {
+      "source": "/demos/instant-quote",
+      "destination": "/demos/instant-quote.html"
+    },
+    {
+      "source": "/demos/job-status",
+      "destination": "/demos/job-status.html"
+    },
+    {
+      "source": "/demos/qr-menu",
+      "destination": "/demos/qr-menu.html"
+    },
+    {
+      "source": "/demos/gift-cards",
+      "destination": "/demos/gift-cards.html"
+    },
+    {
+      "source": "/demos/before-after",
+      "destination": "/demos/before-after.html"
+    }
   ]
 }

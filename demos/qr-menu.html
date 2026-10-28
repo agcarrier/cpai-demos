@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Menu — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Edit your menu or price list once and the QR code on the counter always shows the latest, sold-out items included. Scan the demo code with your phone.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/qr-menu">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/demos/tool.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  .items { display: flex; flex-direction: column; gap: 6px; }
+  .it { display: grid; grid-template-columns: 1fr 74px auto auto; gap: 6px; align-items: center; }
+  .it input[type=text], .it input[type=number] { font: 13px var(--font-sans); padding: 8px 9px; border: 1px solid var(--ink-3); background: var(--ink); color: var(--paper); border-radius: 0; min-width: 0; }
+  .it input[type=number] { font-family: var(--font-mono); text-align: right; }
+  .it input:focus { outline: none; border-color: var(--paper); background: #fff; }
+  .it .so { font: 600 9px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 9px 7px; border: 1px solid var(--ink-3); background: #fff; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .it .so[aria-pressed="true"] { background: #b4361a; color: #fff; border-color: #b4361a; }
+  .it .x { border: none; background: none; color: var(--faint); cursor: pointer; font-size: 16px; padding: 0 4px; }
+  .sec-name { font: 600 12px var(--font-sans); padding: 8px 9px; border: 1px solid var(--ink-3); background: #fff; width: 100%; margin: 14px 0 6px; border-radius: 0; }
+  .add { margin-top: 6px; }
+  .qr-wrap { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ink-3); }
+  .qr { background: #fff; border: 1px solid var(--paper); padding: 8px; aspect-ratio: 1; }
+  .qr svg { display: block; width: 100%; height: auto; }
+  .qr-wrap p { font-size: 13px; color: var(--muted); }
+  .qr-wrap b { color: var(--paper); }
+  /* The menu customers see */
+  .menu { flex: 1; overflow-y: auto; padding: 18px 16px; background: #fffdf8; }
+  .menu .mn { font-family: var(--font-display); font-weight: 600; font-size: 24px; letter-spacing: -0.02em; line-height: 1.1; }
+  .menu .mt { font-size: 12.5px; color: var(--muted); margin: 4px 0 14px; }
+  .menu .ms { font: 600 10px var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--signal); margin: 16px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--ink-3); }
+  .menu .mi { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; font-size: 14px; }
+  .menu .mi .dots { flex: 1; border-bottom: 1px dotted var(--ink-3); transform: translateY(-3px); }
+  .menu .mi .mp { font: 600 13px var(--font-mono); }
+  .menu .mi.out { color: var(--faint); }
+  .menu .mi.out .mp { text-decoration: line-through; }
+  .menu .mi .tag { font: 600 8.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #fff; background: #b4361a; padding: 2px 5px; }
+  .menu .upd { font: 10px var(--font-mono); color: var(--faint); margin-top: 18px; text-align: center; }
+  /* Opened from the QR code: just the menu, full screen */
+  body.scan > *:not(#scan) { display: none !important; }
+  body.scan #scan { display: block !important; min-height: 100vh; }
+  body.scan #scan .menu { max-width: 520px; margin: 0 auto; min-height: 100vh; }
+  @media (max-width: 560px) { .qr-wrap { grid-template-columns: 110px 1fr; } }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div id="scan" hidden></div>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / QR menu</div>
+      <h1>Change the menu, not the <em>sign</em>.</h1>
+      <p class="hero-sub">A food truck's menu lives behind one QR code on the window. Change a price or mark the boudin balls sold out, and everyone who scans sees it right away. No reprinting. Scan the code below with your phone to see it for real.</p>
+    </div>
+  </section>
+
+  <div class="split">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">Edit your menu</span><span class="s" id="s1">editing</span></div>
+      <div class="panel"><div class="pad">
+        <div class="field"><label for="mName">Business name</label><input id="mName" maxlength="40"></div>
+        <div class="field"><label for="mTag">One line under it</label><input id="mTag" maxlength="70"></div>
+        <div id="secs"></div>
+        <div class="qr-wrap">
+          <div class="qr" id="qr" aria-label="QR code for this menu"></div>
+          <p><b>Scan me.</b> This code opens exactly the menu you're editing, sold-out tags and all. In a real build it's one permanent link, so the sticker on the window never changes.</p>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">What they see after scanning</span><span class="s">live</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span>11:32</span><span>5G</span></div>
+              <div class="pc-name">menu.lepetittruck.com</div>
+              <div class="pc-sub">Scanned from the window</div>
+            </div>
+            <div class="menu" id="preview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">A working prototype. The demo packs the menu into the QR link itself; nothing is stored on a server.</p>
+</div>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Short keys keep the QR link small: n name, t tagline, s [[section, [[item, price, soldOut]]]].
+  let menu = {
+    n: 'Le Petit Truck', t: 'Cajun street food · Parc Sans Souci, Lafayette',
+    s: [
+      ['Plates', [['Crawfish étouffée bowl', 14, 0], ['Shrimp po’boy', 13, 0], ['Red beans and rice', 10, 0]]],
+      ['Sides', [['Boudin balls (3)', 7, 1], ['Cracklins', 6, 0], ['Sweet potato fries', 5, 0]]],
+      ['Drinks', [['Sweet tea', 3, 0], ['Barq’s root beer', 3, 0]]],
+    ],
+  };
+  const pack = m => btoa(unescape(encodeURIComponent(JSON.stringify(m)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const unpack = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/')))));
+
+  function menuHTML(m) {
+    return `<div class="mn">${esc(m.n)}</div><div class="mt">${esc(m.t)}</div>` +
+      m.s.map(([name, items]) => `<div class="ms">${esc(name)}</div>` + items.map(([n, p, out]) =>
+        `<div class="mi${out ? ' out' : ''}"><span>${esc(n)}</span>${out ? '<span class="tag">Sold out</span>' : ''}<span class="dots"></span><span class="mp">$${Number(p).toFixed(0)}</span></div>`).join('')).join('') +
+      `<div class="upd">Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div>`;
+  }
+
+  // Opened from the QR code: show only the menu.
+  const m = location.hash.match(/^#m=(.+)$/);
+  if (m) {
+    try { $('scan').innerHTML = `<div class="menu">${menuHTML(unpack(m[1]))}</div>`; $('scan').hidden = false; document.body.classList.add('scan'); return; }
+    catch (e) { /* bad link: fall through to the editor */ }
+  }
+
+  function editor() {
+    $('mName').value = menu.n; $('mTag').value = menu.t;
+    $('secs').innerHTML = menu.s.map(([name, items], si) =>
+      `<input class="sec-name" data-s="${si}" value="${esc(name)}" maxlength="24" aria-label="Section name"><div class="items">` +
+      items.map(([n, p, out], ii) => `<div class="it"><input type="text" data-s="${si}" data-i="${ii}" data-f="0" value="${esc(n)}" maxlength="40" aria-label="Item"><input type="number" data-s="${si}" data-i="${ii}" data-f="1" value="${p}" min="0" aria-label="Price"><button type="button" class="so" data-s="${si}" data-i="${ii}" aria-pressed="${!!out}">Sold out</button><button type="button" class="x" data-s="${si}" data-i="${ii}" aria-label="Remove item">×</button></div>`).join('') +
+      `</div><button type="button" class="tool-btn add" data-add="${si}">+ Add item</button>`).join('');
+  }
+  function draw() {
+    $('preview').innerHTML = menuHTML(menu);
+    const qr = qrcode(0, 'L');
+    qr.addData(location.origin + location.pathname + '#m=' + pack(menu));
+    qr.make();
+    $('qr').innerHTML = qr.createSvgTag({ cellSize: 3, margin: 0, scalable: true });
+  }
+
+  $('mName').oninput = e => { menu.n = e.target.value; draw(); };
+  $('mTag').oninput = e => { menu.t = e.target.value; draw(); };
+  $('secs').oninput = e => {
+    const d = e.target.dataset;
+    if (e.target.classList.contains('sec-name')) menu.s[d.s][0] = e.target.value;
+    else menu.s[d.s][1][d.i][d.f] = d.f === '1' ? Number(e.target.value) || 0 : e.target.value;
+    draw();
+  };
+  $('secs').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const d = b.dataset;
+    if (d.add !== undefined) menu.s[d.add][1].push(['New item', 5, 0]);
+    else if (b.classList.contains('so')) menu.s[d.s][1][d.i][2] ^= 1;
+    else if (b.classList.contains('x')) menu.s[d.s][1].splice(d.i, 1);
+    editor(); draw();
+  };
+  editor(); draw();
+})();
+</script>
+</body>
+</html>

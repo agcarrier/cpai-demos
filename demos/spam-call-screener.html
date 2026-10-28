@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spam Call Screener — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Call an electrician as a customer or a spammer. A live AI screener answers, works out which you are, and only rings the owner for real work.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/spam-call-screener">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  :root { --alert: #b4361a; --alert-wash: #fbe9e3; }
+  .call { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 22px; gap: 6px; min-height: 380px; }
+  .call .av { width: 64px; height: 64px; font-size: 20px; margin-bottom: 10px; background: var(--ink-3); color: var(--paper); }
+  .call .who { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .call .num { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .06em; }
+  .call .why { font-size: 13px; color: var(--muted); max-width: 30ch; margin-top: 12px; }
+  .call .submit { margin-top: 18px; width: auto; padding: 14px 26px; }
+  .call .live-dot { display: none; margin-top: 12px; font: 500 11px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--signal); align-items: center; gap: 8px; }
+  .call.on .live-dot { display: inline-flex; }
+
+  /* 03 Ray's phone */
+  .owner { display: flex; flex-direction: column; gap: 12px; }
+  .ring { display: none; border: 1px solid var(--paper); background: var(--hl); padding: 14px; box-shadow: 3px 3px 0 var(--paper); }
+  .ring.show { display: block; animation: stampIn .4s cubic-bezier(.22,1,.36,1); }
+  .ring.emergency { background: var(--alert); color: #fff; border-color: var(--alert); box-shadow: 3px 3px 0 var(--paper); }
+  .ring .rt { font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .ring .rn { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin: 4px 0 2px; }
+  .ring .rd { font-size: 13px; }
+  .silent { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); padding: 12px 14px; border: 1px dashed var(--ink-3); background: #fff; }
+  .silent.hide { display: none; }
+  .log-h { display: flex; justify-content: space-between; font: 600 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-top: 6px; }
+  .log { display: flex; flex-direction: column; max-height: 260px; overflow-y: auto; border: 1px solid var(--ink-3); background: #fff; }
+  .log-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--ink-2); font-size: 12.5px; }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .t { font: 500 10.5px var(--font-mono); color: var(--faint); width: 58px; flex-shrink: 0; }
+  .log-row .d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag { font: 600 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border: 1px solid var(--ink-3); color: var(--muted); flex-shrink: 0; }
+  .tag.rang { background: var(--hl); color: var(--on-hl); border-color: var(--paper); }
+  .log-row.new { animation: fill .9s ease-out; }
+  @keyframes fill { from { background: var(--hl); } to { background: #fff; } }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Spam call screener</div>
+      <h1>Your phone only rings for <em>real work</em>.</h1>
+      <p class="hero-sub">Ray's an electrician who stopped answering unknown numbers, because most of them are warranty scams and "your Google listing" robocalls. Call his shop as a customer or as a spammer. A live AI screener picks up, figures out which you are, and only rings Ray when it's a job.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="stages">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The incoming call</span><span class="s" id="s1">waiting</span></div>
+      <div class="panel">
+        <div class="call" id="call">
+          <div class="av">?</div>
+          <div class="who">Unknown caller</div>
+          <div class="num">(337) 555-0142 · Lafayette, LA</div>
+          <div class="why" id="callWhy">Be whoever you like: a homeowner with a tripping breaker, or the "Google Business team". The screener doesn't know which.</div>
+          <div class="live-dot"><span class="pulse"></span>On the line with the screener</div>
+          <button class="submit" id="dial" type="button">Call Bayou Electric →</button>
+          <button class="replay" id="replay" type="button">or watch a replay</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn1"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">The AI screener</span><span class="s" id="s2">waiting</span></div>
+      <div class="panel">
+        <div class="phone-pad">
+          <div class="phone">
+            <div class="phone-top">
+              <div class="phone-status"><span id="clock">9:41</span><span>LTE</span></div>
+              <div class="av">BE</div>
+              <div class="pc-name">Bayou Electric</div>
+              <div class="pc-sub">Call transcript</div>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+            <div class="err" id="err" hidden></div>
+            <div class="chips" id="chips"></div>
+            <form class="composer" id="composer">
+              <input id="msg" placeholder="Say something" autocomplete="off" maxlength="300" disabled aria-label="What you say">
+              <button id="msgSend" disabled aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn" id="conn2"><svg viewBox="0 0 40 24"><path class="track" d="M2 12 H30"/><path class="flow" d="M2 12 H30"/><path class="head" d="M30 7 L38 12 L30 17 Z"/></svg></div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">03</span><span class="t">Ray's phone</span><span class="s" id="s3">silent</span></div>
+      <div class="panel">
+        <div class="pad owner">
+          <div class="silent" id="silent"><span class="pulse"></span>Silent. Ray's up in an attic in Broussard.</div>
+          <div class="ring" id="ring">
+            <div class="rt" id="ringT">Ringing Ray now</div>
+            <div class="rn" id="ringN">—</div>
+            <div class="rd" id="ringD">—</div>
+          </div>
+          <div class="log-h"><span>Today's calls</span><span id="tally">—</span></div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div class="mv hl" id="r-blocked">—</div><div class="ml">Spam calls Ray never heard</div></div>
+    <div class="div"></div>
+    <div class="metric"><div class="mv" id="r-rang">—</div><div class="ml">Real jobs that rang through</div></div>
+    <div class="cta">
+      <p>Owners screen calls because the phone is a spam firehose, and the real customer gets buried. This puts a screener in front of your own number.</p>
+      <a href="https://carrierpigeonai.dev/services/ai-agents">See AI agents →</a>
+    </div>
+  </div>
+
+  <p class="note">Live agent: Claude Haiku via the Carrier Pigeon demo API. No call is placed, nobody's phone rings, and nothing is stored.</p>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const BIZ = 'Bayou Electric';
+  const KIND = { warranty: 'Car warranty', listing: 'Google listing', robocall: 'Robocall', sales: 'Sales pitch', scam: 'Scam', other: 'Spam' };
+  // A morning's worth of calls already screened, so the log reads like a real phone.
+  const EARLIER = [
+    ['7:02 AM', 'Vehicle warranty robocall', 'warranty'], ['7:31 AM', '"Verify your Google listing"', 'listing'],
+    ['7:48 AM', 'Mrs. Guidry, ceiling fan install', 'rang'], ['8:15 AM', 'Merchant services pitch', 'sales'],
+    ['8:22 AM', 'Silent robocall', 'robocall'], ['8:40 AM', 'SEO agency, "page one guaranteed"', 'sales'],
+    ['9:05 AM', 'Outage, half the house dark', 'rang'], ['9:12 AM', 'Business loan offer', 'sales'],
+    ['9:26 AM', '"Final notice" on a utility bill', 'scam'],
+  ];
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let run = 0, history = [], ctx = null, counts = {};
+
+  const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('abort'), reduce ? Math.min(ms, 120) : ms));
+  const clock = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const status = (n, text, live) => { const el = $('s' + n); el.textContent = text; el.classList.toggle('live', !!live); };
+
+  function bubble(side, text) { const t = $('thread'), b = document.createElement('div'); b.className = 'bubble ' + side; b.textContent = text; t.appendChild(b); t.scrollTop = t.scrollHeight; }
+  function typing(on) {
+    const t = $('thread'), e = $('typing');
+    if (on && !e) { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<span></span><span></span><span></span>'; t.appendChild(d); t.scrollTop = t.scrollHeight; }
+    if (!on && e) e.remove();
+  }
+  function composer(on, chips = []) {
+    $('msg').disabled = $('msgSend').disabled = !on;
+    $('chips').innerHTML = '';
+    chips.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c; b.onclick = () => callerSays(c); $('chips').appendChild(b); });
+    if (on && !matchMedia('(max-width: 960px)').matches) $('msg').focus();
+  }
+  function showError(msg) { $('err').hidden = !msg; $('err').textContent = msg || ''; }
+
+  function logRow(time, desc, kind, fresh) {
+    const r = document.createElement('div'); r.className = 'log-row' + (fresh ? ' new' : '');
+    r.innerHTML = '<span class="t"></span><span class="d"></span><span class="tag"></span>';
+    r.querySelector('.t').textContent = time; r.querySelector('.d').textContent = desc;
+    const tag = r.querySelector('.tag');
+    tag.textContent = kind === 'rang' ? 'Rang Ray' : 'Blocked';
+    if (kind === 'rang') tag.classList.add('rang');
+    $('log').prepend(r);
+    counts[kind === 'rang' ? 'rang' : 'blocked']++;
+    $('tally').textContent = counts.blocked + ' blocked · ' + counts.rang + ' rang';
+  }
+
+  // ── Ray's phone, driven by the screener's verdict ──
+  function applyVerdict(r) {
+    if (!r || ctx.closed || r.verdict === 'screening') return;
+    ctx.closed = true;
+    $('conn2').classList.add('on');
+    if (r.verdict === 'spam') {
+      logRow(clock(), KIND[r.kind] || 'Spam', r.kind, true);
+      status(3, 'still silent', true); status(2, 'call ended');
+      $('silent').textContent = 'Still silent. Ray never knew that call happened.';
+    } else {
+      const l = r.lead || {};
+      $('silent').classList.add('hide');
+      $('ring').classList.add('show');
+      $('ring').classList.toggle('emergency', l.urgency === 'emergency');
+      $('ringT').textContent = l.urgency === 'emergency' ? 'Emergency · ringing Ray now' : 'New job · Ray calls back within the hour';
+      $('ringN').textContent = l.name || 'New customer';
+      $('ringD').textContent = l.need || '';
+      logRow(clock(), (l.name ? l.name + ', ' : '') + (l.need || 'New job'), 'rang', true);
+      status(3, 'ringing', true); status(2, 'handed off');
+    }
+    $('call').classList.remove('on');
+    $('r-blocked').textContent = counts.blocked; $('r-rang').textContent = counts.rang;
+    $('results').classList.add('show');
+    composer(false);
+  }
+
+  async function ask() {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'screener', businessName: BIZ, messages: history }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'The screener is unavailable right now.');
+    return d;
+  }
+  async function agentTurn(id) {
+    typing(true);
+    const r = await ask();
+    if (id !== run) return;
+    typing(false);
+    history.push({ role: 'assistant', content: r.content });
+    bubble('agent', r.content);
+    applyVerdict(r);
+    return r;
+  }
+  function nextChips() {
+    if (history.length <= 1) return ['My breaker keeps tripping', 'This is about your Google listing', 'Calling about your vehicle warranty', 'Need a quote on a panel upgrade'];
+    return ['It’s Tom, in Scott', 'I’d rather not say', 'There’s a burning smell', 'Can I speak to the owner?'];
+  }
+  async function callerSays(text) {
+    text = text.trim(); if (!text || !ctx || !ctx.live || ctx.closed) return;
+    const id = run;
+    $('msg').value = ''; composer(false); showError('');
+    history.push({ role: 'user', content: text }); bubble('you', text);
+    try {
+      await sleep(300, id);
+      await agentTurn(id);
+      if (!ctx.closed) composer(true, nextChips());
+    } catch (e) {
+      if (e === 'abort') return;
+      typing(false); history.pop(); $('thread').lastElementChild?.remove(); $('msg').value = text; showError(e.message); composer(true, nextChips());
+    }
+  }
+
+  async function replay(id) {
+    ctx.live = false;
+    const turns = [
+      ['agent', 'Bayou Electric, how can I help you?'],
+      ['you', 'Hi, this is Sarah with Google Business Services. Your listing is about to be suspended.'],
+      ['agent', 'Thanks Sarah, but Ray doesn’t take sales calls. You can email the office with anything about the listing.', { verdict: 'spam', kind: 'listing' }],
+    ];
+    for (const [side, text, v] of turns) {
+      if (side === 'agent') { typing(true); await sleep(1400, id); typing(false); } else await sleep(1300, id);
+      bubble(side, text); if (v) applyVerdict(v);
+      await sleep(600, id);
+    }
+  }
+
+  async function start(mode) {
+    const id = ++run;
+    ctx = { live: mode === 'live', closed: false };
+    history = [];
+    $('dial').hidden = $('replay').hidden = true;
+    $('call').classList.add('on'); $('callWhy').textContent = 'Ray’s phone stays silent while the screener talks to you.';
+    status(1, 'connected', true); $('conn1').classList.add('on');
+    status(2, mode === 'live' ? 'live' : 'replay', true);
+    $('thread').innerHTML = '<div class="daystamp">Incoming call ' + clock() + '</div>';
+    try {
+      if (mode === 'live') {
+        try { await agentTurn(id); composer(true, nextChips()); }
+        catch (e) {
+          if (e === 'abort') throw e;
+          typing(false); showError('The live screener is busy right now, so here’s a replay.'); status(2, 'replay', true);
+          await replay(id);
+        }
+      } else await replay(id);
+    } catch (e) { /* aborted by reset */ }
+  }
+
+  function reset() {
+    run++; ctx = null; history = []; counts = { blocked: 0, rang: 0 };
+    $('dial').hidden = $('replay').hidden = false;
+    $('call').className = 'call';
+    $('callWhy').textContent = 'Be whoever you like: a homeowner with a tripping breaker, or the "Google Business team". The screener doesn’t know which.';
+    status(1, 'waiting'); status(2, 'waiting'); status(3, 'silent');
+    $('conn1').classList.remove('on'); $('conn2').classList.remove('on');
+    $('thread').innerHTML = '<div class="empty">Place the call. The screener answers here; talk to it like you would on the phone.</div>';
+    $('silent').className = 'silent'; $('silent').innerHTML = '<span class="pulse"></span>Silent. Ray’s up in an attic in Broussard.';
+    $('ring').className = 'ring';
+    $('log').innerHTML = ''; EARLIER.forEach(([t, d, k]) => logRow(t, d, k));
+    $('results').classList.remove('show');
+    showError(''); composer(false);
+    $('clock').textContent = clock().replace(/\s?[AP]M/, '');
+  }
+
+  $('dial').addEventListener('click', () => start('live'));
+  $('replay').addEventListener('click', () => start('replay'));
+  $('composer').addEventListener('submit', e => { e.preventDefault(); callerSays($('msg').value); });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

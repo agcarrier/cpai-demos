@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Gift Cards — Carrier Pigeon AI Demo</title>
+<meta name="description" content="Sell gift cards from your website, deliver them by text or email, and redeem them at the counter with a code. Balances track themselves.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/gift-cards">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<link rel="stylesheet" href="/demos/tool.css">
+<style>
+  .gc { aspect-ratio: 1.6; border: 1px solid var(--paper); box-shadow: 5px 5px 0 var(--paper); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; background: var(--c, #2d4a3e); margin-bottom: 18px; transition: background .3s; }
+  .gc .gb { font: 600 11px var(--font-mono); letter-spacing: .16em; text-transform: uppercase; opacity: .85; }
+  .gc .ga { font: 600 40px var(--font-mono); letter-spacing: -0.03em; }
+  .gc .gm { font-size: 13px; opacity: .92; min-height: 20px; overflow-wrap: anywhere; }
+  .gc .gf { display: flex; justify-content: space-between; font: 500 11px var(--font-mono); letter-spacing: .08em; opacity: .85; }
+  .colors { display: flex; gap: 8px; margin-bottom: 14px; }
+  .colors button { width: 30px; height: 30px; border: 1px solid var(--ink-3); cursor: pointer; }
+  .colors button[aria-pressed="true"] { outline: 2px solid var(--paper); outline-offset: 2px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sent { display: none; font-size: 13px; padding: 10px 12px; border: 1px solid var(--signal); background: #eef6e6; color: var(--signal); margin-top: 12px; }
+  .sent.show { display: block; animation: stampIn .35s cubic-bezier(.22,1,.36,1); }
+  .redeem { display: flex; gap: 8px; margin-bottom: 8px; }
+  .redeem input { flex: 1; min-width: 0; font: 14px var(--font-mono); padding: 10px 12px; border: 1px solid var(--ink-3); background: var(--ink); border-radius: 0; text-transform: uppercase; }
+  .redeem input:focus { outline: none; border-color: var(--paper); background: #fff; }
+  .rmsg { font-size: 13px; min-height: 20px; margin-bottom: 8px; }
+  .rmsg.bad { color: #a33a1c; }
+  .rmsg.ok { color: var(--signal); }
+  .ledger { border: 1px solid var(--ink-3); background: #fff; }
+  .lr { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--ink-2); font-size: 13px; align-items: center; }
+  .lr:last-child { border-bottom: none; }
+  .lr .c { font: 600 12px var(--font-mono); }
+  .lr .w { color: var(--muted); font-size: 12px; }
+  .lr .b { font: 600 13px var(--font-mono); text-align: right; }
+  .lr.new { animation: fill .9s ease-out; }
+  .lr.used .b { color: var(--faint); }
+  @keyframes fill { from { background: var(--hl); } to { background: #fff; } }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .stats div { border: 1px solid var(--ink-3); background: var(--ink); padding: 10px 12px; }
+  .stats b { display: block; font: 600 20px var(--font-mono); }
+  .stats span { font: 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+<script src="/lead-cta.js" defer></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">The Lab / Digital gift cards</div>
+      <h1>Holiday money in the bank <em>before</em> January.</h1>
+      <p class="hero-sub">A coffee shop sells gift cards from its website. The buyer picks an amount and a note, the card arrives by text, and the barista redeems the code at the counter. Partial balances carry over. Buy one on the left, then spend it on the right.</p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="split">
+    <div class="col">
+      <div class="stage-label"><span class="n">01</span><span class="t">The buyer, on your website</span><span class="s" id="s1">shopping</span></div>
+      <div class="panel"><div class="pad">
+        <div class="gc" id="card">
+          <div class="gb">Vermilion Coffee Co.</div>
+          <div><div class="ga" id="gAmt">$25</div><div class="gm" id="gMsg"></div></div>
+          <div class="gf"><span id="gTo">For a friend</span><span id="gCode">••••-••••</span></div>
+        </div>
+        <div class="field"><label>Amount</label></div>
+        <div class="seg" id="amt"></div>
+        <div class="field"><label>Card color</label></div>
+        <div class="colors" id="colors"></div>
+        <div class="two">
+          <div class="field"><label for="to">To</label><input id="to" maxlength="30" placeholder="Mom"></div>
+          <div class="field"><label for="from">From</label><input id="from" maxlength="30" placeholder="Jules"></div>
+        </div>
+        <div class="field"><label for="note">Note</label><input id="note" maxlength="80" placeholder="Merry Christmas! Lattes on me."></div>
+        <button class="submit" id="buy" type="button">Buy and text it to them →</button>
+        <div class="sent" id="sent"></div>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="stage-label"><span class="n">02</span><span class="t">At the counter</span><span class="s" id="s2">register</span></div>
+      <div class="panel"><div class="pad">
+        <div class="field"><label for="code">Gift card code</label></div>
+        <div class="redeem"><input id="code" maxlength="9" placeholder="VCC-XXXX" autocomplete="off"><input id="spend" type="number" min="1" step="0.01" value="6.75" aria-label="Order total" style="max-width:96px"></div>
+        <button class="tool-btn" id="apply" type="button">Apply to order</button>
+        <div class="rmsg" id="rmsg"></div>
+        <div class="sub-h">Gift cards on the books</div>
+        <div class="ledger" id="ledger"></div>
+        <div class="stats"><div><b id="sold">$0</b><span>Sold</span></div><div><b id="owed">$0</b><span>Balance still out</span></div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <p class="note">A working prototype. In a real build payment runs through your own Stripe or Square account and the card is texted or emailed. Nothing is charged or stored here.</p>
+</div>
+
+<script>
+(function () {
+  const AMTS = [25, 50, 100];
+  const COLORS = ['#2d4a3e', '#7a2e2e', '#1f3a5f', '#161615'];
+  const SEED = [['VCC-8M2Q', 'Ellie', 50, 18.25], ['VCC-K4TZ', 'Mr. Hebert', 25, 25]];
+  const $ = id => document.getElementById(id);
+  const money = n => '$' + (Math.round(n * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  let amt, color, cards, fresh;
+
+  function code() {
+    const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    let c; do { c = 'VCC-' + Array.from({ length: 4 }, () => A[Math.floor(Math.random() * A.length)]).join(''); } while (cards.some(k => k.code === c));
+    return c;
+  }
+  function drawCard() {
+    [...$('amt').children].forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.v) === amt));
+    [...$('colors').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.c === color));
+    $('card').style.setProperty('--c', color);
+    $('gAmt').textContent = money(amt);
+    $('gMsg').textContent = $('note').value.trim();
+    $('gTo').textContent = $('to').value.trim() ? 'For ' + $('to').value.trim() : 'For a friend';
+  }
+  function drawLedger() {
+    $('ledger').innerHTML = cards.map(c => `<div class="lr${c.code === fresh ? ' new' : ''}${c.bal === 0 ? ' used' : ''}"><span class="c">${c.code}</span><span class="w"></span><span class="b">${money(c.bal)}</span></div>`).join('');
+    [...$('ledger').children].forEach((r, i) => r.querySelector('.w').textContent = cards[i].to);
+    $('sold').textContent = money(cards.reduce((t, c) => t + c.amt, 0));
+    $('owed').textContent = money(cards.reduce((t, c) => t + c.bal, 0));
+  }
+
+  $('amt').innerHTML = AMTS.map(a => `<button type="button" data-v="${a}">${money(a)}</button>`).join('');
+  $('amt').onclick = e => { const b = e.target.closest('button'); if (b) { amt = Number(b.dataset.v); drawCard(); } };
+  $('colors').innerHTML = COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" aria-label="Card color"></button>`).join('');
+  $('colors').onclick = e => { const b = e.target.closest('button'); if (b) { color = b.dataset.c; drawCard(); } };
+  ['to', 'note'].forEach(id => $(id).oninput = drawCard);
+
+  $('buy').onclick = () => {
+    const c = { code: code(), to: $('to').value.trim() || 'A friend', amt, bal: amt };
+    cards.unshift(c); fresh = c.code;
+    $('gCode').textContent = c.code;
+    $('sent').textContent = `Texted to ${c.to}: "${$('from').value.trim() || 'Someone'} sent you a ${money(amt)} Vermilion Coffee gift card. Show code ${c.code} at the counter."`;
+    $('sent').classList.add('show');
+    $('code').value = c.code;
+    $('s1').textContent = 'sold'; $('s1').classList.add('live');
+    drawLedger();
+  };
+
+  $('apply').onclick = () => {
+    const c = cards.find(k => k.code === $('code').value.trim().toUpperCase());
+    const spend = Math.round((Number($('spend').value) || 0) * 100) / 100;
+    $('rmsg').className = 'rmsg bad';
+    if (!c) return $('rmsg').textContent = 'No card with that code.';
+    if (c.bal === 0) return $('rmsg').textContent = 'That card is used up.';
+    if (spend <= 0) return $('rmsg').textContent = 'Enter the order total.';
+    const used = Math.min(spend, c.bal);
+    c.bal = Math.round((c.bal - used) * 100) / 100; fresh = c.code;
+    $('rmsg').className = 'rmsg ok';
+    $('rmsg').textContent = `Took ${money(used)} off. ${spend > used ? 'Customer owes ' + money(spend - used) + '. ' : ''}${money(c.bal)} left on ${c.code}.`;
+    $('s2').textContent = 'redeemed'; $('s2').classList.add('live');
+    drawLedger();
+  };
+
+  function reset() {
+    amt = 25; color = COLORS[0]; fresh = null;
+    cards = SEED.map(([code, to, a, bal]) => ({ code, to, amt: a, bal }));
+    ['to', 'from', 'note'].forEach(id => $(id).value = '');
+    $('gCode').textContent = '••••-••••'; $('sent').className = 'sent';
+    $('code').value = ''; $('rmsg').textContent = '';
+    $('s1').textContent = 'shopping'; $('s1').classList.remove('live'); $('s2').textContent = 'register'; $('s2').classList.remove('live');
+    drawCard(); drawLedger();
+  }
+  $('reset').onclick = reset;
+  reset();
+})();
+</script>
+</body>
+</html>
