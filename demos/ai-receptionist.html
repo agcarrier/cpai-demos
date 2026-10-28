@@ -155,7 +155,7 @@
   // the prompt variables. Pinned to 3.0.2 so this keeps working until Retell
   // ships a server-created call path in the new client.
   const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  const API = LOCAL ? 'http://localhost:8799' : 'https://demo-line.REPLACE.workers.dev';
+  const API = LOCAL ? 'http://localhost:8799' : 'https://demo-line.carrierpigeonai.workers.dev';
   // Cloudflare's always-pass test key locally; the real one is set after the
   // widget is created for demos.carrierpigeonai.dev.
   const SITE_KEY = LOCAL ? '1x00000000000000000000AA' : 'REPLACE_WITH_TURNSTILE_SITE_KEY';
