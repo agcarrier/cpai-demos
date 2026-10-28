@@ -35,6 +35,8 @@
   .call .err { margin-top: 10px; max-width: 34ch; }
   .callme { width: 100%; max-width: 320px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--ink-2); text-align: left; }
   .callme .replay { margin-top: 0; }
+  .nomic { font-size: 12.5px; color: var(--muted); max-width: 320px; }
+  .nomic a { color: var(--paper); font-weight: 500; }
   .callme form { margin-top: 12px; }
   .consent { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--muted); margin: 4px 0 8px; }
   .consent input { margin-top: 3px; }
@@ -134,6 +136,10 @@
           <button class="submit" id="talk" type="button" disabled>Call the front desk →</button>
           <button class="replay" id="end" type="button" hidden>hang up</button>
           <div class="err" id="callErr" hidden></div>
+          <!-- Self-serve can't ring a typed-in number (no way to verify it's theirs), so no-mic visitors get these instead. -->
+          <div class="callme nomic" id="nomic" hidden>
+            No microphone? Call <a href="tel:+13372730139">(337) 273-0139</a> to hear a live AI receptionist, or <a href="https://carrierpigeonai.dev/contact">ask Andrew for one built for your business</a>.
+          </div>
           <div class="callme" id="callme" hidden>
             <button class="replay" id="callmeOpen" type="button">No microphone? Have it call your phone</button>
             <form id="callmeForm" hidden>
@@ -345,7 +351,7 @@
   };
 
   if (slug) loadLink();
-  else { $('build').hidden = false; }
+  else { $('build').hidden = false; $('nomic').hidden = false; }
 </script>
 </body>
 </html>
