@@ -33,6 +33,11 @@
   .call .why { font-size: 13px; color: var(--muted); max-width: 32ch; min-height: 40px; }
   .call .submit { margin-top: 18px; width: auto; padding: 14px 26px; }
   .call .err { margin-top: 10px; max-width: 34ch; }
+  .callme { width: 100%; max-width: 320px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--ink-2); text-align: left; }
+  .callme .replay { margin-top: 0; }
+  .callme form { margin-top: 12px; }
+  .consent { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--muted); margin: 4px 0 8px; }
+  .consent input { margin-top: 3px; }
   @media (max-width: 960px) { .stages.two { grid-template-columns: 1fr; } }
 </style>
 <link rel="stylesheet" href="/site-nav.css">
@@ -88,7 +93,6 @@
             <div class="hd">Your business</div>
             <div class="hd-sub">It only learns what your site says.</div>
             <div class="field"><label for="url">Your website</label><input id="url" placeholder="bayoudental.com" autocomplete="url" required maxlength="200"></div>
-            <div id="ts"></div>
             <button class="submit" id="buildBtn" type="submit">Build my receptionist →</button>
             <div class="err" id="buildErr" hidden></div>
           </form>
@@ -130,11 +134,20 @@
           <button class="submit" id="talk" type="button" disabled>Call the front desk →</button>
           <button class="replay" id="end" type="button" hidden>hang up</button>
           <div class="err" id="callErr" hidden></div>
+          <div class="callme" id="callme" hidden>
+            <button class="replay" id="callmeOpen" type="button">No microphone? Have it call your phone</button>
+            <form id="callmeForm" hidden>
+              <div class="field"><label for="phone">Your phone number</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(337) 555-1234" required maxlength="20"></div>
+              <label class="consent"><input type="checkbox" id="consent" required> I agree to one automated demo call to this number.</label>
+              <button class="submit" id="callmeBtn" type="submit">Call my phone →</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <div id="ts"></div>
   <div class="results" id="results">
     <div class="metric"><div class="mv hl">24/7</div><div class="ml">Answers every call</div></div>
     <div class="div"></div>
@@ -144,7 +157,7 @@
       <a href="https://carrierpigeonai.dev/contact">Talk to Andrew →</a>
     </div>
   </div>
-  <p class="note">Live voice agent on Retell. Nothing is dialed: the call runs in your browser and ends after 3 minutes. Want to hear the real thing? Call (337) 273-0139.</p>
+  <p class="note">Live voice agent on Retell. The call runs in your browser, or rings the phone you enter, and ends after 3 minutes. Want to hear the real thing? Call (337) 273-0139.</p>
 </div>
 
 <script type="module">
@@ -232,6 +245,7 @@
       $('sub').textContent = 'This receptionist was built from your website and answers as your business. Call it from your browser and ask what a customer would ask: hours, services, getting an appointment.';
       if (card.calls_left === 0) throw new Error('This demo has used all its calls. Text Andrew for a fresh link.');
       ready(card);
+      $('callme').hidden = false;
     } catch (e) {
       $('view').hidden = true;
       showErr('loadErr', e.message);
@@ -304,6 +318,31 @@
     }
   };
   $('end').onclick = () => client && client.stopCall();
+
+  // ── No microphone: the receptionist calls their phone (link demos only) ──
+  $('callmeOpen').onclick = () => { $('callmeForm').hidden = false; $('callmeOpen').hidden = true; $('phone').focus(); };
+  $('callmeForm').onsubmit = async e => {
+    e.preventDefault();
+    showErr('callErr', '');
+    $('callmeBtn').disabled = $('talk').disabled = true;
+    $('callmeBtn').textContent = 'Calling…';
+    try {
+      const r = await post('/api/callme', { slug, phone: $('phone').value, consent: $('consent').checked, turnstile: await turnstileToken() });
+      window.gtag && gtag('event', 'demo_used', { mode: 'receptionist', source: 'link_phone', turn: 1 });
+      const from = r.from.replace(/^\+1(\d{3})(\d{3})(\d{4})$/, '($1) $2-$3');
+      callState('connecting', 'Calling your phone', 'Pick up the call from ' + from + '. That\'s your receptionist.');
+      status(2, 'ringing', true);
+      $('callme').hidden = true;
+      $('talk').hidden = true;
+      $('results').classList.add('show');
+    } catch (err) {
+      showErr('callErr', err.message);
+      $('talk').disabled = false;
+    } finally {
+      $('callmeBtn').disabled = false;
+      $('callmeBtn').textContent = 'Call my phone →';
+    }
+  };
 
   if (slug) loadLink();
   else { $('build').hidden = false; }
