@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Desk | Carrier Pigeon AI Demo</title>
+<meta name="description" content="A live AI agent reads a stack of made-up documents, cites a page for every row, and leaves the sign-off to a person.">
+<link rel="canonical" href="https://demos.carrierpigeonai.dev/demos/medical-chronology">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/agent-demo.css">
+<style>
+  :root { --alert: #b4361a; --alert-wash: #fbe9e3; --amber: #8a5a00; --amber-wash: #fbf1d8; }
+
+  .banner { border: 1px solid var(--paper); background: var(--paper); color: var(--ink); padding: 10px 14px; font: 500 11px var(--font-mono); letter-spacing: .08em; margin-bottom: 20px; }
+  .desk { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  .desk .panel { padding: 18px; display: block; overflow: visible; }
+  .label { font: 500 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+  .stack { list-style: none; display: grid; gap: 2px; margin: 12px 0 14px; max-height: 232px; overflow-y: auto; }
+  .stack button { width: 100%; display: flex; gap: 10px; align-items: baseline; text-align: left; background: none; border: 1px solid transparent; padding: 6px 8px; font: 13px var(--font-sans); color: var(--paper); cursor: pointer; }
+  .stack button:hover { border-color: var(--ink-3); }
+  .stack button[aria-current="true"] { background: var(--ink-2); border-color: var(--paper); }
+  .stack .n { font: 500 10px var(--font-mono); color: var(--faint); min-width: 24px; }
+
+  .viewer { background: #fff; border: 1px solid var(--ink-3); padding: 20px; font-size: 14px; line-height: 1.6; min-height: 220px; overflow-wrap: anywhere; }
+  .viewer .v-label { font: 500 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .viewer.typed .v-text { font-family: Georgia, "Times New Roman", serif; }
+  .viewer.fax .v-text { font-family: var(--font-mono); font-size: 12.5px; color: #3c3b38; }
+  .viewer.handwriting .v-text { font-family: "Bradley Hand", "Segoe Script", "Snell Roundhand", cursive; font-size: 17px; }
+  .viewer mark { background: var(--hl); color: var(--on-hl); }
+
+  .runbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 12px 0; }
+  .runbar .submit { width: auto; padding: 13px 24px; }
+  .runbar .submit:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+  .run-state { font: 12px var(--font-mono); color: var(--muted); }
+  .saved-note { border: 1px solid var(--amber); background: var(--amber-wash); color: var(--amber); padding: 9px 12px; font-size: 13px; margin-bottom: 12px; }
+  .legend { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+  .d-row { border: 1px solid var(--ink-3); background: #fff; padding: 12px 14px; margin-bottom: 8px; }
+  .d-row.is-rejected .fields { text-decoration: line-through; color: var(--faint); }
+  .d-row-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .status { font: 600 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 7px; border: 1px solid currentColor; }
+  .status.quote_found { color: var(--signal); }
+  .status.needs_human { color: var(--amber); background: var(--amber-wash); }
+  .status.failed { color: var(--alert); background: var(--alert-wash); }
+  .chip { font: 500 11px var(--font-mono); background: var(--ink-2); border: 1px solid var(--ink-3); padding: 4px 8px; cursor: pointer; color: var(--paper); }
+  .chip:hover { border-color: var(--paper); }
+  .fields { font-size: 14px; display: grid; gap: 2px; }
+  .fields b { font-weight: 600; }
+  .why { font-size: 13px; color: var(--amber); margin-top: 6px; }
+  .quote { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .d-row-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .d-row-actions button { font: 11px var(--font-mono); letter-spacing: .06em; padding: 7px 10px; background: none; border: 1px solid var(--ink-3); color: var(--paper); cursor: pointer; }
+  .d-row-actions button:hover { border-color: var(--paper); }
+  .d-row-actions button[aria-pressed="true"] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .edit-field { display: block; font: 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .edit-field input { display: block; width: 100%; margin-top: 3px; font: 14px var(--font-sans); padding: 7px 8px; border: 1px solid var(--ink-3); background: var(--ink); color: var(--paper); }
+
+  .missing { margin-top: 18px; border-top: 1px solid var(--ink-3); padding-top: 14px; }
+  .missing ul { list-style: none; display: grid; gap: 6px; margin-top: 8px; }
+  .missing li { font-size: 14px; border-left: 3px solid var(--amber); padding: 2px 0 2px 10px; }
+  .signoff { margin-top: 18px; border: 1px solid var(--paper); padding: 14px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .signoff .who { font-size: 14px; }
+  .signoff .btn-ghost:disabled { opacity: .45; cursor: default; background: none; color: var(--paper); }
+  .closing { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .load-error { padding: 24px; border: 1px solid var(--alert); background: var(--alert-wash); }
+  .load-error a { color: inherit; }
+  .load-error button { margin-top: 10px; }
+
+  @media (max-width: 960px) {
+    .desk { grid-template-columns: minmax(0, 1fr); }
+    .stack { max-height: none; }
+  }
+  @media print {
+    nav, .demo-bar, .banner, .stack-panel, .runbar, .d-row-actions, .closing, .no-print, .signoff button { display: none !important; }
+    .desk { display: block; }
+    .d-row.is-rejected { display: none; }
+  }
+</style>
+<link rel="stylesheet" href="/site-nav.css">
+<script src="/lead-cta.js" defer></script>
+<script src="/site-nav.js" defer></script>
+<script src="/analytics.js"></script>
+</head>
+<body>
+
+<div class="demo-bar"><a href="/">← All demos</a><span class="sep">|</span>Demo by <a href="https://carrierpigeonai.dev">Carrier Pigeon AI</a><span class="sep">|</span>Want this for your business? <a href="https://carrierpigeonai.dev/contact">Get in touch →</a></div>
+
+<nav>
+  <a class="nav-logo" href="https://carrierpigeonai.dev">
+    <svg class="nav-mark" width="36" height="36" viewBox="0 0 96 96" role="img" aria-label="Carrier Pigeon mark">
+      <g fill="#161615">
+        <rect x="17.5" y="8.7" width="8" height="8" rx="0.8"/><rect x="26.2" y="8.7" width="8" height="8" rx="0.8"/><rect x="60" y="8.7" width="8" height="8" rx="0.8"/><rect x="68.7" y="8.7" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="17.5" y="17.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="17.5" width="8" height="8" rx="0.8"/><rect x="35" y="17.5" width="8" height="8" rx="0.8"/><rect x="60" y="17.5" width="8" height="8" rx="0.8"/><rect x="68.7" y="17.5" width="8" height="8" rx="0.8"/><rect x="86.2" y="17.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="26.2" width="8" height="8" rx="0.8"/><rect x="35" y="26.2" width="8" height="8" rx="0.8"/><rect x="43.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="52.5" y="26.2" width="8" height="8" rx="0.8"/><rect x="60" y="26.2" width="8" height="8" rx="0.8"/><rect x="68.7" y="26.2" width="8" height="8" rx="0.8"/><rect x="77.5" y="26.2" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="35" width="8" height="8" rx="0.8"/><rect x="26.2" y="35" width="8" height="8" rx="0.8"/><rect x="35" y="35" width="8" height="8" rx="0.8"/><rect x="43.7" y="35" width="8" height="8" rx="0.8"/><rect x="52.5" y="35" width="8" height="8" rx="0.8"/><rect x="60" y="35" width="8" height="8" rx="0.8"/><rect x="68.7" y="35" width="8" height="8" rx="0.8"/>
+        <rect x="26.2" y="43.7" width="8" height="8" rx="0.8"/><rect x="35" y="43.7" width="8" height="8" rx="0.8"/><rect x="43.7" y="43.7" width="8" height="8" rx="0.8"/><rect x="52.5" y="43.7" width="8" height="8" rx="0.8"/><rect x="60" y="43.7" width="8" height="8" rx="0.8"/>
+        <rect x="17.5" y="52.5" width="8" height="8" rx="0.8"/><rect x="26.2" y="52.5" width="8" height="8" rx="0.8"/><rect x="35" y="52.5" width="8" height="8" rx="0.8"/><rect x="43.7" y="52.5" width="8" height="8" rx="0.8"/><rect x="52.5" y="52.5" width="8" height="8" rx="0.8"/>
+        <rect x="8.7" y="61.2" width="8" height="8" rx="0.8"/><rect x="17.5" y="61.2" width="8" height="8" rx="0.8"/><rect x="26.2" y="61.2" width="8" height="8" rx="0.8"/><rect x="35" y="61.2" width="8" height="8" rx="0.8"/>
+        <rect x="0" y="70" width="8" height="8" rx="0.8"/><rect x="8.7" y="70" width="8" height="8" rx="0.8"/>
+      </g>
+      <rect x="77.5" y="17.5" width="8" height="8" rx="0.8" fill="#2e7d1e"/>
+    </svg>
+    <span class="nav-wordmark">Carrier Pigeon AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="https://carrierpigeonai.dev/#solutions">Solutions</a>
+    <a href="/" aria-current="page">The Lab</a>
+    <a href="https://carrierpigeonai.dev/field-notes">Field Notes</a>
+  </div>
+  <a class="nav-cta" href="https://carrierpigeonai.dev/contact">Send a Pigeon &rarr;</a>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow" id="eyebrow">The Lab</div>
+      <h1>Read the file. <em>Cite the page.</em> Flag the gaps.</h1>
+      <p class="hero-sub" id="sub"></p>
+    </div>
+    <button class="btn-ghost" id="reset">Reset demo</button>
+  </section>
+
+  <div class="banner">Made-up documents. Nothing here is legal, tax or title advice.</div>
+
+  <div id="load-error" class="load-error" role="alert" hidden>
+    <p>The sample documents didn't load. Try again, or call <a href="tel:+13372730139">(337) 273-0139</a>.</p>
+    <button class="btn-ghost" id="retry-load">Try again</button>
+  </div>
+
+  <div class="desk" id="desk" hidden>
+    <section class="panel stack-panel">
+      <div class="label">01 The stack</div>
+      <div class="hd" id="subject"></div>
+      <ul class="stack" id="stack"></ul>
+      <div class="viewer" id="viewer" tabindex="-1">
+        <div class="v-label" id="v-label"></div>
+        <div class="v-text" id="v-text"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="label">02 The draft</div>
+      <div class="hd" id="row-label"></div>
+      <div class="runbar">
+        <button class="submit" id="run">Run the agent</button>
+        <span class="run-state" id="run-state" role="status" aria-live="polite"></span>
+      </div>
+      <div class="saved-note" id="saved-note" hidden></div>
+      <div id="results" hidden>
+        <p class="legend"><b>Quote found</b> means code found those exact words on that page. It doesn't prove the row is right, so a person still reviews it.</p>
+        <div id="rows"></div>
+        <div class="missing">
+          <div class="label">03 What's missing</div>
+          <p class="legend gap-note">These are the agent's leads. Code doesn't check them, so a person does.</p>
+          <ul id="gaps"></ul>
+        </div>
+        <div class="signoff">
+          <div class="who"><div class="label">04 Sign-off</div><span id="reviewer"></span>. <span id="open-count"></span></div>
+          <button class="btn-ghost" id="print" disabled>Print for review</button>
+        </div>
+        <p class="closing">Nothing leaves this page. In a real setup, sending and filing stay with a person.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  const API = 'https://carrier-pigeon-api-gold.vercel.app/api/chat';
+  const PATHS = { '/demos/medical-chronology': 'law', '/demos/mineral-runsheet': 'land', '/demos/tax-missing-items': 'cpa' };
+  const COPY = {
+    law: { title: 'Medical chronology', sub: "A paralegal can spend a day turning a stack of records into a chronology. Here a live AI agent reads 14 made-up pages from an injury file, builds a dated chronology and cites a page for every row. Code checks the quotes. You make the calls." },
+    land: { title: 'Mineral title runsheet', sub: "Running title means reading every conveyance on a tract in order and catching the break in the chain. Here a live AI agent reads a made-up stack for one tract, builds the runsheet and cites a page for every row. Code checks the quotes. You make the calls." },
+    cpa: { title: 'Tax document intake', sub: "Tax season starts with a pile of client documents and a list of what didn't come in. Here a live AI agent reads one made-up household's stack, organizes it and flags what's missing. Code checks the quotes. You make the calls." },
+  };
+  const STATUS = { quote_found: 'Quote found', needs_human: 'Needs a person', failed: 'Failed check' };
+
+  function packFromUrl(path, search) {
+    const clean = path.split('.html')[0];
+    if (PATHS[clean]) return PATHS[clean];
+    const q = new URLSearchParams(search).get('pack');
+    return Object.hasOwn(COPY, q) ? q : 'law';
+  }
+  // Rows nobody has to look at can stay undecided; flagged rows can't.
+  const canPrint = (rows, decisions) => rows.length > 0 && rows.filter(r => r.status !== 'quote_found').every(r => decisions[r.id]);
+  window.__dd = { packFromUrl, canPrint };
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+  const packId = packFromUrl(location.pathname, location.search);
+  const narrow = matchMedia('(max-width: 960px)');
+  let pack = null, rows = [], decisions = {}, running = false;
+
+  $('eyebrow').textContent = 'The Lab / ' + COPY[packId].title;
+  $('sub').textContent = COPY[packId].sub;
+  document.title = COPY[packId].title + ' | Carrier Pigeon AI Demo';
+
+  // On phones the viewer sits among the rows, so put it back before they're cleared.
+  const homeViewer = () => document.querySelector('.stack-panel').append($('viewer'));
+
+  function showPage(n, quote, anchor) {
+    const page = pack.pages.find(p => p.n === n);
+    if (!page) return;
+    const viewer = $('viewer');
+    viewer.className = 'viewer ' + page.kind;
+    $('v-label').textContent = `Page ${page.n}. ${page.label}`;
+    const box = $('v-text');
+    box.textContent = '';
+    // A quote that differs from the page in spacing or punctuation still opens the page, unmarked.
+    const lower = page.text.toLowerCase();
+    const spots = (quote ? quote.split(' ... ') : []).map(q => [lower.indexOf(q.toLowerCase()), q.length]);
+    if (!spots.length || spots.some(([at]) => at < 0)) box.textContent = page.text;
+    else {
+      let from = 0;
+      spots.sort((a, b) => a[0] - b[0]).forEach(([at, len]) => {
+        box.append(page.text.slice(from, at), el('mark', '', page.text.slice(at, at + len)));
+        from = at + len;
+      });
+      box.append(page.text.slice(from));
+    }
+    document.querySelectorAll('#stack button').forEach(b => b.setAttribute('aria-current', String(Number(b.dataset.n) === n)));
+    if (anchor && narrow.matches) { anchor.after(viewer); viewer.scrollIntoView({ block: 'nearest' }); }
+    else homeViewer();
+    if (anchor && !narrow.matches) viewer.scrollIntoView({ block: 'nearest' });
+  }
+
+  function refreshSignoff() {
+    const open = rows.filter(r => r.status !== 'quote_found' && !decisions[r.id]).length;
+    $('open-count').textContent = open ? `${open} flagged ${open === 1 ? 'row' : 'rows'} still open.` : 'No flagged rows open.';
+    $('print').disabled = !canPrint(rows, decisions);
+  }
+
+  function renderRow(r) {
+    const box = el('div', 'd-row');
+    box.id = 'row-' + r.id;
+    const paint = () => {
+      box.textContent = '';
+      box.classList.toggle('is-rejected', decisions[r.id] === 'reject');
+      const top = el('div', 'd-row-top');
+      top.append(el('span', 'status ' + r.status, STATUS[r.status]));
+      if (r.page) {
+        const chip = el('button', 'chip', 'Page ' + r.page);
+        chip.onclick = () => showPage(r.page, r.quote, box);
+        top.append(chip);
+      }
+      box.append(top);
+      const f = el('div', 'fields');
+      pack.columns.forEach(c => {
+        const line = el('div');
+        line.append(el('b', '', c.split('_').join(' ') + ': '), String(r.fields[c] ?? ''));
+        f.append(line);
+      });
+      box.append(f);
+      if (r.why) box.append(el('div', 'why', r.why));
+      if (r.quote) box.append(el('div', 'quote', '"' + r.quote + '"'));
+      const acts = el('div', 'd-row-actions');
+      [['accept', 'Accept'], ['edit', 'Edit'], ['reject', 'Reject']].forEach(([k, label]) => {
+        const b = el('button', '', label);
+        b.setAttribute('aria-pressed', String(decisions[r.id] === k));
+        b.onclick = () => {
+          if (k === 'edit') return editRow();
+          decisions[r.id] = k;
+          paint();
+          refreshSignoff();
+        };
+        acts.append(b);
+      });
+      box.append(acts);
+    };
+    const editRow = () => {
+      box.textContent = '';
+      const inputs = pack.columns.map(c => {
+        const lab = el('label', 'edit-field', c.split('_').join(' '));
+        const inp = el('input');
+        inp.value = r.fields[c] ?? '';
+        lab.append(inp);
+        box.append(lab);
+        return [c, inp];
+      });
+      const acts = el('div', 'd-row-actions');
+      const save = el('button', '', 'Save');
+      save.onclick = () => {
+        inputs.forEach(([c, inp]) => { r.fields[c] = inp.value; });
+        decisions[r.id] = 'edit';
+        paint();
+        refreshSignoff();
+      };
+      const cancel = el('button', '', 'Cancel');
+      cancel.onclick = paint;
+      acts.append(save, cancel);
+      box.append(acts);
+      inputs[0][1].focus();
+    };
+    paint();
+    return box;
+  }
+
+  function renderRun(run) {
+    rows = run.items.map(r => ({ ...r, fields: { ...r.fields } }));
+    decisions = {};
+    homeViewer();
+    $('rows').textContent = '';
+    rows.forEach(r => $('rows').append(renderRow(r)));
+    $('gaps').textContent = '';
+    [...(run.standingFlags || []), ...run.gaps.map(g => g.text + (g.pages.length ? ` (see page ${g.pages.join(', ')})` : ''))]
+      .forEach(t => $('gaps').append(el('li', '', t)));
+    if (!run.gaps.length && !(run.standingFlags || []).length) $('gaps').append(el('li', '', 'The agent listed nothing here. A person still checks.'));
+    $('reviewer').textContent = pack.reviewer;
+    $('results').hidden = false;
+    refreshSignoff();
+  }
+
+  async function run() {
+    if (running) return;
+    if ((Object.keys(decisions).length || document.querySelector('.edit-field')) && !confirm('Run again and clear your sign-off choices?')) return;
+    running = true;
+    $('run').disabled = true;
+    $('reset').disabled = true;
+    // Rows left on screen could be signed off and then wiped when the run lands.
+    $('results').hidden = true;
+    $('saved-note').hidden = true;
+    $('run-state').textContent = `Reading ${pack.pages.length} pages. This takes about 15 seconds.`;
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 32000);
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal, body: JSON.stringify({ mode: 'docread', pack: packId, messages: [] }) });
+      clearTimeout(timer);
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error('no run');
+      renderRun(data);
+      $('run-state').textContent = `Done. ${data.items.length} ${data.items.length === 1 ? 'row' : 'rows'} from ${pack.pages.length} pages.`;
+    } catch {
+      if (pack.savedRun) {
+        $('saved-note').textContent = `Saved run from ${pack.savedAt}. The live agent didn't answer.`;
+        $('saved-note').hidden = false;
+        renderRun(pack.savedRun);
+        $('run-state').textContent = '';
+      } else {
+        $('run-state').textContent = "The agent didn't answer. Try again in a moment.";
+        $('results').hidden = !rows.length;
+      }
+    }
+    running = false;
+    $('run').disabled = false;
+    $('reset').disabled = false;
+  }
+
+  function reset() {
+    rows = [];
+    decisions = {};
+    $('results').hidden = true;
+    $('saved-note').hidden = true;
+    $('run-state').textContent = '';
+    if (pack) showPage(pack.pages[0].n);
+  }
+
+  async function load() {
+    $('load-error').hidden = true;
+    try {
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'docpack', pack: packId, messages: [] }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error('no pack');
+      pack = data.pack;
+    } catch {
+      $('load-error').hidden = false;
+      return;
+    }
+    $('subject').textContent = pack.subject;
+    $('row-label').textContent = pack.rowLabel;
+    $('stack').textContent = '';
+    pack.pages.forEach(p => {
+      const li = el('li');
+      const b = el('button');
+      b.dataset.n = p.n;
+      b.append(el('span', 'n', 'P' + p.n), p.label);
+      b.onclick = () => showPage(p.n);
+      li.append(b);
+      $('stack').append(li);
+    });
+    $('desk').hidden = false;
+    showPage(pack.pages[0].n);
+  }
+
+  $('run').onclick = run;
+  $('reset').onclick = () => { if (!Object.keys(decisions).length || confirm('Clear this run and your sign-off choices?')) reset(); };
+  $('print').onclick = () => window.print();
+  $('retry-load').onclick = load;
+  load();
+})();
+</script>
+</body>
+</html>

@@ -491,13 +491,14 @@
   <button class="filter-btn" data-filter="beauty" aria-pressed="false">Salons &amp; spas</button>
   <button class="filter-btn" data-filter="health" aria-pressed="false">Clinics &amp; health</button>
   <button class="filter-btn" data-filter="retail" aria-pressed="false">Retail shops</button>
+  <button class="filter-btn" data-filter="pro" aria-pressed="false">Law, land &amp; tax</button>
 </div>
 
 <!-- GRID -->
 <main id="card-grid">
   <section class="grid-section" data-section="ai" aria-labelledby="sec-ai">
     <div class="grid-head">
-      <div class="grid-kicker"><span class="status-dot"></span>Live AI agents <span class="grid-count">13</span></div>
+      <div class="grid-kicker"><span class="status-dot"></span>Live AI agents <span class="grid-count">16</span></div>
       <h2 id="sec-ai">Talk to these like a customer would.</h2>
       <p>Each one runs a real AI agent on the other end. Type anything and watch the side panels respond to what it actually does.</p>
     </div>
@@ -804,6 +805,75 @@
     </div>
   </div>
 
+  <!-- LIVE AI: Document Desk, medical chronology -->
+  <div class="card" data-industries="pro">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h7M9 17h7"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Documents</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Medical chronology</div>
+      <p class="card-desc">A live AI agent reads 14 made-up pages from an injury file, builds a dated chronology and cites a page for every row. Code checks the quotes. You sign off.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/medical-chronology">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: Document Desk, mineral runsheet -->
+  <div class="card" data-industries="pro">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h7M9 17h7"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Documents</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Mineral title runsheet</div>
+      <p class="card-desc">A live AI agent reads a made-up stack of conveyances for one tract, builds the runsheet and flags breaks in the chain. Code checks the quotes. You sign off.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/mineral-runsheet">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- LIVE AI: Document Desk, tax intake -->
+  <div class="card" data-industries="pro">
+    <div class="card-thumb">
+      <div class="card-thumb-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h7M9 17h7"/></svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-tag">Documents</span>
+        <span class="card-status status-ai"><span class="status-dot"></span>Live AI</span>
+      </div>
+      <div class="card-title">Tax document intake</div>
+      <p class="card-desc">A live AI agent reads one made-up household's tax documents, organizes them and lists what never came in. Code checks the quotes. You sign off.</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn-demo" href="/demos/tax-missing-items">
+        View demo
+        <svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>
+      </a>
+    </div>
+  </div>
+
     </div>
   </section>
 
@@ -1052,7 +1122,7 @@ function filterCards(filter) {
   });
   document.querySelectorAll('.card').forEach(card => {
     const ind = (card.dataset.industries || '').split(' ');
-    card.style.display = filter === 'all' || ind.includes(filter) || ind.includes('any') ? '' : 'none';
+    card.style.display = filter === 'all' || ind.includes(filter) || (ind.includes('any') && filter !== 'pro') ? '' : 'none';
   });
   // A section whose cards are all filtered out drops its heading too; the counts follow the filter.
   document.querySelectorAll('.grid-section').forEach(sec => {

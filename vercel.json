@@ -81,6 +81,22 @@
       "destination": "/demos/gift-cards.html"
     },
     {
+      "source": "/demos/document-desk",
+      "destination": "/demos/document-desk.html"
+    },
+    {
+      "source": "/demos/medical-chronology",
+      "destination": "/demos/document-desk.html"
+    },
+    {
+      "source": "/demos/mineral-runsheet",
+      "destination": "/demos/document-desk.html"
+    },
+    {
+      "source": "/demos/tax-missing-items",
+      "destination": "/demos/document-desk.html"
+    },
+    {
       "source": "/demos/before-after",
       "destination": "/demos/before-after.html"
     }
